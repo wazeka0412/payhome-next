@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import ContentTable from '@/components/appadmin/ContentTable';
 import DatePicker from '@/components/appadmin/DatePicker';
+import RichTextEditor from '@/components/appadmin/RichTextEditor';
+import EditableSelect from '@/components/appadmin/EditableSelect';
 import { useArticles, articleStore } from '@/lib/content-store';
 import { type ArticleData } from '@/lib/articles-data';
 
@@ -61,10 +63,13 @@ function ArticleForm({ item, onSave, onCancel }: { item: ArticleData | null; onS
     title: item?.title ?? '',
     tag: item?.tag ?? '',
     date: item?.date ?? '',
+    description: item?.description ?? '',
+    body: item?.body ?? '',
   });
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
 
-  const TAGS = ['家づくりの基本', '資金計画', '間取り', '設備', '断熱・省エネ', '土地探し', 'メンテナンス'];
+  const [tags, setTags] = useState(['家づくりの基本', '資金計画', '間取り', '設備', '断熱・省エネ', '土地探し', 'メンテナンス']);
+  const cls = "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E8740C]/30 focus:border-[#E8740C]";
 
   return (
     <div>
@@ -74,22 +79,25 @@ function ArticleForm({ item, onSave, onCancel }: { item: ArticleData | null; onS
       </div>
       <form onSubmit={(e) => { e.preventDefault(); onSave(form); }} className="space-y-6 max-w-3xl">
         <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
+          <h3 className="text-sm font-bold text-[#E8740C] uppercase tracking-wider mb-4">基本情報</h3>
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">ID<span className="text-red-500 ml-0.5">*</span></label>
-            <input type="text" value={form.id} onChange={(e) => set('id', e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E8740C]/30 focus:border-[#E8740C]" required />
+            <input type="text" value={form.id} onChange={(e) => set('id', e.target.value)} className={cls} required />
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">タイトル<span className="text-red-500 ml-0.5">*</span></label>
-            <input type="text" value={form.title} onChange={(e) => set('title', e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E8740C]/30 focus:border-[#E8740C]" required />
+            <input type="text" value={form.title} onChange={(e) => set('title', e.target.value)} className={cls} required />
           </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">タグ</label>
-            <select value={form.tag} onChange={(e) => set('tag', e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
-              <option value="">選択してください</option>
-              {TAGS.map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
-          </div>
+          <EditableSelect label="タグ" value={form.tag} options={tags} onChangeValue={(v) => set('tag', v)} onChangeOptions={setTags} />
           <DatePicker label="日付" value={form.date} onChange={(v) => set('date', v)} format="dot" />
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">概要</label>
+            <textarea value={form.description} onChange={(e) => set('description', e.target.value)} className={cls + " resize-y"} rows={3} placeholder="記事の概要を入力" />
+          </div>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
+          <h3 className="text-sm font-bold text-[#E8740C] uppercase tracking-wider mb-4">本文</h3>
+          <RichTextEditor label="本文" value={form.body} onChange={(v) => set('body', v)} />
         </div>
         <div className="flex gap-3 pt-4">
           <button type="submit" className="bg-[#E8740C] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#d4680b] transition cursor-pointer">{item ? '更新する' : '追加する'}</button>

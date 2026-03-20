@@ -4,6 +4,7 @@ import { useState } from 'react';
 import ContentTable from '@/components/appadmin/ContentTable';
 import ImageUploader from '@/components/appadmin/ImageUploader';
 import DatePicker from '@/components/appadmin/DatePicker';
+import EditableSelect from '@/components/appadmin/EditableSelect';
 import { useEvents, eventStore } from '@/lib/content-store';
 import { type EventData } from '@/lib/events-data';
 
@@ -93,12 +94,7 @@ function EventForm({ item, onSave, onCancel }: { item: EventData | null; onSave:
     } as unknown as Partial<EventData>);
   };
 
-  const TYPE_OPTIONS = [
-    { value: 'completion', label: '完成見学会' },
-    { value: 'model', label: 'モデルハウス' },
-    { value: 'online', label: 'オンライン見学会' },
-    { value: 'special', label: 'ぺいほーむ特別見学会' },
-  ];
+  const [typeLabels, setTypeLabels] = useState(['完成見学会', 'モデルハウス', 'オンライン見学会', 'ぺいほーむ特別見学会']);
 
   return (
     <div>
@@ -111,12 +107,7 @@ function EventForm({ item, onSave, onCancel }: { item: EventData | null; onSave:
           <h3 className="text-sm font-bold text-[#E8740C] uppercase tracking-wider mb-4">基本情報</h3>
           <Field label="ID" value={form.id} onChange={(v) => set('id', v)} required />
           <Field label="タイトル" value={form.title} onChange={(v) => set('title', v)} required />
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">種別</label>
-            <select value={form.type} onChange={(e) => { set('type', e.target.value); set('typeLabel', TYPE_OPTIONS.find(o => o.value === e.target.value)?.label ?? ''); }} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
-              {TYPE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
-          </div>
+          <EditableSelect label="種別" value={form.typeLabel} options={typeLabels} onChangeValue={(v) => { set('typeLabel', v); set('type', v); }} onChangeOptions={setTypeLabels} />
           <Field label="説明文" value={form.description} onChange={(v) => set('description', v)} multiline rows={3} />
           <div className="grid grid-cols-2 gap-4">
             <DatePicker label="開始日" value={form.startDate} onChange={(v) => set('startDate', v)} format="iso" />

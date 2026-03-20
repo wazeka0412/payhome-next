@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 
 interface RichTextEditorProps {
   label: string;
@@ -12,19 +12,32 @@ const BTN = 'px-2 py-1 text-xs rounded hover:bg-gray-200 transition cursor-point
 
 export default function RichTextEditor({ label, value, onChange }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
+  const onChangeRef = useRef(onChange);
+  const initializedRef = useRef(false);
+
+  // Keep onChange ref up to date without causing re-renders
+  onChangeRef.current = onChange;
+
+  // Set initial HTML only once on mount
+  useEffect(() => {
+    if (editorRef.current && !initializedRef.current) {
+      editorRef.current.innerHTML = value;
+      initializedRef.current = true;
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const exec = useCallback((cmd: string, val?: string) => {
     document.execCommand(cmd, false, val);
     if (editorRef.current) {
-      onChange(editorRef.current.innerHTML);
+      onChangeRef.current(editorRef.current.innerHTML);
     }
-  }, [onChange]);
+  }, []);
 
   const handleInput = useCallback(() => {
     if (editorRef.current) {
-      onChange(editorRef.current.innerHTML);
+      onChangeRef.current(editorRef.current.innerHTML);
     }
-  }, [onChange]);
+  }, []);
 
   const insertLink = useCallback(() => {
     const url = prompt('URLを入力してください', 'https://');
@@ -66,7 +79,6 @@ export default function RichTextEditor({ label, value, onChange }: RichTextEdito
             [&_blockquote]:border-l-4 [&_blockquote]:border-[#E8740C]/30 [&_blockquote]:pl-4 [&_blockquote]:text-gray-600
             [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5
             [&_a]:text-[#E8740C] [&_a]:underline"
-          dangerouslySetInnerHTML={{ __html: value }}
           onInput={handleInput}
         />
       </div>
