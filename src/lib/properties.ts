@@ -21,8 +21,19 @@ export interface PropertyData {
   insulation: string
   uaValue: string
   earthquake: string
-  builder: { name: string; location: string; specialty: string }
+  builder: {
+    name: string
+    location: string
+    specialty: string
+    description: string
+    phone: string
+    website: string
+    established: string
+    serviceArea: string
+    features: string[]
+  }
   points: string[]
+  photos: string[]
 }
 
 export const properties: PropertyData[] = [
@@ -49,8 +60,19 @@ export const properties: PropertyData[] = [
     insulation: '等級5',
     uaValue: '0.56',
     earthquake: '等級3',
-    builder: { name: 'ハウスサポート', location: '鹿児島市', specialty: '平屋・ローコスト住宅' },
+    builder: {
+      name: 'ハウスサポート',
+      location: '鹿児島県鹿児島市中央町10-2',
+      specialty: '平屋・ローコスト住宅',
+      description: '鹿児島を拠点に、手の届く価格で高品質な平屋住宅を提供。自然素材とシンプルデザインにこだわり、長く愛される家づくりを追求しています。年間施工実績50棟以上。',
+      phone: '099-123-4567',
+      website: 'https://example.com/house-support',
+      established: '2005年',
+      serviceArea: '鹿児島市・姶良市・霧島市',
+      features: ['平屋専門の設計チーム', '自然素材標準仕様', 'アフターサポート充実', '土地探しからサポート'],
+    },
     points: ['コンパクトながら収納豊富', 'リビングから庭が一望', '家事動線を最短に設計', '自然素材をふんだんに使用', '将来のバリアフリー対応済み'],
+    photos: ['/images/properties/10-photo-1.jpg', '/images/properties/10-photo-2.jpg', '/images/properties/10-photo-3.jpg'],
   },
   {
     id: '11',
@@ -75,8 +97,19 @@ export const properties: PropertyData[] = [
     insulation: '等級6',
     uaValue: '0.46',
     earthquake: '等級3',
-    builder: { name: 'シニアホームズ鹿児島', location: '鹿児島市', specialty: 'バリアフリー住宅' },
+    builder: {
+      name: 'シニアホームズ鹿児島',
+      location: '鹿児島県鹿児島市荒田2-15-8',
+      specialty: 'バリアフリー住宅',
+      description: '高齢者にやさしい住まいづくりのパイオニア。バリアフリー設計とIoT技術を融合させ、老後も安心して暮らせる次世代住宅を提案しています。',
+      phone: '099-234-5678',
+      website: 'https://example.com/senior-homes',
+      established: '2010年',
+      serviceArea: '鹿児島市・日置市・南さつま市',
+      features: ['バリアフリー設計専門', 'IoTスマートホーム対応', '全館空調標準', '介護リフォーム実績多数'],
+    },
     points: ['全室段差ゼロのバリアフリー', '車いす対応の広い廊下', 'IoTによるスマートホーム', 'ヒートショック対策の全館空調', '太陽光+蓄電池で光熱費ゼロ'],
+    photos: ['/images/properties/11-photo-1.jpg', '/images/properties/11-photo-2.jpg', '/images/properties/11-photo-3.jpg'],
   },
   {
     id: '12',
@@ -101,8 +134,19 @@ export const properties: PropertyData[] = [
     insulation: '等級5',
     uaValue: '0.52',
     earthquake: '等級3',
-    builder: { name: 'ナチュラルハウス工房', location: '姶良市', specialty: 'デザイン住宅' },
+    builder: {
+      name: 'ナチュラルハウス工房',
+      location: '鹿児島県姶良市加治木町本町250',
+      specialty: 'デザイン住宅',
+      description: '「暮らしを楽しむ家」をコンセプトに、デザイン性と機能性を両立した注文住宅を提供。自然と調和する外観デザインと、暮らしやすい動線設計が評判です。',
+      phone: '0995-62-1234',
+      website: 'https://example.com/natural-house',
+      established: '2008年',
+      serviceArea: '姶良市・霧島市・鹿児島市',
+      features: ['デザイナーズ住宅', '自然素材×モダンデザイン', '回遊動線設計', 'ウッドデッキ標準'],
+    },
     points: ['回遊動線で家事効率UP', 'リビング天井高3.2mの開放感', 'ウォークインクローゼット2ヶ所', 'パントリー付きキッチン', 'ウッドデッキでアウトドアリビング'],
+    photos: ['/images/properties/12-photo-1.jpg', '/images/properties/12-photo-2.jpg', '/images/properties/12-photo-3.jpg'],
   },
   {
     id: '13',
@@ -127,8 +171,19 @@ export const properties: PropertyData[] = [
     insulation: '等級6',
     uaValue: '0.40',
     earthquake: '等級3',
-    builder: { name: 'アーキテクトデザインラボ', location: '鹿児島市', specialty: '建築家住宅' },
+    builder: {
+      name: 'アーキテクトデザインラボ',
+      location: '鹿児島県鹿児島市城山町1-30',
+      specialty: '建築家住宅',
+      description: '一級建築士が主宰するデザイン事務所。住む人の個性とライフスタイルを丁寧にヒアリングし、唯一無二の空間を設計。数々の建築賞受賞実績あり。',
+      phone: '099-345-6789',
+      website: 'https://example.com/architect-lab',
+      established: '2003年',
+      serviceArea: '鹿児島県全域・宮崎県一部',
+      features: ['一級建築士設計', '建築賞受賞実績', '完全オーダーメイド', '素材へのこだわり'],
+    },
     points: ['一級建築家のオリジナルデザイン', '中庭を囲むコの字型プラン', '全開口サッシで内外一体', 'アイランドキッチンが主役のLDK', '素材にこだわった上質な空間'],
+    photos: ['/images/properties/13-photo-1.jpg', '/images/properties/13-photo-2.jpg', '/images/properties/13-photo-3.jpg'],
   },
   {
     id: '14',
@@ -153,8 +208,19 @@ export const properties: PropertyData[] = [
     insulation: '等級5',
     uaValue: '0.54',
     earthquake: '等級3',
-    builder: { name: 'コスモホーム鹿児島', location: '鹿児島市', specialty: 'ローコスト高性能住宅' },
+    builder: {
+      name: 'コスモホーム鹿児島',
+      location: '鹿児島県鹿児島市紫原5-20-1',
+      specialty: 'ローコスト高性能住宅',
+      description: '「価格の見える家づくり」をモットーに、建築費用をすべて公開。ローコストでありながら断熱等級5以上の高性能住宅を実現する独自の仕入れネットワークが強み。',
+      phone: '099-456-7890',
+      website: 'https://example.com/cosmo-home',
+      established: '2012年',
+      serviceArea: '鹿児島市・日置市・いちき串木野市',
+      features: ['価格全公開の透明性', '高性能×ローコスト', '独自仕入れネットワーク', '若い世代の家づくり応援'],
+    },
     points: ['20坪でも広く感じる設計の工夫', '高性能断熱で光熱費を抑制', '価格を全て公開する透明性', 'コンパクトでも収納は十分', '将来の間取り変更に対応可能'],
+    photos: ['/images/properties/14-photo-1.jpg', '/images/properties/14-photo-2.jpg', '/images/properties/14-photo-3.jpg'],
   },
   {
     id: '15',
@@ -179,8 +245,19 @@ export const properties: PropertyData[] = [
     insulation: '等級5',
     uaValue: '0.50',
     earthquake: '等級3',
-    builder: { name: 'リヴェール住宅工房', location: '鹿児島市', specialty: '女性設計士の家づくり' },
+    builder: {
+      name: 'リヴェール住宅工房',
+      location: '鹿児島県鹿児島市武岡3-8-12',
+      specialty: '女性設計士の家づくり',
+      description: '女性設計士が中心となり、女性目線の暮らしやすさを追求した住宅を設計。キッチン・収納・洗面など水まわりの使い勝手に定評があります。',
+      phone: '099-567-8901',
+      website: 'https://example.com/reveil',
+      established: '2015年',
+      serviceArea: '鹿児島市・姶良市',
+      features: ['女性設計士チーム', '水まわり設計に定評', 'インテリアコーディネート込み', '収納計画のプロ'],
+    },
     points: ['女性設計士による繊細なデザイン', 'パウダールーム付きの広い洗面', 'ウォークスルークローゼット', 'カフェのようなキッチン空間', 'プライバシーに配慮した窓計画'],
+    photos: ['/images/properties/15-photo-1.jpg', '/images/properties/15-photo-2.jpg', '/images/properties/15-photo-3.jpg'],
   },
   {
     id: '16',
@@ -205,8 +282,19 @@ export const properties: PropertyData[] = [
     insulation: '等級6',
     uaValue: '0.43',
     earthquake: '等級3',
-    builder: { name: 'グランドホーム鹿児島', location: '鹿児島市', specialty: '大空間平屋' },
+    builder: {
+      name: 'グランドホーム鹿児島',
+      location: '鹿児島県鹿児島市与次郎1-5-3',
+      specialty: '大空間平屋',
+      description: '「平屋の常識を変える」をテーマに、圧倒的なスケール感の平屋住宅を提案。大空間リビングやビルトインガレージなど、贅沢な暮らしを実現します。',
+      phone: '099-678-9012',
+      website: 'https://example.com/grand-home',
+      established: '2000年',
+      serviceArea: '鹿児島市・指宿市・南九州市',
+      features: ['大空間設計', 'ビルトインガレージ対応', 'ホテルライク内装', '高級住宅実績多数'],
+    },
     points: ['42坪の大空間LDK', '天井高4mの吹き抜け風リビング', 'ビルトインガレージ付き', '全室南向きの贅沢な間取り', 'ホテルライクなマスターベッドルーム'],
+    photos: ['/images/properties/16-photo-1.jpg', '/images/properties/16-photo-2.jpg', '/images/properties/16-photo-3.jpg'],
   },
   {
     id: '17',
@@ -231,8 +319,19 @@ export const properties: PropertyData[] = [
     insulation: '等級5',
     uaValue: '0.52',
     earthquake: '等級3',
-    builder: { name: 'みらい住建', location: '霧島市', specialty: '注文住宅・平屋' },
+    builder: {
+      name: 'みらい住建',
+      location: '鹿児島県霧島市国分中央3-12-7',
+      specialty: '注文住宅・平屋',
+      description: '霧島エリアを中心に、時代のトレンドを取り入れた注文住宅を提供。回遊動線やランドリールームなど、令和の暮らしに合った間取り提案が得意です。',
+      phone: '0995-45-1234',
+      website: 'https://example.com/mirai-juken',
+      established: '2011年',
+      serviceArea: '霧島市・姶良市・伊佐市',
+      features: ['トレンド間取り提案', '回遊動線設計', '子育て世代応援', '地元密着型'],
+    },
     points: ['令和の定番「回遊動線」を採用', 'ランドリールーム完備', 'リビング横の畳コーナー', 'ファミリークローゼット', 'スタディコーナー付き'],
+    photos: ['/images/properties/17-photo-1.jpg', '/images/properties/17-photo-2.jpg', '/images/properties/17-photo-3.jpg'],
   },
   {
     id: '18',
@@ -257,8 +356,19 @@ export const properties: PropertyData[] = [
     insulation: '等級6',
     uaValue: '0.38',
     earthquake: '等級3',
-    builder: { name: '谷川建設', location: '長崎市', specialty: '木造住宅' },
+    builder: {
+      name: '谷川建設',
+      location: '長崎県長崎市松山町3-50',
+      specialty: '木造住宅',
+      description: '創業50年以上の老舗工務店。国産ひのきを使った木造住宅にこだわり、九州各地で高品質な住宅を提供。大規模な平屋から二世帯住宅まで幅広く対応。',
+      phone: '095-123-4567',
+      website: 'https://example.com/tanigawa',
+      established: '1972年',
+      serviceArea: '長崎県・佐賀県・福岡県',
+      features: ['創業50年超の実績', '国産ひのき使用', '大規模住宅対応', '九州全域施工可能'],
+    },
     points: ['平屋とは思えない圧倒的スケール', 'インナーガレージ2台分', '書斎+ワークスペース完備', 'プライベートテラス付き主寝室', '全館空調で年中快適'],
+    photos: ['/images/properties/18-photo-1.jpg', '/images/properties/18-photo-2.jpg', '/images/properties/18-photo-3.jpg'],
   },
   {
     id: '19',
@@ -283,8 +393,19 @@ export const properties: PropertyData[] = [
     insulation: '等級5',
     uaValue: '0.54',
     earthquake: '等級3',
-    builder: { name: 'ベガハウス', location: '鹿児島市', specialty: 'デザイン住宅' },
+    builder: {
+      name: 'ベガハウス',
+      location: '鹿児島県鹿児島市上之園町24-1',
+      specialty: 'デザイン住宅',
+      description: '「暮らしに物語を」がモットー。自然素材とクラフト感あふれるデザインで、住む人の個性を引き出す住宅を提案。インテリアコーディネートまで一貫対応。',
+      phone: '099-789-0123',
+      website: 'https://example.com/vega-house',
+      established: '2007年',
+      serviceArea: '鹿児島市・姶良市・日置市',
+      features: ['デザイン×自然素材', 'インテリアコーディネート一貫', 'オリジナル造作家具', 'SNS映えする空間設計'],
+    },
     points: ['ボーホーインテリアの統一感', 'アーチ壁がアクセント', '無垢材フローリングの温もり', 'オープン棚のおしゃれ収納', '土間玄関からつながるシューズクローク'],
+    photos: ['/images/properties/19-photo-1.jpg', '/images/properties/19-photo-2.jpg', '/images/properties/19-photo-3.jpg'],
   },
   {
     id: '20',
@@ -309,8 +430,19 @@ export const properties: PropertyData[] = [
     insulation: '等級4',
     uaValue: '0.60',
     earthquake: '等級3',
-    builder: { name: '丸和建設', location: '霧島市', specialty: '注文住宅・平屋' },
+    builder: {
+      name: '丸和建設',
+      location: '鹿児島県霧島市隼人町見次1229',
+      specialty: '注文住宅・平屋',
+      description: '霧島エリアで40年以上の実績を持つ地元密着型工務店。シンプルで飽きのこないデザインと、コストパフォーマンスの高い家づくりが特徴です。',
+      phone: '0995-42-5678',
+      website: 'https://example.com/maruwa',
+      established: '1983年',
+      serviceArea: '霧島市・姶良市・曽於市',
+      features: ['地元密着40年', 'コスパ重視の家づくり', 'シンプルデザイン', '若い世代の実績多数'],
+    },
     points: ['22坪のコンパクトでも十分な広さ', 'シンプルな外観デザイン', 'LDK16帖の開放感', '造作洗面台がおしゃれ', 'ローコストでも妥協しない品質'],
+    photos: ['/images/properties/20-photo-1.jpg', '/images/properties/20-photo-2.jpg', '/images/properties/20-photo-3.jpg'],
   },
 ]
 

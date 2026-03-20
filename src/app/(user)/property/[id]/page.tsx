@@ -1,7 +1,9 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import PropertySummary from '@/components/property/PropertySummary';
 import { LINE_URL } from '@/lib/constants';
 import { getPropertyById, properties } from '@/lib/properties';
+import { events, EVENT_TYPE_STYLES, formatPeriod } from '@/lib/events-data';
 
 export function generateStaticParams() {
   return properties.map(p => ({ id: p.id }))
@@ -42,6 +44,9 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
     bathroom: `${property.bath.maker} / ${property.bath.size}サイズ`,
     toilet: `${property.toilet.maker} / ${property.toilet.series}`,
   };
+
+  // Find events matching this builder
+  const builderEvents = events.filter(e => e.builder === property.builder.name);
 
   return (
     <>
@@ -100,6 +105,29 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
             </div>
           </div>
 
+          {/* Photos */}
+          <div className="mb-8">
+            <h2 className="text-lg font-bold text-[#3D2200] mb-4">写真ギャラリー</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {property.photos.map((photo, i) => (
+                <div key={i} className="relative aspect-[4/3] bg-gray-100 rounded-xl overflow-hidden">
+                  <Image
+                    src={photo}
+                    alt={`${property.title} 写真${i + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center text-gray-300 pointer-events-none">
+                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3l-2-2H10L8 7H5a2 2 0 00-2 2z" />
+                      <circle cx="12" cy="13" r="3" strokeWidth={1} />
+                    </svg>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Points */}
           <div className="mb-8">
             <h2 className="text-lg font-bold text-[#3D2200] mb-4">この家のポイント</h2>
@@ -140,34 +168,129 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
             </div>
           </div>
 
-          {/* Builder Info */}
+          {/* Builder Info (Enhanced) */}
           <div className="mb-8">
             <h2 className="text-lg font-bold text-[#3D2200] mb-4">今回紹介した工務店はこちら</h2>
             <div className="bg-[#FFF8F0] rounded-2xl p-6">
-              <div className="flex gap-5 flex-wrap">
+              <div className="flex gap-5 flex-wrap mb-4">
                 <div className="w-20 h-20 bg-[#E8740C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
                   <span className="text-xs text-gray-400">Logo</span>
                 </div>
                 <div className="flex-1 min-w-[200px]">
-                  <h3 className="text-base font-bold text-[#3D2200] mb-3">{property.builder.name}</h3>
-                  <div className="bg-white rounded-xl overflow-hidden mb-3">
-                    <table className="w-full">
-                      <tbody>
-                        {[
-                          { label: '所在地', value: property.builder.location },
-                          { label: '得意分野', value: property.builder.specialty },
-                        ].map((row) => (
-                          <tr key={row.label} className="border-b border-gray-50 last:border-0">
-                            <th className="text-left text-xs text-gray-500 font-medium py-2 px-3 w-24">{row.label}</th>
-                            <td className="text-sm text-gray-800 py-2 px-3">{row.value}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                  <h3 className="text-lg font-bold text-[#3D2200] mb-1">{property.builder.name}</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed mb-3">{property.builder.description}</p>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {property.builder.features.map((f) => (
+                      <span key={f} className="text-[0.7rem] font-semibold text-[#E8740C] bg-white border border-[#E8740C]/20 px-2.5 py-1 rounded-full">
+                        {f}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>
+
+              <div className="bg-white rounded-xl overflow-hidden">
+                <table className="w-full">
+                  <tbody>
+                    {[
+                      { label: '所在地', value: property.builder.location },
+                      { label: '得意分野', value: property.builder.specialty },
+                      { label: '創業', value: property.builder.established },
+                      { label: '対応エリア', value: property.builder.serviceArea },
+                      { label: '電話番号', value: property.builder.phone },
+                      { label: 'ウェブサイト', value: property.builder.website },
+                    ].map((row) => (
+                      <tr key={row.label} className="border-b border-gray-50 last:border-0">
+                        <th className="text-left text-xs text-gray-500 font-medium py-2.5 px-4 w-28 bg-gray-50/50">{row.label}</th>
+                        <td className="text-sm text-gray-800 py-2.5 px-4">
+                          {row.label === 'ウェブサイト' ? (
+                            <span className="text-[#E8740C] text-sm">{row.value}</span>
+                          ) : (
+                            row.value
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
+          </div>
+
+          {/* Builder Events */}
+          <div className="mb-8">
+            <h2 className="text-lg font-bold text-[#3D2200] mb-4">
+              この工務店の見学会・イベント情報はこちら
+            </h2>
+            {builderEvents.length > 0 ? (
+              <div className="grid sm:grid-cols-2 gap-4">
+                {builderEvents.map((event) => {
+                  const style = EVENT_TYPE_STYLES[event.type];
+                  return (
+                    <Link
+                      key={event.id}
+                      href={`/event/${event.id}`}
+                      className="group bg-white rounded-2xl border-2 border-gray-100 overflow-hidden hover:border-[#E8740C] hover:shadow-lg transition-all"
+                    >
+                      <div className="relative aspect-[16/9] bg-gray-100 overflow-hidden">
+                        <Image
+                          src={event.images[0]}
+                          alt={event.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center text-gray-300 pointer-events-none">
+                          <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3l-2-2H10L8 7H5a2 2 0 00-2 2z" />
+                            <circle cx="12" cy="13" r="3" strokeWidth={1} />
+                          </svg>
+                        </div>
+                        <span className={`absolute top-3 left-3 text-xs font-bold px-3 py-1 rounded-full ${style.bg} ${style.text} backdrop-blur-sm`}>
+                          {event.typeLabel}
+                        </span>
+                      </div>
+                      <div className="p-4">
+                        <h3 className="text-sm font-bold text-[#3D2200] leading-snug mb-2 group-hover:text-[#E8740C] transition-colors">
+                          {event.title}
+                        </h3>
+                        <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+                          <svg className="w-4 h-4 text-[#E8740C] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <rect x="3" y="4" width="18" height="18" rx="2" strokeWidth={1.5} />
+                            <path strokeWidth={1.5} d="M16 2v4M8 2v4M3 10h18" />
+                          </svg>
+                          <span className="font-semibold text-[#3D2200]">
+                            {formatPeriod(event.startDate, event.endDate)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                          <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          <span>{event.location}</span>
+                        </div>
+                        <div className="mt-3 pt-2 border-t border-gray-100 flex items-center justify-end">
+                          <span className="text-xs font-bold text-[#E8740C] group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                            詳細を見る
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="bg-gray-50 rounded-xl py-10 text-center">
+                <svg className="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <rect x="3" y="4" width="18" height="18" rx="2" strokeWidth={1.5} />
+                  <path strokeWidth={1.5} d="M16 2v4M8 2v4M3 10h18" />
+                </svg>
+                <p className="text-sm text-gray-400">見学会・イベントの開催予定はありません。</p>
+              </div>
+            )}
           </div>
 
           {/* CTA */}
