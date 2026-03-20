@@ -5,8 +5,8 @@ import { getToken } from 'next-auth/jwt'
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // /admin/* は admin ロールのみ
-  if (pathname.startsWith('/admin')) {
+  // /admin/*, /appadmin/* は admin ロールのみ
+  if (pathname.startsWith('/admin') || pathname.startsWith('/appadmin')) {
     const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
     if (!token) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
@@ -37,5 +37,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/dashboard/builder/:path*', '/dashboard/user/:path*'],
+  matcher: ['/admin/:path*', '/appadmin/:path*', '/dashboard/builder/:path*', '/dashboard/user/:path*'],
 }
