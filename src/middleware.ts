@@ -17,28 +17,25 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Phase 1: /dashboard/builder/* と /dashboard/user/* は一時的に無効化
-  // ローンチ時はログイン障壁を排除し、CV率を最大化する
-  // 認証コードは温存し、リード数が増えてから段階的に開放する
-  //
-  // Phase 2 で以下を有効化:
-  // if (pathname.startsWith('/dashboard/builder')) {
-  //   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
-  //   if (!token) return NextResponse.redirect(new URL('/dashboard', request.url))
-  //   if (token.role !== 'builder' && token.role !== 'admin')
-  //     return NextResponse.redirect(new URL('/dashboard/user', request.url))
-  //   return NextResponse.next()
-  // }
-  //
-  // if (pathname.startsWith('/dashboard/user')) {
-  //   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
-  //   if (!token) return NextResponse.redirect(new URL('/dashboard', request.url))
-  //   return NextResponse.next()
-  // }
+  // Phase 1: /dashboard/builder/* と /dashboard/user/* は admin のみアクセス可能
+  // ローンチ時はユーザー・工務店にはログインを求めず、リードはメール通知で届ける
+  // Phase 2 でロール別アクセス制御に切り替え:
+  //   builder/* → builder or admin
+  //   user/*    → any authenticated user
+  if (pathname.startsWith('/dashboard/builder') || pathname.startsWith('/dashboard/user')) {
+    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
+    if (!token) {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+    if (token.role !== 'admin') {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+    return NextResponse.next()
+  }
 
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin/:path*', '/dashboard/builder/:path*', '/dashboard/user/:path*'],
 }
