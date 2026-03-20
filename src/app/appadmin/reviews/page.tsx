@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import ContentTable from '@/components/appadmin/ContentTable';
+import RichTextEditor from '@/components/appadmin/RichTextEditor';
 import { useReviews, reviewStore } from '@/lib/content-store';
 import { type Review } from '@/lib/reviews-data';
 
@@ -101,7 +102,7 @@ function ReviewForm({ item, onSave, onCancel }: { item: Review | null; onSave: (
         <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
           <h3 className="text-sm font-bold text-[#E8740C] uppercase tracking-wider mb-4">コンテンツ</h3>
           <Field label="一言コメント" value={form.text} onChange={(v) => set('text', v)} multiline rows={2} />
-          <Field label="本文（HTML）" value={form.body} onChange={(v) => set('body', v)} multiline rows={8} />
+          <RichTextEditor label="本文" value={form.body} onChange={(v) => set('body', v)} />
         </div>
         <div className="flex gap-3 pt-4">
           <button type="submit" className="bg-[#E8740C] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#d4680b] transition cursor-pointer">{item ? '更新する' : '追加する'}</button>

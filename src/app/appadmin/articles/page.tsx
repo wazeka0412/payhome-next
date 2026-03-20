@@ -4,8 +4,8 @@ import { useState } from 'react';
 import ContentTable from '@/components/appadmin/ContentTable';
 import DatePicker from '@/components/appadmin/DatePicker';
 import RichTextEditor from '@/components/appadmin/RichTextEditor';
-import EditableSelect from '@/components/appadmin/EditableSelect';
 import { useArticles, articleStore } from '@/lib/content-store';
+import { useSettings } from '@/lib/settings-store';
 import { type ArticleData } from '@/lib/articles-data';
 
 type EditMode = 'list' | 'add' | 'edit';
@@ -68,7 +68,7 @@ function ArticleForm({ item, onSave, onCancel }: { item: ArticleData | null; onS
   });
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
 
-  const [tags, setTags] = useState(['家づくりの基本', '資金計画', '間取り', '設備', '断熱・省エネ', '土地探し', 'メンテナンス']);
+  const settings = useSettings();
   const cls = "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E8740C]/30 focus:border-[#E8740C]";
 
   return (
@@ -88,7 +88,13 @@ function ArticleForm({ item, onSave, onCancel }: { item: ArticleData | null; onS
             <label className="block text-xs font-medium text-gray-500 mb-1">タイトル<span className="text-red-500 ml-0.5">*</span></label>
             <input type="text" value={form.title} onChange={(e) => set('title', e.target.value)} className={cls} required />
           </div>
-          <EditableSelect label="タグ" value={form.tag} options={tags} onChangeValue={(v) => set('tag', v)} onChangeOptions={setTags} />
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">タグ</label>
+            <select value={form.tag} onChange={(e) => set('tag', e.target.value)} className={cls}>
+              <option value="">選択してください</option>
+              {settings.articleTags.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </div>
           <DatePicker label="日付" value={form.date} onChange={(v) => set('date', v)} format="dot" />
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">概要</label>

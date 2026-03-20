@@ -4,8 +4,8 @@ import { useState } from 'react';
 import ContentTable from '@/components/appadmin/ContentTable';
 import DatePicker from '@/components/appadmin/DatePicker';
 import RichTextEditor from '@/components/appadmin/RichTextEditor';
-import EditableSelect from '@/components/appadmin/EditableSelect';
 import { useNews, newsStore } from '@/lib/content-store';
+import { useSettings } from '@/lib/settings-store';
 import { type NewsItem } from '@/lib/news-data';
 
 type EditMode = 'list' | 'add' | 'edit';
@@ -75,7 +75,7 @@ function NewsForm({ item, onSave, onCancel }: { item: NewsItem | null; onSave: (
   });
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
 
-  const [categories, setCategories] = useState(['お知らせ', '業界ニュース', 'コラム']);
+  const settings = useSettings();
 
   return (
     <div>
@@ -90,7 +90,12 @@ function NewsForm({ item, onSave, onCancel }: { item: NewsItem | null; onSave: (
           <Field label="タイトル" value={form.title} onChange={(v) => set('title', v)} required />
           <div className="grid grid-cols-2 gap-4">
             <DatePicker label="日付" value={form.date} onChange={(v) => set('date', v)} format="dot" />
-            <EditableSelect label="カテゴリー" value={form.category} options={categories} onChangeValue={(v) => set('category', v)} onChangeOptions={setCategories} />
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">カテゴリー</label>
+              <select value={form.category} onChange={(e) => set('category', e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                {settings.newsCategories.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
           </div>
           <Field label="概要" value={form.description} onChange={(v) => set('description', v)} multiline rows={3} />
         </div>

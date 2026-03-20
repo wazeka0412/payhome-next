@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import ContentTable from '@/components/appadmin/ContentTable';
 import DatePicker from '@/components/appadmin/DatePicker';
-import EditableSelect from '@/components/appadmin/EditableSelect';
 import RichTextEditor from '@/components/appadmin/RichTextEditor';
 import { useInterviews, interviewStore } from '@/lib/content-store';
+import { useSettings } from '@/lib/settings-store';
 import { type Interview, type InterviewBodyItem } from '@/lib/interviews';
 
 type EditMode = 'list' | 'add' | 'edit';
@@ -112,7 +112,7 @@ function InterviewForm({ item, onSave, onCancel }: { item: Interview | null; onS
   });
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
 
-  const [categories, setCategories] = useState(['工務店取材', 'ハウスメーカー取材', '施主インタビュー', 'トレンドレポート']);
+  const settings = useSettings();
 
   return (
     <div>
@@ -126,7 +126,12 @@ function InterviewForm({ item, onSave, onCancel }: { item: Interview | null; onS
           <Field label="ID" value={form.id} onChange={(v) => set('id', v)} required />
           <Field label="タイトル" value={form.title} onChange={(v) => set('title', v)} required />
           <DatePicker label="日付" value={form.date} onChange={(v) => set('date', v)} format="iso" />
-          <EditableSelect label="カテゴリー" value={form.category} options={categories} onChangeValue={(v) => set('category', v)} onChangeOptions={setCategories} />
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">カテゴリー</label>
+            <select value={form.category} onChange={(e) => set('category', e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+              {settings.interviewCategories.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
           <Field label="会社名" value={form.company} onChange={(v) => set('company', v)} />
           <Field label="所在地" value={form.location} onChange={(v) => set('location', v)} />
           <Field label="概要" value={form.excerpt} onChange={(v) => set('excerpt', v)} multiline rows={3} />

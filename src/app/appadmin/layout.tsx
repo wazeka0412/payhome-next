@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { href: '/appadmin/articles', icon: '📝', label: 'お役立ち記事' },
   { href: '/appadmin/news', icon: '📢', label: 'ニュース' },
   { href: '/appadmin/magazine', icon: '📖', label: '月刊ぺいほーむ' },
+  { href: '/appadmin/settings', icon: '⚙️', label: 'システム設定' },
 ];
 
 export default function AppAdminLayout({ children }: { children: React.ReactNode }) {
