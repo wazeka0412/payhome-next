@@ -34,6 +34,11 @@ export interface PropertyData {
   }
   points: string[]
   photos: string[]
+  designerMemo: {
+    name: string
+    role: string
+    comment: string
+  }
 }
 
 export const properties: PropertyData[] = [
@@ -73,6 +78,11 @@ export const properties: PropertyData[] = [
     },
     points: ['コンパクトながら収納豊富', 'リビングから庭が一望', '家事動線を最短に設計', '自然素材をふんだんに使用', '将来のバリアフリー対応済み'],
     photos: ['/images/properties/10-photo-1.jpg', '/images/properties/10-photo-2.jpg', '/images/properties/10-photo-3.jpg'],
+    designerMemo: {
+      name: '田中 真一',
+      role: '設計担当',
+      comment: '施主様の「小さくてもかわいい家がいい」というご要望を大切に、25坪ながらも開放感のある空間を目指しました。リビングから中庭が見える窓の配置がこだわりポイントです。自然素材の温かみを活かしつつ、将来のバリアフリー対応も見据えた設計にしています。',
+    },
   },
   {
     id: '11',
@@ -110,6 +120,11 @@ export const properties: PropertyData[] = [
     },
     points: ['全室段差ゼロのバリアフリー', '車いす対応の広い廊下', 'IoTによるスマートホーム', 'ヒートショック対策の全館空調', '太陽光+蓄電池で光熱費ゼロ'],
     photos: ['/images/properties/11-photo-1.jpg', '/images/properties/11-photo-2.jpg', '/images/properties/11-photo-3.jpg'],
+    designerMemo: {
+      name: '佐藤 恵子',
+      role: '設計主任',
+      comment: '「老後も安心して暮らしたい」というご夫婦のご要望に応え、全室段差ゼロ・車いす対応の廊下幅を確保しました。IoTスマートホームシステムにより、照明やエアコンを音声で操作できます。全館空調でヒートショックの心配もありません。',
+    },
   },
   {
     id: '12',
@@ -147,6 +162,11 @@ export const properties: PropertyData[] = [
     },
     points: ['回遊動線で家事効率UP', 'リビング天井高3.2mの開放感', 'ウォークインクローゼット2ヶ所', 'パントリー付きキッチン', 'ウッドデッキでアウトドアリビング'],
     photos: ['/images/properties/12-photo-1.jpg', '/images/properties/12-photo-2.jpg', '/images/properties/12-photo-3.jpg'],
+    designerMemo: {
+      name: '山下 健太',
+      role: 'チーフデザイナー',
+      comment: 'デザインの完成度にこだわりました。天井高3.2mのリビングは、実際の面積以上の開放感を生み出します。回遊動線により家事の効率が大幅にアップ。ウッドデッキを「もうひとつのリビング」として活用できるよう、室内との段差をなくしています。',
+    },
   },
   {
     id: '13',
@@ -184,6 +204,11 @@ export const properties: PropertyData[] = [
     },
     points: ['一級建築家のオリジナルデザイン', '中庭を囲むコの字型プラン', '全開口サッシで内外一体', 'アイランドキッチンが主役のLDK', '素材にこだわった上質な空間'],
     photos: ['/images/properties/13-photo-1.jpg', '/images/properties/13-photo-2.jpg', '/images/properties/13-photo-3.jpg'],
+    designerMemo: {
+      name: '黒田 誠',
+      role: '一級建築士',
+      comment: '中庭を囲むコの字型プランは、プライバシーを確保しながら自然光をたっぷり取り込む設計です。全開口サッシにより、内と外がシームレスにつながります。素材はすべて自分の目で厳選し、時間が経つほど味わいが増す空間を目指しました。',
+    },
   },
   {
     id: '14',
@@ -221,6 +246,11 @@ export const properties: PropertyData[] = [
     },
     points: ['20坪でも広く感じる設計の工夫', '高性能断熱で光熱費を抑制', '価格を全て公開する透明性', 'コンパクトでも収納は十分', '将来の間取り変更に対応可能'],
     photos: ['/images/properties/14-photo-1.jpg', '/images/properties/14-photo-2.jpg', '/images/properties/14-photo-3.jpg'],
+    designerMemo: {
+      name: '中村 大輔',
+      role: '設計担当',
+      comment: '20坪という限られた面積でも、視線の抜けと天井高の工夫で広く感じる空間を作りました。コストを抑えながらも断熱性能は妥協せず、等級5を確保。将来の家族構成の変化にも対応できる可変間取りを採用しています。',
+    },
   },
   {
     id: '15',
@@ -258,6 +288,11 @@ export const properties: PropertyData[] = [
     },
     points: ['女性設計士による繊細なデザイン', 'パウダールーム付きの広い洗面', 'ウォークスルークローゼット', 'カフェのようなキッチン空間', 'プライバシーに配慮した窓計画'],
     photos: ['/images/properties/15-photo-1.jpg', '/images/properties/15-photo-2.jpg', '/images/properties/15-photo-3.jpg'],
+    designerMemo: {
+      name: '松本 彩花',
+      role: '女性設計士',
+      comment: '女性ならではの視点で、毎日の暮らしが楽しくなる家を設計しました。パウダールーム付きの洗面やウォークスルークローゼットなど、身支度の動線にもこだわっています。キッチンはカフェのようなオープンスタイルで、料理の時間が楽しくなります。',
+    },
   },
   {
     id: '16',
@@ -295,6 +330,11 @@ export const properties: PropertyData[] = [
     },
     points: ['42坪の大空間LDK', '天井高4mの吹き抜け風リビング', 'ビルトインガレージ付き', '全室南向きの贅沢な間取り', 'ホテルライクなマスターベッドルーム'],
     photos: ['/images/properties/16-photo-1.jpg', '/images/properties/16-photo-2.jpg', '/images/properties/16-photo-3.jpg'],
+    designerMemo: {
+      name: '高橋 龍太郎',
+      role: '設計部長',
+      comment: '「平屋の常識を覆す」をコンセプトに、42坪の大空間を実現しました。天井高4mのリビングは、まるでホテルのロビーのような圧倒的な開放感。ビルトインガレージは雨の日の買い物にも便利で、実用性とデザインを両立させています。',
+    },
   },
   {
     id: '17',
@@ -332,6 +372,11 @@ export const properties: PropertyData[] = [
     },
     points: ['令和の定番「回遊動線」を採用', 'ランドリールーム完備', 'リビング横の畳コーナー', 'ファミリークローゼット', 'スタディコーナー付き'],
     photos: ['/images/properties/17-photo-1.jpg', '/images/properties/17-photo-2.jpg', '/images/properties/17-photo-3.jpg'],
+    designerMemo: {
+      name: '井上 翔太',
+      role: '設計担当',
+      comment: '令和の子育て世代に人気の間取りを詰め込みました。回遊動線で家事のストレスを軽減し、ランドリールームで洗濯動線を完結。リビング横の畳コーナーはお子様の遊び場にも昼寝スペースにもなる万能空間です。',
+    },
   },
   {
     id: '18',
@@ -369,6 +414,11 @@ export const properties: PropertyData[] = [
     },
     points: ['平屋とは思えない圧倒的スケール', 'インナーガレージ2台分', '書斎+ワークスペース完備', 'プライベートテラス付き主寝室', '全館空調で年中快適'],
     photos: ['/images/properties/18-photo-1.jpg', '/images/properties/18-photo-2.jpg', '/images/properties/18-photo-3.jpg'],
+    designerMemo: {
+      name: '渡辺 裕介',
+      role: '設計主任',
+      comment: '国産ひのきの構造材で実現した大スパンの空間が最大の見どころです。インナーガレージ2台分を確保しながら、居住スペースも妥協なし。書斎とワークスペースは在宅勤務にも対応し、プライベートテラス付きの主寝室はまさに大人の隠れ家です。',
+    },
   },
   {
     id: '19',
@@ -406,6 +456,11 @@ export const properties: PropertyData[] = [
     },
     points: ['ボーホーインテリアの統一感', 'アーチ壁がアクセント', '無垢材フローリングの温もり', 'オープン棚のおしゃれ収納', '土間玄関からつながるシューズクローク'],
     photos: ['/images/properties/19-photo-1.jpg', '/images/properties/19-photo-2.jpg', '/images/properties/19-photo-3.jpg'],
+    designerMemo: {
+      name: '川口 美咲',
+      role: 'インテリアデザイナー',
+      comment: 'ボーホーインテリアの世界観を統一するため、素材選びから照明計画まで一貫してコーディネートしました。アーチ壁は空間にやわらかさを、無垢材フローリングは足触りの心地よさを演出。オープン棚は「見せる収納」で暮らしそのものがインテリアになります。',
+    },
   },
   {
     id: '20',
@@ -443,6 +498,11 @@ export const properties: PropertyData[] = [
     },
     points: ['22坪のコンパクトでも十分な広さ', 'シンプルな外観デザイン', 'LDK16帖の開放感', '造作洗面台がおしゃれ', 'ローコストでも妥協しない品質'],
     photos: ['/images/properties/20-photo-1.jpg', '/images/properties/20-photo-2.jpg', '/images/properties/20-photo-3.jpg'],
+    designerMemo: {
+      name: '木村 拓也',
+      role: '設計担当',
+      comment: 'シンプルでありながら飽きのこないデザインを心がけました。22坪でもLDK16帖の開放感を確保し、造作洗面台でオリジナリティをプラス。コストを抑えながらも品質に妥協しない、若いご夫婦にぴったりの住まいに仕上がりました。',
+    },
   },
 ]
 

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import PropertySummary from '@/components/property/PropertySummary';
+import PhotoSlideshow from '@/components/property/PhotoSlideshow';
 import { LINE_URL } from '@/lib/constants';
 import { getPropertyById, properties } from '@/lib/properties';
 import { events, EVENT_TYPE_STYLES, formatPeriod } from '@/lib/events-data';
@@ -105,27 +106,10 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
             </div>
           </div>
 
-          {/* Photos */}
+          {/* Photos Slideshow */}
           <div className="mb-8">
             <h2 className="text-lg font-bold text-[#3D2200] mb-4">写真ギャラリー</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {property.photos.map((photo, i) => (
-                <div key={i} className="relative aspect-[4/3] bg-gray-100 rounded-xl overflow-hidden">
-                  <Image
-                    src={photo}
-                    alt={`${property.title} 写真${i + 1}`}
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center text-gray-300 pointer-events-none">
-                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3l-2-2H10L8 7H5a2 2 0 00-2 2z" />
-                      <circle cx="12" cy="13" r="3" strokeWidth={1} />
-                    </svg>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <PhotoSlideshow photos={property.photos} title={property.title} />
           </div>
 
           {/* Points */}
@@ -143,6 +127,34 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                 </li>
               ))}
             </ul>
+          </div>
+
+          {/* Designer Memo */}
+          <div className="mb-8">
+            <h2 className="text-lg font-bold text-[#3D2200] mb-4">担当者メモ</h2>
+            <div className="bg-[#FFF8F0] rounded-2xl p-6 relative">
+              <div className="absolute top-4 right-4 text-[#E8740C]/15">
+                <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+                </svg>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-[#E8740C]/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg className="w-6 h-6 text-[#E8740C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-sm font-bold text-[#3D2200]">{property.designerMemo.name}</span>
+                    <span className="text-[0.65rem] text-[#E8740C] bg-[#E8740C]/10 px-2 py-0.5 rounded-full font-semibold">
+                      {property.designerMemo.role}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-700 leading-relaxed">{property.designerMemo.comment}</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Performance Table */}
