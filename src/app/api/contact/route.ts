@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { store } from '@/lib/store'
 
+const FORM_META_DELIMITER = '\n---FORM_META---\n'
+
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json()
@@ -8,15 +10,20 @@ export async function POST(req: NextRequest) {
     const builderName = data.builderName || data.builder || undefined
     const selectedCompanies = data.selectedCompanies || data.selected || undefined
 
-    // Build message with extra context (event date, participants, postal, address)
-    const messageParts: string[] = []
-    if (data.eventDate) messageParts.push(`参加希望日: ${data.eventDate}`)
-    if (data.event) messageParts.push(`イベント: ${data.event}`)
-    if (data.participants) messageParts.push(`参加人数: ${data.participants}名`)
-    if (data.postal) messageParts.push(`郵便番号: ${data.postal}`)
-    if (data.address) messageParts.push(`住所: ${data.address}`)
-    if (data.message) messageParts.push(data.message)
-    const message = messageParts.length > 0 ? messageParts.join('\n') : undefined
+    // Collect form-specific metadata that doesn't have dedicated DB columns
+    const meta: Record<string, string> = {}
+    if (data.build_area) meta.buildArea = data.build_area
+    if (data.postal) meta.postal = data.postal
+    if (data.address) meta.address = data.address
+    if (data.eventDate) meta.eventDate = data.eventDate
+    if (data.event) meta.eventTitle = data.event
+    if (data.participants) meta.participants = String(data.participants)
+
+    // Store user message + metadata JSON in message field
+    const userMessage = data.message || ''
+    const message = Object.keys(meta).length > 0
+      ? userMessage + FORM_META_DELIMITER + JSON.stringify(meta)
+      : userMessage || undefined
 
     const lead = await store.addLead({
       type: data.type || '無料相談',

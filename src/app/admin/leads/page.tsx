@@ -21,6 +21,13 @@ type Lead = {
   score: number
   memo: string
   createdAt: string
+  // Form-specific metadata
+  buildArea: string
+  postal: string
+  address: string
+  eventDate: string
+  eventTitle: string
+  participants: string
 }
 
 const statusFilters = ['すべて', '新規', '対応中', '紹介済', '面談済', '成約', '失注'] as const;
@@ -253,77 +260,149 @@ export default function LeadsPage() {
                       <tr className="bg-orange-50/30">
                         <td colSpan={8} className="px-6 py-5">
                           <div className="space-y-4">
-                            {/* Row 1: 基本情報 */}
+                            {/* 基本情報 (common) */}
                             <div>
                               <h4 className="text-xs font-bold text-[#E8740C] uppercase tracking-wider mb-2">基本情報</h4>
                               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <DetailItem label="お名前" value={lead.name} />
+                                <DetailItem label="メールアドレス" value={lead.email} />
                                 <DetailItem label="電話番号" value={lead.phone} />
                                 <DetailItem label="種別" value={lead.type} />
-                                {lead.type !== '無料相談' && <DetailItem label="担当工務店" value={lead.builderName} />}
                                 <DetailItem label="スコア">
                                   <ScoreBadge score={lead.score} />
                                 </DetailItem>
                               </div>
                             </div>
 
-                            {/* Row 2: 希望条件 (if applicable) */}
-                            {(lead.area || lead.budget || lead.layout || lead.video) && (
+                            {/* Type-specific detail sections */}
+                            {lead.type === '無料相談' && (
                               <div>
-                                <h4 className="text-xs font-bold text-[#E8740C] uppercase tracking-wider mb-2">希望条件</h4>
+                                <h4 className="text-xs font-bold text-[#E8740C] uppercase tracking-wider mb-2">相談内容</h4>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                  {lead.area && <DetailItem label="希望エリア" value={lead.area} />}
-                                  {lead.budget && <DetailItem label="予算" value={lead.budget} />}
-                                  {lead.layout && <DetailItem label="間取り" value={lead.layout} />}
-                                  {lead.video && <DetailItem label="参考動画" value={lead.video} />}
+                                  <DetailItem label="お住まいのエリア" value={lead.area} />
+                                  <DetailItem label="建築予定エリア" value={lead.buildArea} />
+                                  <DetailItem label="ご予算" value={lead.budget} />
+                                  <DetailItem label="希望の間取り" value={lead.layout} />
+                                  <DetailItem label="気になった動画" value={lead.video} />
                                 </div>
+                                {lead.message && (
+                                  <div className="mt-3">
+                                    <span className="text-gray-400 text-xs block mb-1">ご相談内容</span>
+                                    <p className="text-sm text-gray-700 bg-white rounded-lg p-3 border border-gray-100 whitespace-pre-wrap">{lead.message}</p>
+                                  </div>
+                                )}
                               </div>
                             )}
 
-                            {/* Row 3: 選択工務店 (for 資料請求) */}
-                            {lead.selectedCompanies.length > 0 && (
+                            {lead.type === '資料請求' && (
                               <div>
-                                <h4 className="text-xs font-bold text-[#E8740C] uppercase tracking-wider mb-2">選択工務店（資料請求先）</h4>
-                                <div className="flex flex-wrap gap-2">
-                                  {lead.selectedCompanies.map((c) => (
-                                    <span key={c} className="inline-block bg-white border border-[#E8740C]/30 text-[#3D2200] text-xs font-medium px-3 py-1.5 rounded-full">
-                                      {c}
-                                    </span>
-                                  ))}
+                                <h4 className="text-xs font-bold text-[#E8740C] uppercase tracking-wider mb-2">送付先情報</h4>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                  <DetailItem label="郵便番号" value={lead.postal} />
+                                  <DetailItem label="ご住所" value={lead.address} />
                                 </div>
+                                {lead.selectedCompanies.length > 0 && (
+                                  <div className="mt-3">
+                                    <span className="text-gray-400 text-xs block mb-1">資料請求先の工務店</span>
+                                    <div className="flex flex-wrap gap-2">
+                                      {lead.selectedCompanies.map((c) => (
+                                        <span key={c} className="inline-block bg-white border border-[#E8740C]/30 text-[#3D2200] text-xs font-medium px-3 py-1.5 rounded-full">
+                                          {c}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             )}
 
-                            {/* Row 4: 選択サービス (for B2B) */}
-                            {lead.selectedServices.length > 0 && (
+                            {lead.type === '見学会予約' && (
                               <div>
-                                <h4 className="text-xs font-bold text-[#E8740C] uppercase tracking-wider mb-2">選択サービス</h4>
-                                <div className="flex flex-wrap gap-2">
-                                  {lead.selectedServices.map((s) => (
-                                    <span key={s} className="inline-block bg-white border border-blue-200 text-blue-700 text-xs font-medium px-3 py-1.5 rounded-full">
-                                      {s}
-                                    </span>
-                                  ))}
+                                <h4 className="text-xs font-bold text-[#E8740C] uppercase tracking-wider mb-2">予約内容</h4>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                  <DetailItem label="イベント名" value={lead.eventTitle} />
+                                  <DetailItem label="参加希望日" value={lead.eventDate} />
+                                  <DetailItem label="参加人数" value={lead.participants ? `${lead.participants}名` : ''} />
+                                  <DetailItem label="担当工務店" value={lead.builderName} />
                                 </div>
+                                {lead.message && (
+                                  <div className="mt-3">
+                                    <span className="text-gray-400 text-xs block mb-1">ご質問・ご要望</span>
+                                    <p className="text-sm text-gray-700 bg-white rounded-lg p-3 border border-gray-100 whitespace-pre-wrap">{lead.message}</p>
+                                  </div>
+                                )}
                               </div>
                             )}
 
-                            {/* Row 5: 会社名 (B2B / パートナー) */}
-                            {lead.company && (
+                            {lead.type === '工務店相談' && (
                               <div>
-                                <h4 className="text-xs font-bold text-[#E8740C] uppercase tracking-wider mb-2">会社情報</h4>
-                                <DetailItem label="会社名" value={lead.company} />
+                                <h4 className="text-xs font-bold text-[#E8740C] uppercase tracking-wider mb-2">相談内容</h4>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                  <DetailItem label="担当工務店" value={lead.builderName} />
+                                  <DetailItem label="建築予定エリア" value={lead.area} />
+                                  <DetailItem label="ご予算" value={lead.budget} />
+                                  <DetailItem label="希望の間取り" value={lead.layout} />
+                                </div>
+                                {lead.message && (
+                                  <div className="mt-3">
+                                    <span className="text-gray-400 text-xs block mb-1">ご相談内容</span>
+                                    <p className="text-sm text-gray-700 bg-white rounded-lg p-3 border border-gray-100 whitespace-pre-wrap">{lead.message}</p>
+                                  </div>
+                                )}
                               </div>
                             )}
 
-                            {/* Row 6: メッセージ */}
-                            {lead.message && (
-                              <div>
-                                <h4 className="text-xs font-bold text-[#E8740C] uppercase tracking-wider mb-2">メッセージ・ご要望</h4>
-                                <p className="text-sm text-gray-700 bg-white rounded-lg p-3 border border-gray-100 whitespace-pre-wrap">{lead.message}</p>
-                              </div>
+                            {/* Fallback for other types (B2B, パートナー, セミナー) */}
+                            {!['無料相談', '資料請求', '見学会予約', '工務店相談'].includes(lead.type) && (
+                              <>
+                                {(lead.area || lead.budget || lead.layout || lead.video) && (
+                                  <div>
+                                    <h4 className="text-xs font-bold text-[#E8740C] uppercase tracking-wider mb-2">詳細情報</h4>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                      {lead.area && <DetailItem label="エリア" value={lead.area} />}
+                                      {lead.budget && <DetailItem label="予算" value={lead.budget} />}
+                                      {lead.layout && <DetailItem label="間取り" value={lead.layout} />}
+                                      {lead.video && <DetailItem label="参考動画" value={lead.video} />}
+                                      {lead.builderName && <DetailItem label="担当工務店" value={lead.builderName} />}
+                                    </div>
+                                  </div>
+                                )}
+                                {lead.selectedCompanies.length > 0 && (
+                                  <div>
+                                    <h4 className="text-xs font-bold text-[#E8740C] uppercase tracking-wider mb-2">選択工務店</h4>
+                                    <div className="flex flex-wrap gap-2">
+                                      {lead.selectedCompanies.map((c) => (
+                                        <span key={c} className="inline-block bg-white border border-[#E8740C]/30 text-[#3D2200] text-xs font-medium px-3 py-1.5 rounded-full">{c}</span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                                {lead.selectedServices.length > 0 && (
+                                  <div>
+                                    <h4 className="text-xs font-bold text-[#E8740C] uppercase tracking-wider mb-2">選択サービス</h4>
+                                    <div className="flex flex-wrap gap-2">
+                                      {lead.selectedServices.map((s) => (
+                                        <span key={s} className="inline-block bg-white border border-blue-200 text-blue-700 text-xs font-medium px-3 py-1.5 rounded-full">{s}</span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                                {lead.company && (
+                                  <div>
+                                    <h4 className="text-xs font-bold text-[#E8740C] uppercase tracking-wider mb-2">会社情報</h4>
+                                    <DetailItem label="会社名" value={lead.company} />
+                                  </div>
+                                )}
+                                {lead.message && (
+                                  <div>
+                                    <h4 className="text-xs font-bold text-[#E8740C] uppercase tracking-wider mb-2">メッセージ</h4>
+                                    <p className="text-sm text-gray-700 bg-white rounded-lg p-3 border border-gray-100 whitespace-pre-wrap">{lead.message}</p>
+                                  </div>
+                                )}
+                              </>
                             )}
 
-                            {/* Row 7: 管理メモ */}
+                            {/* 管理メモ (common) */}
                             <div>
                               <h4 className="text-xs font-bold text-[#E8740C] uppercase tracking-wider mb-2">管理メモ</h4>
                               <textarea

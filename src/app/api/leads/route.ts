@@ -2,7 +2,23 @@ import { NextRequest } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
 import type { DbLead } from '@/lib/supabase'
 
+const FORM_META_DELIMITER = '\n---FORM_META---\n'
+
+function parseMessageAndMeta(raw: string | undefined): { message: string; meta: Record<string, string> } {
+  if (!raw) return { message: '', meta: {} }
+  const idx = raw.indexOf(FORM_META_DELIMITER)
+  if (idx === -1) return { message: raw, meta: {} }
+  const message = raw.slice(0, idx)
+  try {
+    const meta = JSON.parse(raw.slice(idx + FORM_META_DELIMITER.length))
+    return { message, meta }
+  } catch {
+    return { message: raw, meta: {} }
+  }
+}
+
 function formatLead(db: DbLead) {
+  const { message, meta } = parseMessageAndMeta(db.message)
   return {
     id: db.id,
     type: db.type,
@@ -13,7 +29,7 @@ function formatLead(db: DbLead) {
     area: db.area ?? '',
     budget: db.budget ?? '',
     layout: db.layout ?? '',
-    message: db.message ?? '',
+    message,
     video: db.video ?? '',
     builderName: db.builder_name ?? '',
     selectedCompanies: db.selected_companies ?? [],
@@ -22,6 +38,13 @@ function formatLead(db: DbLead) {
     score: db.score,
     memo: db.memo ?? '',
     createdAt: db.created_at,
+    // Form-specific metadata
+    buildArea: meta.buildArea ?? '',
+    postal: meta.postal ?? '',
+    address: meta.address ?? '',
+    eventDate: meta.eventDate ?? '',
+    eventTitle: meta.eventTitle ?? '',
+    participants: meta.participants ?? '',
   }
 }
 
