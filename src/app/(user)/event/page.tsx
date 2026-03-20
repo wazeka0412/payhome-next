@@ -1,6 +1,10 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import PageHeader from '@/components/ui/PageHeader';
+import PrefectureFilter from '@/components/ui/PrefectureFilter';
 import { events, EVENT_TYPE_STYLES, formatPeriod } from '@/lib/events-data';
 
 const reports = [
@@ -9,7 +13,35 @@ const reports = [
   { title: '【レポート】オンライン見学会・高性能住宅のすべて', date: '2026.02.08', participants: '42名' },
 ];
 
+const EVENT_TYPES = ['すべて', '完成見学会', 'モデルハウス', 'オンライン見学会', 'ぺいほーむ特別見学会'] as const;
+
 export default function EventPage() {
+  const [prefecture, setPrefecture] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('すべて');
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [keyword, setKeyword] = useState('');
+  const [builderFilter, setBuilderFilter] = useState('all');
+
+  const builders = ['all', ...Array.from(new Set(events.map(e => e.builder)))];
+
+  const filteredEvents = events.filter(event => {
+    if (prefecture !== 'all' && event.prefecture !== prefecture) return false;
+    if (typeFilter !== 'すべて' && event.typeLabel !== typeFilter) return false;
+    if (builderFilter !== 'all' && event.builder !== builderFilter) return false;
+    if (keyword) {
+      const q = keyword.toLowerCase();
+      if (!event.title.toLowerCase().includes(q) && !event.builder.toLowerCase().includes(q) && !event.location.toLowerCase().includes(q)) return false;
+    }
+    return true;
+  });
+
+  const resetFilters = () => {
+    setPrefecture('all');
+    setTypeFilter('すべて');
+    setKeyword('');
+    setBuilderFilter('all');
+  };
+
   return (
     <>
       <PageHeader
@@ -27,8 +59,78 @@ export default function EventPage() {
           <p className="text-center text-xs font-semibold tracking-widest text-[#E8740C] uppercase mb-2">UPCOMING</p>
           <h2 className="text-2xl font-bold text-center text-[#3D2200] mb-10">開催予定の見学会・イベント</h2>
 
+          {/* Type Filter */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {EVENT_TYPES.map((t) => (
+              <button
+                key={t}
+                onClick={() => setTypeFilter(t)}
+                className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors cursor-pointer ${
+                  typeFilter === t
+                    ? 'bg-[#E8740C] text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+
+          <PrefectureFilter value={prefecture} onChange={setPrefecture} showOnline />
+
+          {/* Advanced Search */}
+          <div className="mb-8">
+            <button
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-[#E8740C] transition cursor-pointer"
+            >
+              <svg className={`w-4 h-4 transition-transform ${showAdvanced ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+              詳細検索
+            </button>
+
+            {showAdvanced && (
+              <div className="mt-3 bg-gray-50 rounded-xl p-4 space-y-4">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 mb-1">キーワード</label>
+                    <input
+                      type="text"
+                      value={keyword}
+                      onChange={(e) => setKeyword(e.target.value)}
+                      placeholder="イベント名・工務店名・エリア..."
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E8740C]/30 focus:border-[#E8740C]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 mb-1">施工会社</label>
+                    <select
+                      value={builderFilter}
+                      onChange={(e) => setBuilderFilter(e.target.value)}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E8740C]/30 focus:border-[#E8740C]"
+                    >
+                      {builders.map(b => (
+                        <option key={b} value={b}>{b === 'all' ? 'すべて' : b}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <button
+                  onClick={resetFilters}
+                  className="text-xs text-gray-400 hover:text-[#E8740C] transition cursor-pointer"
+                >
+                  フィルターをリセット
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Results count */}
+          <p className="text-xs text-gray-400 mb-4">{filteredEvents.length} 件のイベント</p>
+
           <div className="grid md:grid-cols-2 gap-6">
-            {events.map((event) => {
+            {filteredEvents.map((event) => {
               const style = EVENT_TYPE_STYLES[event.type];
               return (
                 <Link
@@ -44,14 +146,12 @@ export default function EventPage() {
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    {/* Fallback overlay shown when image is missing */}
                     <div className="absolute inset-0 flex items-center justify-center text-gray-300 pointer-events-none">
                       <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3l-2-2H10L8 7H5a2 2 0 00-2 2z" />
                         <circle cx="12" cy="13" r="3" strokeWidth={1} />
                       </svg>
                     </div>
-                    {/* Type badge */}
                     <span className={`absolute top-3 left-3 text-xs font-bold px-3 py-1 rounded-full ${style.bg} ${style.text} backdrop-blur-sm`}>
                       {event.typeLabel}
                     </span>
@@ -79,6 +179,7 @@ export default function EventPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
                       <span>{event.location}</span>
+                      <span className="text-[0.65rem] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{event.prefecture === 'オンライン' ? 'オンライン' : event.prefecture.replace('県', '')}</span>
                     </div>
 
                     <div className="flex items-center gap-2 text-xs text-gray-400">
@@ -101,6 +202,10 @@ export default function EventPage() {
               );
             })}
           </div>
+
+          {filteredEvents.length === 0 && (
+            <div className="text-center py-16 text-gray-400 text-sm">該当するイベントがありません</div>
+          )}
         </div>
       </section>
 

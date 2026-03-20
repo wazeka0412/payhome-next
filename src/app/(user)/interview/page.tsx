@@ -4,29 +4,46 @@ import { useState } from 'react';
 import Link from 'next/link';
 import PageHeader from '@/components/ui/PageHeader';
 import FilterTabs from '@/components/ui/FilterTabs';
+import PrefectureFilter from '@/components/ui/PrefectureFilter';
 import Pagination from '@/components/ui/Pagination';
 
 const interviews = [
-  { id: 'interview-01', category: '工務店取材', company: '○○工務店（鹿児島市）', title: '「住む人の暮らし」から逆算する家づくりとは', excerpt: '地元の素材を活かし、住む人のライフスタイルに寄り添う設計哲学を聞きました。創業25年、地域に根ざした家づくりの想いとは。' },
-  { id: 'interview-02', category: 'ハウスメーカー取材', company: '△△ハウス（福岡市）', title: '年間200棟を手がけるハウスメーカーの品質管理', excerpt: '大量供給と品質を両立させる仕組みの裏側に迫ります。独自の検査体制と職人教育の取り組みについて。' },
-  { id: 'interview-03', category: '施主インタビュー', company: '施主Aさんご家族（霧島市）', title: '建てて1年、住んでわかった「本当に良かったこと」', excerpt: '注文住宅を建てて1年が経過したAさんご家族に、実際の住み心地や満足ポイント、後悔ポイントを率直に聞きました。' },
-  { id: 'interview-04', category: '工務店取材', company: '□□建設（熊本市）', title: '耐震等級3が標準仕様。熊本地震から学んだ家づくり', excerpt: '熊本地震を経験した工務店が、地震に強い家づくりをどのように標準化しているのか。具体的な構造の工夫を取材。' },
-  { id: 'interview-05', category: 'トレンドレポート', company: 'トレンドレポート', title: '2026年九州エリアの住宅市場動向レポート', excerpt: '九州エリアの着工数推移、資材価格の変動、人気の間取りトレンドなど、最新の住宅市場データをまとめました。' },
-  { id: 'interview-06', category: '工務店取材', company: '◇◇ホーム（大分市）', title: 'ZEH率95%を実現する地方工務店の挑戦', excerpt: '省エネ住宅の最前線を走る地方工務店。ZEH（ネット・ゼロ・エネルギー・ハウス）をどのように普及させているのか。' },
+  { id: 'interview-01', category: '工務店取材', company: '○○工務店', title: '「住む人の暮らし」から逆算する家づくりとは', excerpt: '地元の素材を活かし、住む人のライフスタイルに寄り添う設計哲学を聞きました。創業25年、地域に根ざした家づくりの想いとは。', prefecture: '鹿児島県' },
+  { id: 'interview-02', category: 'ハウスメーカー取材', company: '△△ハウス', title: '年間200棟を手がけるハウスメーカーの品質管理', excerpt: '大量供給と品質を両立させる仕組みの裏側に迫ります。独自の検査体制と職人教育の取り組みについて。', prefecture: '福岡県' },
+  { id: 'interview-03', category: '施主インタビュー', company: '施主Aさんご家族', title: '建てて1年、住んでわかった「本当に良かったこと」', excerpt: '注文住宅を建てて1年が経過したAさんご家族に、実際の住み心地や満足ポイント、後悔ポイントを率直に聞きました。', prefecture: '鹿児島県' },
+  { id: 'interview-04', category: '工務店取材', company: '□□建設', title: '耐震等級3が標準仕様。熊本地震から学んだ家づくり', excerpt: '熊本地震を経験した工務店が、地震に強い家づくりをどのように標準化しているのか。具体的な構造の工夫を取材。', prefecture: '熊本県' },
+  { id: 'interview-05', category: 'トレンドレポート', company: 'トレンドレポート', title: '2026年九州エリアの住宅市場動向レポート', excerpt: '九州エリアの着工数推移、資材価格の変動、人気の間取りトレンドなど、最新の住宅市場データをまとめました。', prefecture: '福岡県' },
+  { id: 'interview-06', category: '工務店取材', company: '◇◇ホーム', title: 'ZEH率95%を実現する地方工務店の挑戦', excerpt: '省エネ住宅の最前線を走る地方工務店。ZEH（ネット・ゼロ・エネルギー・ハウス）をどのように普及させているのか。', prefecture: '大分県' },
 ];
 
 const ITEMS_PER_PAGE = 6;
 
 export default function InterviewPage() {
   const [activeFilter, setActiveFilter] = useState('すべて');
+  const [prefecture, setPrefecture] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [keyword, setKeyword] = useState('');
 
-  const filteredItems = activeFilter === 'すべて'
-    ? interviews
-    : interviews.filter(item => item.category === activeFilter);
+  const filteredItems = interviews.filter(item => {
+    if (activeFilter !== 'すべて' && item.category !== activeFilter) return false;
+    if (prefecture !== 'all' && item.prefecture !== prefecture) return false;
+    if (keyword) {
+      const q = keyword.toLowerCase();
+      if (!item.title.toLowerCase().includes(q) && !item.company.toLowerCase().includes(q) && !item.excerpt.toLowerCase().includes(q)) return false;
+    }
+    return true;
+  });
 
   const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
   const paginatedItems = filteredItems.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+  const resetFilters = () => {
+    setActiveFilter('すべて');
+    setPrefecture('all');
+    setKeyword('');
+    setCurrentPage(1);
+  };
 
   return (
     <>
@@ -45,6 +62,45 @@ export default function InterviewPage() {
             onChange={(tab) => { setActiveFilter(tab); setCurrentPage(1); }}
           />
 
+          <PrefectureFilter value={prefecture} onChange={(v) => { setPrefecture(v); setCurrentPage(1); }} />
+
+          {/* Advanced Search Toggle */}
+          <div className="mb-8">
+            <button
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-[#E8740C] transition cursor-pointer"
+            >
+              <svg className={`w-4 h-4 transition-transform ${showAdvanced ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+              詳細検索
+            </button>
+
+            {showAdvanced && (
+              <div className="mt-3 bg-gray-50 rounded-xl p-4 space-y-3">
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 mb-1">キーワード</label>
+                  <input
+                    type="text"
+                    value={keyword}
+                    onChange={(e) => { setKeyword(e.target.value); setCurrentPage(1); }}
+                    placeholder="タイトル・会社名・本文で検索..."
+                    className="w-full max-w-md border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#E8740C]/30 focus:border-[#E8740C]"
+                  />
+                </div>
+                <button
+                  onClick={resetFilters}
+                  className="text-xs text-gray-400 hover:text-[#E8740C] transition cursor-pointer"
+                >
+                  フィルターをリセット
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Results count */}
+          <p className="text-xs text-gray-400 mb-4">{filteredItems.length} 件の記事</p>
+
           <div className="grid md:grid-cols-2 gap-6">
             {paginatedItems.map((item) => (
               <Link
@@ -56,7 +112,10 @@ export default function InterviewPage() {
                   Photo
                 </div>
                 <div className="p-5">
-                  <p className="text-xs text-[#E8740C] font-semibold mb-1">{item.company}</p>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xs text-[#E8740C] font-semibold">{item.company}</span>
+                    <span className="text-[0.65rem] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{item.prefecture.replace('県', '')}</span>
+                  </div>
                   <h3 className="text-sm font-bold text-gray-900 mb-2 group-hover:text-[#E8740C] transition-colors">
                     {item.title}
                   </h3>

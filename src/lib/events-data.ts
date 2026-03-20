@@ -8,6 +8,7 @@ export interface EventData {
   endDate: string;   // YYYY-MM-DD
   location: string;
   address: string;
+  prefecture: string;
   builder: string;
   capacity: number;
   images: string[];
@@ -37,6 +38,7 @@ export const events: EventData[] = [
     endDate: '2026-04-13',
     location: '鹿児島市吉野町',
     address: '鹿児島県鹿児島市吉野町1234-5',
+    prefecture: '鹿児島県',
     builder: '万代ホーム',
     capacity: 10,
     images: [
@@ -68,6 +70,7 @@ export const events: EventData[] = [
     endDate: '2026-04-27',
     location: '福岡市東区',
     address: '福岡県福岡市東区香椎浜3-12-1 ABCハウジング内',
+    prefecture: '福岡県',
     builder: 'タマルハウス',
     capacity: 15,
     images: [
@@ -100,6 +103,7 @@ export const events: EventData[] = [
     endDate: '2026-05-10',
     location: 'オンライン（Zoom）',
     address: 'お申し込み後にZoomリンクをお送りします',
+    prefecture: 'オンライン',
     builder: '感動ハウス',
     capacity: 50,
     images: [
@@ -130,6 +134,7 @@ export const events: EventData[] = [
     endDate: '2026-05-18',
     location: '熊本市南区',
     address: '熊本県熊本市南区城南町○○ ※詳細は予約後にご案内',
+    prefecture: '熊本県',
     builder: 'ハウスサポート',
     capacity: 8,
     images: [
