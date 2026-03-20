@@ -20,26 +20,36 @@ const DEFAULTS: Omit<SettingsState, 'listeners'> = {
   eventTypes: ['完成見学会', 'モデルハウス', 'オンライン見学会', 'ぺいほーむ特別見学会'],
 };
 
+type SettingsData = Omit<SettingsState, 'listeners'>;
+
+// Cached snapshot — only replaced when data changes
+let snapshot: SettingsData = { ...DEFAULTS };
+
 function getStore(): SettingsState {
   if (typeof window === 'undefined') {
     return { ...DEFAULTS, listeners: new Set() };
   }
   if (!(window as unknown as Record<string, unknown>).__payhomeSettings) {
     (window as unknown as Record<string, unknown>).__payhomeSettings = { ...DEFAULTS, listeners: new Set() };
+    snapshot = { ...DEFAULTS };
   }
   return (window as unknown as Record<string, unknown>).__payhomeSettings as SettingsState;
 }
 
 function notify() {
-  getStore().listeners.forEach((l) => l());
+  const store = getStore();
+  snapshot = {
+    articleTags: store.articleTags,
+    newsCategories: store.newsCategories,
+    interviewCategories: store.interviewCategories,
+    eventTypes: store.eventTypes,
+  };
+  store.listeners.forEach((l) => l());
 }
 
 export const settingsStore = {
-  get: () => {
-    const { listeners: _, ...data } = getStore();
-    return data;
-  },
-  update: (key: keyof Omit<SettingsState, 'listeners'>, value: string[]) => {
+  get: (): SettingsData => snapshot,
+  update: (key: keyof SettingsData, value: string[]) => {
     const store = getStore();
     store[key] = value;
     notify();
