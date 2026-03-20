@@ -12,24 +12,55 @@ import { articles as initialArticles, type ArticleData } from './articles-data';
 import { magazineIssues as initialMagazine, type MagazineIssue } from './magazine-data';
 
 // ---------------------------------------------------------------------------
-// Generic store factory
+// Window global to ensure singleton state across Next.js route chunks
 // ---------------------------------------------------------------------------
-type Listener = () => void;
+interface StoreState<T> {
+  data: T[];
+  listeners: Set<() => void>;
+}
 
-function createStore<T>(initial: T[]) {
-  let data = [...initial];
-  const listeners = new Set<Listener>();
+interface GlobalStores {
+  [key: string]: StoreState<unknown>;
+}
 
-  const get = () => data;
+declare global {
+  interface Window {
+    __payhomeStores?: GlobalStores;
+  }
+}
+
+function getGlobalStore<T>(key: string, initial: T[]): StoreState<T> {
+  if (typeof window === 'undefined') {
+    // SSR fallback — each request gets a fresh copy
+    return { data: [...initial], listeners: new Set() };
+  }
+  if (!window.__payhomeStores) {
+    window.__payhomeStores = {};
+  }
+  if (!window.__payhomeStores[key]) {
+    window.__payhomeStores[key] = { data: [...initial], listeners: new Set() };
+  }
+  return window.__payhomeStores[key] as StoreState<T>;
+}
+
+// ---------------------------------------------------------------------------
+// Generic store factory — backed by window global
+// ---------------------------------------------------------------------------
+function createStore<T>(key: string, initial: T[]) {
+  const get = (): T[] => getGlobalStore<T>(key, initial).data;
 
   const set = (updater: T[] | ((prev: T[]) => T[])) => {
-    data = typeof updater === 'function' ? (updater as (prev: T[]) => T[])(data) : [...updater];
-    listeners.forEach((l) => l());
+    const store = getGlobalStore<T>(key, initial);
+    store.data = typeof updater === 'function'
+      ? (updater as (prev: T[]) => T[])(store.data)
+      : [...updater];
+    store.listeners.forEach((l) => l());
   };
 
-  const subscribe = (listener: Listener) => {
-    listeners.add(listener);
-    return () => { listeners.delete(listener); };
+  const subscribe = (listener: () => void) => {
+    const store = getGlobalStore<T>(key, initial);
+    store.listeners.add(listener);
+    return () => { store.listeners.delete(listener); };
   };
 
   return { get, set, subscribe };
@@ -38,15 +69,15 @@ function createStore<T>(initial: T[]) {
 // ---------------------------------------------------------------------------
 // Stores
 // ---------------------------------------------------------------------------
-export const propertyStore  = createStore<PropertyData>(initialProperties);
-export const eventStore     = createStore<EventData>(initialEvents);
-export const interviewStore = createStore<Interview>(initialInterviews);
-export const reviewStore    = createStore<Review>(initialReviews);
-export const webinarStore   = createStore<WebinarData>(initialWebinars);
-export const newsStore      = createStore<NewsItem>(initialNews);
-export const builderStore   = createStore<BuilderData>(initialBuilders);
-export const articleStore   = createStore<ArticleData>(initialArticles);
-export const magazineStore  = createStore<MagazineIssue>(initialMagazine);
+export const propertyStore  = createStore<PropertyData>('properties', initialProperties);
+export const eventStore     = createStore<EventData>('events', initialEvents);
+export const interviewStore = createStore<Interview>('interviews', initialInterviews);
+export const reviewStore    = createStore<Review>('reviews', initialReviews);
+export const webinarStore   = createStore<WebinarData>('webinars', initialWebinars);
+export const newsStore      = createStore<NewsItem>('news', initialNews);
+export const builderStore   = createStore<BuilderData>('builders', initialBuilders);
+export const articleStore   = createStore<ArticleData>('articles', initialArticles);
+export const magazineStore  = createStore<MagazineIssue>('magazine', initialMagazine);
 
 // ---------------------------------------------------------------------------
 // React hooks  — each returns the live array and re-renders on change
