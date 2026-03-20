@@ -1,5 +1,29 @@
 import { NextRequest } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
+import type { DbLead } from '@/lib/supabase'
+
+function formatLead(db: DbLead) {
+  return {
+    id: db.id,
+    type: db.type,
+    name: db.name,
+    email: db.email,
+    phone: db.phone ?? '',
+    company: db.company ?? '',
+    area: db.area ?? '',
+    budget: db.budget ?? '',
+    layout: db.layout ?? '',
+    message: db.message ?? '',
+    video: db.video ?? '',
+    builderName: db.builder_name ?? '',
+    selectedCompanies: db.selected_companies ?? [],
+    selectedServices: db.selected_services ?? [],
+    status: db.status,
+    score: db.score,
+    memo: db.memo ?? '',
+    createdAt: db.created_at,
+  }
+}
 
 export async function GET(request: NextRequest) {
   const builder = request.nextUrl.searchParams.get('builder')
@@ -22,7 +46,7 @@ export async function GET(request: NextRequest) {
     return Response.json({ error: 'Failed to fetch leads' }, { status: 500 })
   }
 
-  return Response.json(data)
+  return Response.json((data as DbLead[]).map(formatLead))
 }
 
 export async function POST(request: NextRequest) {
