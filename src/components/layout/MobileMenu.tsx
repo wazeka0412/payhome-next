@@ -39,8 +39,8 @@ export default function MobileMenu({ isOpen, onClose, navContent }: MobileMenuPr
 
       {/* Body — グループ一覧 */}
       <div className="flex-1 px-5 py-5">
-        {/* マイページ — 上部に目立つように配置 */}
-        <Link
+        {/* Phase 2: マイページリンク（ユーザーログイン導入後に有効化） */}
+        {/* <Link
           href="/mypage"
           className="flex items-center justify-between w-full mb-5 px-5 py-3.5 rounded-xl border-2 border-[#E8740C] text-[#E8740C] font-bold text-sm hover:bg-[#E8740C] hover:text-white transition-all"
           onClick={onClose}
@@ -52,7 +52,7 @@ export default function MobileMenu({ isOpen, onClose, navContent }: MobileMenuPr
             <span>マイページ</span>
           </div>
           <span>→</span>
-        </Link>
+        </Link> */}
 
         {navContent.map((group) => (
           <div key={group.label} className="mb-5">

@@ -132,12 +132,13 @@ export default function BizHeader() {
                 )}
               </div>
             ))}
-            <Link
+            {/* Phase 2: 工務店ログイン導入後に有効化 */}
+            {/* <Link
               href="/dashboard"
               className="text-sm text-gray-600 hover:text-[#E8740C] transition hidden md:block"
             >
               管理画面
-            </Link>
+            </Link> */}
 
             <Link
               href="/biz/contact"
@@ -194,7 +195,8 @@ export default function BizHeader() {
               </div>
             ))}
 
-            <div className="mb-5">
+            {/* Phase 2: 工務店管理画面リンク */}
+            {/* <div className="mb-5">
               <Link
                 href="/dashboard"
                 className="flex items-center gap-3 py-3.5 px-3 text-[0.95rem] font-bold hover:bg-orange-50 transition-all"
@@ -203,7 +205,7 @@ export default function BizHeader() {
               >
                 管理画面 →
               </Link>
-            </div>
+            </div> */}
 
             <div className="mb-5">
               <Link

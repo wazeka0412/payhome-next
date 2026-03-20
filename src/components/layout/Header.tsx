@@ -163,12 +163,13 @@ export default function Header() {
               </div>
             ))}
 
-            <Link
+            {/* Phase 2: マイページリンク（ユーザーログイン導入後に有効化） */}
+            {/* <Link
               href="/mypage"
               className="text-sm text-gray-600 hover:text-[#E8740C] transition hidden md:block"
             >
               マイページ
-            </Link>
+            </Link> */}
 
             <Link
               href="/biz"
