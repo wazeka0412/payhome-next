@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, Fragment, useRef } from 'react';
 
 type Lead = {
   id: string
@@ -84,21 +84,6 @@ export default function LeadsPage() {
       }
     } catch (err) {
       console.error('Status update failed:', err)
-    }
-  }
-
-  const handleScoreUpdate = async (leadId: string, newScore: number) => {
-    try {
-      const res = await fetch(`/api/leads/${leadId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ score: newScore }),
-      })
-      if (res.ok) {
-        setLeads(prev => prev.map(l => l.id === leadId ? { ...l, score: newScore } : l))
-      }
-    } catch (err) {
-      console.error('Score update failed:', err)
     }
   }
 
@@ -245,7 +230,7 @@ export default function LeadsPage() {
                         </span>
                       </td>
                       <td className="py-3 px-4 text-gray-600 text-xs max-w-[160px] truncate" title={targetBuilder}>
-                        {targetBuilder || <span className="text-gray-300">—</span>}
+                        {lead.type === '無料相談' ? <span className="text-gray-300">—</span> : (targetBuilder || <span className="text-gray-300">—</span>)}
                       </td>
                       <td className="py-3 px-4">
                         <select
@@ -274,17 +259,9 @@ export default function LeadsPage() {
                               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                 <DetailItem label="電話番号" value={lead.phone} />
                                 <DetailItem label="種別" value={lead.type} />
-                                <DetailItem label="担当工務店" value={lead.builderName} />
+                                {lead.type !== '無料相談' && <DetailItem label="担当工務店" value={lead.builderName} />}
                                 <DetailItem label="スコア">
-                                  <input
-                                    type="number"
-                                    min={0}
-                                    max={100}
-                                    value={lead.score}
-                                    onChange={(e) => { e.stopPropagation(); handleScoreUpdate(lead.id, Number(e.target.value)); }}
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="w-20 border border-gray-200 rounded px-2 py-1 text-sm font-medium text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#E8740C]"
-                                  />
+                                  <ScoreBadge score={lead.score} />
                                 </DetailItem>
                               </div>
                             </div>
@@ -384,6 +361,59 @@ function DetailItem({ label, value, children }: { label: string; value?: string;
     <div>
       <span className="text-gray-400 text-xs block mb-0.5">{label}</span>
       {children ?? <span className="text-gray-800 font-medium text-sm">{value || '未登録'}</span>}
+    </div>
+  );
+}
+
+const SCORE_RULES = [
+  { min: 80, label: 'S', color: 'bg-red-100 text-red-700', desc: '即対応（複数条件一致・高予算・具体的な要望あり）' },
+  { min: 60, label: 'A', color: 'bg-orange-100 text-orange-700', desc: '優先対応（予算・間取り記入あり）' },
+  { min: 40, label: 'B', color: 'bg-yellow-100 text-yellow-700', desc: '通常対応（基本情報のみ）' },
+  { min: 0, label: 'C', color: 'bg-gray-100 text-gray-500', desc: '情報不足（名前・メールのみ）' },
+];
+
+function ScoreBadge({ score }: { score: number }) {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showTooltip) return;
+    const handleClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setShowTooltip(false);
+    };
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, [showTooltip]);
+
+  const rule = SCORE_RULES.find(r => score >= r.min) ?? SCORE_RULES[SCORE_RULES.length - 1];
+
+  return (
+    <div className="relative inline-block" ref={ref}>
+      <span className="text-sm font-bold text-gray-800">{score}点</span>
+      <span className={`inline-block ml-1.5 px-1.5 py-0.5 rounded text-[0.65rem] font-bold ${rule.color}`}>{rule.label}</span>
+      <button
+        onClick={(e) => { e.stopPropagation(); setShowTooltip(!showTooltip); }}
+        className="ml-1 w-4 h-4 rounded-full bg-gray-200 text-gray-500 text-[0.6rem] font-bold inline-flex items-center justify-center hover:bg-gray-300 transition cursor-pointer"
+        aria-label="スコア条件を表示"
+      >
+        ?
+      </button>
+      {showTooltip && (
+        <div className="absolute left-0 top-full mt-2 w-72 bg-white rounded-xl shadow-lg border border-gray-200 p-3 z-50" onClick={(e) => e.stopPropagation()}>
+          <p className="text-xs font-bold text-gray-700 mb-2">スコア判定基準</p>
+          <div className="space-y-1.5">
+            {SCORE_RULES.map((r) => (
+              <div key={r.label} className="flex items-start gap-2">
+                <span className={`shrink-0 px-1.5 py-0.5 rounded text-[0.6rem] font-bold ${r.color}`}>{r.label}</span>
+                <div>
+                  <span className="text-xs text-gray-500">{r.min}点以上</span>
+                  <p className="text-xs text-gray-600">{r.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
