@@ -1,23 +1,31 @@
 'use client';
 
 import Link from 'next/link';
-import { properties } from '@/lib/properties';
-import { events } from '@/lib/events-data';
-import { interviews } from '@/lib/interviews';
-import { reviews } from '@/lib/reviews-data';
-import { webinars } from '@/lib/webinars-data';
-
-const SECTIONS = [
-  { href: '/appadmin/properties', icon: '🎬', label: '動画コンテンツ', color: 'bg-orange-500', count: properties.length },
-  { href: '/appadmin/events', icon: '📅', label: '見学会・イベント', color: 'bg-purple-500', count: events.length },
-  { href: '/appadmin/interviews', icon: '📰', label: '取材・レポート', color: 'bg-blue-500', count: interviews.length },
-  { href: '/appadmin/reviews', icon: '💬', label: 'お客様の声', color: 'bg-green-500', count: reviews.length },
-  { href: '/appadmin/webinars', icon: '🎓', label: 'ウェビナー', color: 'bg-indigo-500', count: webinars.length },
-  { href: '/appadmin/builders', icon: '🏗', label: '工務店一覧', color: 'bg-yellow-500', count: 0 },
-  { href: '/appadmin/articles', icon: '📝', label: 'お役立ち記事', color: 'bg-pink-500', count: 0 },
-];
+import { useProperties, useEvents, useInterviews, useReviews, useWebinars, useNews, useBuilders, useArticles, useMagazine } from '@/lib/content-store';
 
 export default function AppAdminDashboard() {
+  const propertiesCount = useProperties().length;
+  const eventsCount = useEvents().length;
+  const interviewsCount = useInterviews().length;
+  const reviewsCount = useReviews().length;
+  const webinarsCount = useWebinars().length;
+  const newsCount = useNews().length;
+  const buildersCount = useBuilders().length;
+  const articlesCount = useArticles().length;
+  const magazineCount = useMagazine().length;
+
+  const SECTIONS = [
+    { href: '/appadmin/properties', icon: '🎬', label: '動画コンテンツ', color: 'bg-orange-500', count: propertiesCount },
+    { href: '/appadmin/events', icon: '📅', label: '見学会・イベント', color: 'bg-purple-500', count: eventsCount },
+    { href: '/appadmin/interviews', icon: '📰', label: '取材・レポート', color: 'bg-blue-500', count: interviewsCount },
+    { href: '/appadmin/reviews', icon: '💬', label: 'お客様の声', color: 'bg-green-500', count: reviewsCount },
+    { href: '/appadmin/webinars', icon: '🎓', label: 'ウェビナー', color: 'bg-indigo-500', count: webinarsCount },
+    { href: '/appadmin/builders', icon: '🏗', label: '工務店一覧', color: 'bg-yellow-500', count: buildersCount },
+    { href: '/appadmin/articles', icon: '📝', label: 'お役立ち記事', color: 'bg-pink-500', count: articlesCount },
+    { href: '/appadmin/news', icon: '📢', label: 'ニュース', color: 'bg-teal-500', count: newsCount },
+    { href: '/appadmin/magazine', icon: '📖', label: '月刊ぺいほーむ', color: 'bg-rose-500', count: magazineCount },
+  ];
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-gray-900 mb-2">コンテンツ管理</h1>

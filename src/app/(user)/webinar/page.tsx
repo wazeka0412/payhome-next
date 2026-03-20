@@ -1,6 +1,8 @@
+'use client'
+
 import PageHeader from '@/components/ui/PageHeader';
 import Link from 'next/link';
-import { getUpcomingWebinars, getArchiveWebinars } from '@/lib/webinars-data';
+import { useWebinars } from '@/lib/content-store';
 import type { WebinarData } from '@/lib/webinars-data';
 
 function WebinarCard({ item }: { item: WebinarData }) {
@@ -29,8 +31,9 @@ function WebinarCard({ item }: { item: WebinarData }) {
 }
 
 export default function WebinarPage() {
-  const upcomingWebinars = getUpcomingWebinars();
-  const archiveWebinars = getArchiveWebinars();
+  const items = useWebinars();
+  const upcomingWebinars = items.filter((w) => w.isUpcoming);
+  const archiveWebinars = items.filter((w) => !w.isUpcoming);
 
   return (
     <>

@@ -13,6 +13,8 @@ const NAV_ITEMS = [
   { href: '/appadmin/webinars', icon: '🎓', label: 'ウェビナー' },
   { href: '/appadmin/builders', icon: '🏗', label: '工務店一覧' },
   { href: '/appadmin/articles', icon: '📝', label: 'お役立ち記事' },
+  { href: '/appadmin/news', icon: '📢', label: 'ニュース' },
+  { href: '/appadmin/magazine', icon: '📖', label: '月刊ぺいほーむ' },
 ];
 
 export default function AppAdminLayout({ children }: { children: React.ReactNode }) {

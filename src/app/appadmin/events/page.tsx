@@ -2,14 +2,17 @@
 
 import { useState } from 'react';
 import ContentTable from '@/components/appadmin/ContentTable';
-import { events, type EventData } from '@/lib/events-data';
+import ImageUploader from '@/components/appadmin/ImageUploader';
+import DatePicker from '@/components/appadmin/DatePicker';
+import { useEvents, eventStore } from '@/lib/content-store';
+import { type EventData } from '@/lib/events-data';
 
 type EditMode = 'list' | 'add' | 'edit';
 
 export default function EventsAdmin() {
   const [mode, setMode] = useState<EditMode>('list');
   const [editItem, setEditItem] = useState<EventData | null>(null);
-  const [items, setItems] = useState<EventData[]>(events);
+  const items = useEvents();
 
   const columns = [
     { key: 'id', label: 'ID' },
@@ -21,7 +24,7 @@ export default function EventsAdmin() {
   ];
 
   const handleDelete = (item: Record<string, unknown>) => {
-    setItems((prev) => prev.filter((p) => p.id !== item.id));
+    eventStore.set((prev) => prev.filter((p) => p.id !== item.id));
   };
 
   if (mode === 'add' || mode === 'edit') {
@@ -30,9 +33,9 @@ export default function EventsAdmin() {
         item={editItem}
         onSave={(data) => {
           if (mode === 'edit' && editItem) {
-            setItems((prev) => prev.map((p) => (p.id === editItem.id ? { ...p, ...data } : p)));
+            eventStore.set((prev) => prev.map((p) => (p.id === editItem.id ? { ...p, ...data } : p)));
           } else {
-            setItems((prev) => [data as EventData, ...prev]);
+            eventStore.set((prev) => [data as EventData, ...prev]);
           }
           setMode('list');
           setEditItem(null);
@@ -69,11 +72,11 @@ function EventForm({ item, onSave, onCancel }: { item: EventData | null; onSave:
     prefecture: item?.prefecture ?? '',
     builder: item?.builder ?? '',
     capacity: String(item?.capacity ?? ''),
-    images: item?.images?.join('\n') ?? '',
     highlights: item?.highlights?.join('\n') ?? '',
     features: item?.features?.map(f => `${f.label}:${f.value}`).join('\n') ?? '',
   });
 
+  const [images, setImages] = useState<string[]>(item?.images ?? []);
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -81,7 +84,7 @@ function EventForm({ item, onSave, onCancel }: { item: EventData | null; onSave:
     onSave({
       ...form,
       capacity: Number(form.capacity) || 0,
-      images: form.images.split('\n').filter(Boolean),
+      images,
       highlights: form.highlights.split('\n').filter(Boolean),
       features: form.features.split('\n').filter(Boolean).map(line => {
         const [label, value] = line.split(':');
@@ -116,8 +119,8 @@ function EventForm({ item, onSave, onCancel }: { item: EventData | null; onSave:
           </div>
           <Field label="説明文" value={form.description} onChange={(v) => set('description', v)} multiline rows={3} />
           <div className="grid grid-cols-2 gap-4">
-            <Field label="開始日" value={form.startDate} onChange={(v) => set('startDate', v)} placeholder="YYYY-MM-DD" required />
-            <Field label="終了日" value={form.endDate} onChange={(v) => set('endDate', v)} placeholder="YYYY-MM-DD" required />
+            <DatePicker label="開始日" value={form.startDate} onChange={(v) => set('startDate', v)} format="iso" />
+            <DatePicker label="終了日" value={form.endDate} onChange={(v) => set('endDate', v)} format="iso" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <Field label="場所" value={form.location} onChange={(v) => set('location', v)} />
@@ -131,7 +134,7 @@ function EventForm({ item, onSave, onCancel }: { item: EventData | null; onSave:
         </div>
         <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
           <h3 className="text-sm font-bold text-[#E8740C] uppercase tracking-wider mb-4">コンテンツ</h3>
-          <Field label="画像パス（1行1パス）" value={form.images} onChange={(v) => set('images', v)} multiline rows={3} />
+          <ImageUploader label="画像" images={images} onChange={setImages} />
           <Field label="ハイライト（1行1項目）" value={form.highlights} onChange={(v) => set('highlights', v)} multiline rows={4} />
           <Field label="特徴（1行1項目、ラベル:値）" value={form.features} onChange={(v) => set('features', v)} multiline rows={4} placeholder="延床面積:28坪" />
         </div>

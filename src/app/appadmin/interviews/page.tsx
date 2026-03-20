@@ -2,14 +2,16 @@
 
 import { useState } from 'react';
 import ContentTable from '@/components/appadmin/ContentTable';
-import { interviews, type Interview } from '@/lib/interviews';
+import DatePicker from '@/components/appadmin/DatePicker';
+import { useInterviews, interviewStore } from '@/lib/content-store';
+import { type Interview } from '@/lib/interviews';
 
 type EditMode = 'list' | 'add' | 'edit';
 
 export default function InterviewsAdmin() {
   const [mode, setMode] = useState<EditMode>('list');
   const [editItem, setEditItem] = useState<Interview | null>(null);
-  const [items, setItems] = useState<Interview[]>(interviews);
+  const items = useInterviews();
 
   const columns = [
     { key: 'id', label: 'ID' },
@@ -20,7 +22,7 @@ export default function InterviewsAdmin() {
   ];
 
   const handleDelete = (item: Record<string, unknown>) => {
-    setItems((prev) => prev.filter((p) => p.id !== item.id));
+    interviewStore.set((prev) => prev.filter((p) => p.id !== item.id));
   };
 
   if (mode === 'add' || mode === 'edit') {
@@ -29,9 +31,9 @@ export default function InterviewsAdmin() {
         item={editItem}
         onSave={(data) => {
           if (mode === 'edit' && editItem) {
-            setItems((prev) => prev.map((p) => (p.id === editItem.id ? { ...p, ...data } : p)));
+            interviewStore.set((prev) => prev.map((p) => (p.id === editItem.id ? { ...p, ...data } : p)));
           } else {
-            setItems((prev) => [data as Interview, ...prev]);
+            interviewStore.set((prev) => [data as Interview, ...prev]);
           }
           setMode('list');
           setEditItem(null);
@@ -78,7 +80,7 @@ function InterviewForm({ item, onSave, onCancel }: { item: Interview | null; onS
         <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
           <Field label="ID" value={form.id} onChange={(v) => set('id', v)} required />
           <Field label="タイトル" value={form.title} onChange={(v) => set('title', v)} required />
-          <Field label="日付" value={form.date} onChange={(v) => set('date', v)} placeholder="2026-03-15" required />
+          <DatePicker label="日付" value={form.date} onChange={(v) => set('date', v)} format="iso" />
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">カテゴリー</label>
             <select value={form.category} onChange={(e) => set('category', e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">

@@ -2,14 +2,16 @@
 
 import { useState } from 'react';
 import ContentTable from '@/components/appadmin/ContentTable';
-import { properties, type PropertyData } from '@/lib/properties';
+import ImageUploader from '@/components/appadmin/ImageUploader';
+import { useProperties, propertyStore } from '@/lib/content-store';
+import { type PropertyData } from '@/lib/properties';
 
 type EditMode = 'list' | 'add' | 'edit';
 
 export default function PropertiesAdmin() {
   const [mode, setMode] = useState<EditMode>('list');
   const [editItem, setEditItem] = useState<PropertyData | null>(null);
-  const [items, setItems] = useState<PropertyData[]>(properties);
+  const items = useProperties();
 
   const columns = [
     { key: 'id', label: 'ID' },
@@ -32,7 +34,7 @@ export default function PropertiesAdmin() {
   ];
 
   const handleDelete = (item: Record<string, unknown>) => {
-    setItems((prev) => prev.filter((p) => p.id !== item.id));
+    propertyStore.set(prev => prev.filter(p => p.id !== item.id));
   };
 
   if (mode === 'add' || mode === 'edit') {
@@ -41,9 +43,9 @@ export default function PropertiesAdmin() {
         item={editItem}
         onSave={(data) => {
           if (mode === 'edit' && editItem) {
-            setItems((prev) => prev.map((p) => (p.id === editItem.id ? { ...p, ...data } : p)));
+            propertyStore.set(prev => prev.map(p => p.id === editItem.id ? { ...p, ...data } : p));
           } else {
-            setItems((prev) => [data as PropertyData, ...prev]);
+            propertyStore.set(prev => [data as PropertyData, ...prev]);
           }
           setMode('list');
           setEditItem(null);
@@ -114,12 +116,12 @@ function PropertyForm({
     builderServiceArea: item?.builder?.serviceArea ?? '',
     builderFeatures: item?.builder?.features?.join(', ') ?? '',
     points: item?.points?.join('\n') ?? '',
-    photos: item?.photos?.join('\n') ?? '',
     memoName: item?.designerMemo?.name ?? '',
     memoRole: item?.designerMemo?.role ?? '',
     memoComment: item?.designerMemo?.comment ?? '',
   });
 
+  const [photos, setPhotos] = useState<string[]>(item?.photos ?? []);
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -159,7 +161,7 @@ function PropertyForm({
         features: form.builderFeatures.split(',').map((s) => s.trim()).filter(Boolean),
       },
       points: form.points.split('\n').filter(Boolean),
-      photos: form.photos.split('\n').filter(Boolean),
+      photos,
       designerMemo: { name: form.memoName, role: form.memoRole, comment: form.memoComment },
     });
   };
@@ -236,7 +238,7 @@ function PropertyForm({
 
         <FormSection title="コンテンツ">
           <FormRow label="ポイント（1行1項目）" value={form.points} onChange={(v) => set('points', v)} multiline rows={5} />
-          <FormRow label="写真パス（1行1パス）" value={form.photos} onChange={(v) => set('photos', v)} multiline rows={3} />
+          <ImageUploader label="写真" images={photos} onChange={setPhotos} />
         </FormSection>
 
         <FormSection title="担当者メモ">

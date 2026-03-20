@@ -1,28 +1,20 @@
-import { notFound } from 'next/navigation';
+'use client';
+
 import Link from 'next/link';
-import { articleItems, getArticleItem, getAdjacentArticles } from '@/lib/articles-data';
 import ShareButtons from '@/components/ui/ShareButtons';
+import { useNews } from '@/lib/content-store';
 
-export function generateStaticParams() {
-  return articleItems.map((item) => ({ id: item.id }));
-}
+export default function NewsDetailContent({ id }: { id: string }) {
+  const news = useNews();
+  const item = news.find(n => n.id === id);
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const item = getArticleItem(id);
-  if (!item) return { title: 'お役立ち記事 | ぺいほーむ' };
-  return {
-    title: `${item.title} | ぺいほーむ`,
-    description: item.title,
-  };
-}
+  if (!item) {
+    return <div className="text-center py-20 text-gray-400">記事が見つかりません</div>;
+  }
 
-export default async function ArticleDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const item = getArticleItem(id);
-  if (!item) notFound();
-
-  const { prev, next } = getAdjacentArticles(id);
+  const idx = news.findIndex(n => n.id === id);
+  const prev = idx > 0 ? news[idx - 1] : null;
+  const next = idx < news.length - 1 ? news[idx + 1] : null;
 
   return (
     <>
@@ -32,7 +24,7 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
           <nav>
             <Link href="/">ホーム</Link>
             <span>&gt;</span>
-            <Link href="/articles">お役立ち記事</Link>
+            <Link href="/news">ニュース</Link>
             <span>&gt;</span>
             <span className="text-gray-800">{item.title}</span>
           </nav>
@@ -46,7 +38,7 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
             {/* Meta */}
             <div className="article-detail__meta">
               <span className="article-detail__date">{item.date}</span>
-              <span className="article-detail__tag">{item.tag}</span>
+              <span className="article-detail__tag">{item.category}</span>
             </div>
 
             {/* Title */}
@@ -61,7 +53,7 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
             {/* Body */}
             <div
               className="article-detail__body"
-              dangerouslySetInnerHTML={{ __html: item.body ?? '' }}
+              dangerouslySetInnerHTML={{ __html: item.body }}
             />
 
             {/* Share */}
@@ -73,12 +65,12 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
             {/* Prev/Next */}
             <div className="article-detail__nav">
               {prev ? (
-                <Link href={`/articles/${prev.id}`}>&larr; 前の記事</Link>
+                <Link href={`/news/${prev.id}`}>&larr; 前の記事</Link>
               ) : (
                 <span />
               )}
               {next ? (
-                <Link href={`/articles/${next.id}`}>次の記事 &rarr;</Link>
+                <Link href={`/news/${next.id}`}>次の記事 &rarr;</Link>
               ) : (
                 <span />
               )}

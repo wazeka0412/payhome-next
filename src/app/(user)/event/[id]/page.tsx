@@ -6,11 +6,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import PageHeader from '@/components/ui/PageHeader';
 import {
-  getEventById,
   formatPeriod,
   formatDateJP,
   EVENT_TYPE_STYLES,
 } from '@/lib/events-data';
+import { useEvents } from '@/lib/content-store';
 
 /* ─── Calendar helpers ─── */
 function getDaysInMonth(year: number, month: number) {
@@ -33,7 +33,8 @@ export default function EventDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
-  const event = getEventById(id);
+  const events = useEvents();
+  const event = events.find(e => e.id === id);
 
   /* slideshow */
   const [slideIdx, setSlideIdx] = useState(0);

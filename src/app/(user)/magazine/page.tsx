@@ -1,16 +1,14 @@
+'use client'
+
 import PageHeader from '@/components/ui/PageHeader';
 import Link from 'next/link';
-
-const backNumbers = [
-  { issue: '2026年2月号', title: '特集：断熱等級7の家づくり最前線' },
-  { issue: '2026年1月号', title: '特集：2026年の住宅トレンド予測' },
-  { issue: '2025年12月号', title: '特集：施主100人に聞いた「建てて良かったこと」' },
-  { issue: '2025年11月号', title: '特集：平屋ブームの本当の理由' },
-  { issue: '2025年10月号', title: '特集：住宅ローン減税 最新ガイド' },
-  { issue: '2025年9月号', title: '特集：九州の木造住宅と地産地消' },
-];
+import { useMagazine } from '@/lib/content-store';
 
 export default function MagazinePage() {
+  const items = useMagazine();
+  const latestIssue = items.find((i) => i.isLatest) || items[0];
+  const backNumbers = items.filter((i) => !i.isLatest);
+
   return (
     <>
       <PageHeader
@@ -28,44 +26,36 @@ export default function MagazinePage() {
           <p className="text-center text-xs font-semibold tracking-widest text-[#E8740C] uppercase mb-2">Latest Issue</p>
           <h2 className="text-2xl font-bold text-center text-[#3D2200] mb-10">最新号</h2>
 
-          <div className="flex flex-col md:flex-row gap-8 bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div className="md:w-1/2 aspect-[3/4] md:aspect-auto bg-gray-100 flex items-center justify-center text-gray-400 text-sm min-h-[300px]">
-              Cover Image
+          {latestIssue && (
+            <div className="flex flex-col md:flex-row gap-8 bg-white rounded-2xl shadow-sm overflow-hidden">
+              <div className="md:w-1/2 aspect-[3/4] md:aspect-auto bg-gray-100 flex items-center justify-center text-gray-400 text-sm min-h-[300px]">
+                Cover Image
+              </div>
+              <div className="md:w-1/2 p-6 md:p-10 flex flex-col justify-center">
+                <span className="inline-block text-xs font-semibold text-[#E8740C] bg-[#E8740C]/10 px-3 py-1 rounded mb-3 w-fit">
+                  最新号
+                </span>
+                <h3 className="text-xl font-bold text-[#3D2200] mb-3">月刊ぺいほーむ {latestIssue.issue}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed mb-4">
+                  {latestIssue.description}
+                </p>
+                <ul className="text-sm text-gray-500 space-y-2 mb-6">
+                  {latestIssue.contents.map((content, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <span className="text-[#E8740C] font-bold mt-0.5">-</span>
+                      {content}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href="#"
+                  className="inline-flex items-center justify-center bg-[#E8740C] text-white font-bold px-8 py-3 rounded-full text-sm hover:bg-[#D4660A] transition w-fit"
+                >
+                  この号を読む
+                </Link>
+              </div>
             </div>
-            <div className="md:w-1/2 p-6 md:p-10 flex flex-col justify-center">
-              <span className="inline-block text-xs font-semibold text-[#E8740C] bg-[#E8740C]/10 px-3 py-1 rounded mb-3 w-fit">
-                最新号
-              </span>
-              <h3 className="text-xl font-bold text-[#3D2200] mb-3">月刊ぺいほーむ 2026年3月号</h3>
-              <p className="text-sm text-gray-600 leading-relaxed mb-4">
-                特集「鹿児島・九州の注目工務店10選」— 地元の気候風土を知り尽くした工務店が提案する、次世代の家づくり。
-              </p>
-              <ul className="text-sm text-gray-500 space-y-2 mb-6">
-                <li className="flex items-start gap-2">
-                  <span className="text-[#E8740C] font-bold mt-0.5">-</span>
-                  鹿児島の注目工務店10選
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[#E8740C] font-bold mt-0.5">-</span>
-                  住宅ローン金利の最新トレンド
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[#E8740C] font-bold mt-0.5">-</span>
-                  施主インタビュー：建てて1年後のリアル
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[#E8740C] font-bold mt-0.5">-</span>
-                  ぺいほーむ取材の裏側
-                </li>
-              </ul>
-              <Link
-                href="#"
-                className="inline-flex items-center justify-center bg-[#E8740C] text-white font-bold px-8 py-3 rounded-full text-sm hover:bg-[#D4660A] transition w-fit"
-              >
-                この号を読む
-              </Link>
-            </div>
-          </div>
+          )}
         </div>
       </section>
 

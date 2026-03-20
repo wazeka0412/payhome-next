@@ -2,14 +2,16 @@
 
 import { useState } from 'react';
 import ContentTable from '@/components/appadmin/ContentTable';
-import { webinars, type WebinarData } from '@/lib/webinars-data';
+import DatePicker from '@/components/appadmin/DatePicker';
+import { useWebinars, webinarStore } from '@/lib/content-store';
+import { type WebinarData } from '@/lib/webinars-data';
 
 type EditMode = 'list' | 'add' | 'edit';
 
 export default function WebinarsAdmin() {
   const [mode, setMode] = useState<EditMode>('list');
   const [editItem, setEditItem] = useState<WebinarData | null>(null);
-  const [items, setItems] = useState<WebinarData[]>(webinars);
+  const items = useWebinars();
 
   const columns = [
     { key: 'id', label: 'ID' },
@@ -20,7 +22,7 @@ export default function WebinarsAdmin() {
   ];
 
   const handleDelete = (item: Record<string, unknown>) => {
-    setItems((prev) => prev.filter((p) => p.id !== item.id));
+    webinarStore.set((prev) => prev.filter((p) => p.id !== item.id));
   };
 
   if (mode === 'add' || mode === 'edit') {
@@ -29,9 +31,9 @@ export default function WebinarsAdmin() {
         item={editItem}
         onSave={(data) => {
           if (mode === 'edit' && editItem) {
-            setItems((prev) => prev.map((p) => (p.id === editItem.id ? { ...p, ...data } : p)));
+            webinarStore.set((prev) => prev.map((p) => (p.id === editItem.id ? { ...p, ...data } : p)));
           } else {
-            setItems((prev) => [data as WebinarData, ...prev]);
+            webinarStore.set((prev) => [data as WebinarData, ...prev]);
           }
           setMode('list');
           setEditItem(null);
@@ -104,7 +106,7 @@ function WebinarForm({ item, onSave, onCancel }: { item: WebinarData | null; onS
           <Field label="タイトル" value={form.title} onChange={(v) => set('title', v)} required />
           <Field label="短縮タイトル" value={form.shortTitle} onChange={(v) => set('shortTitle', v)} />
           <div className="grid grid-cols-2 gap-4">
-            <Field label="日付" value={form.date} onChange={(v) => set('date', v)} placeholder="2026-04-15" />
+            <DatePicker label="日付" value={form.date} onChange={(v) => set('date', v)} format="iso" />
             <Field label="表示日付" value={form.dateFormatted} onChange={(v) => set('dateFormatted', v)} placeholder="2026年4月15日（水）" />
             <Field label="カテゴリー" value={form.category} onChange={(v) => set('category', v)} />
             <Field label="ステータス" value={form.status} onChange={(v) => set('status', v)} />

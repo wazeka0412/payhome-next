@@ -5,23 +5,12 @@ import Link from 'next/link';
 import PageHeader from '@/components/ui/PageHeader';
 import FilterTabs from '@/components/ui/FilterTabs';
 import Pagination from '@/components/ui/Pagination';
-
-const newsItems = [
-  { id: 'news-01', date: '2026.03.18', tag: 'お知らせ', title: 'ウェビナー「九州の住宅トレンド2026」開催のお知らせ' },
-  { id: 'news-02', date: '2026.03.15', tag: '業界ニュース', title: '2026年度の住宅省エネ基準改正について解説' },
-  { id: 'news-03', date: '2026.03.12', tag: 'コラム', title: '「良い工務店」の見分け方 ― 10のチェックポイント' },
-  { id: 'news-04', date: '2026.03.10', tag: 'お知らせ', title: '月刊ぺいほーむ 3月号を公開しました' },
-  { id: 'news-05', date: '2026.03.05', tag: '業界ニュース', title: '住宅ローン金利、変動型が過去最低水準を更新' },
-  { id: 'news-06', date: '2026.03.01', tag: 'コラム', title: '家づくりの第一歩｜情報収集で押さえるべき3つのポイント' },
-  { id: 'news-07', date: '2026.02.25', tag: 'お知らせ', title: 'ぺいほーむYouTubeチャンネル登録者4.28万人突破' },
-  { id: 'news-08', date: '2026.02.20', tag: '業界ニュース', title: '国土交通省、2026年度の住宅補助金制度の概要を発表' },
-  { id: 'news-09', date: '2026.02.15', tag: 'コラム', title: '平屋 vs 二階建て｜ライフスタイル別の選び方ガイド' },
-  { id: 'news-10', date: '2026.02.10', tag: 'お知らせ', title: '月刊ぺいほーむ 2月号を公開しました' },
-];
+import { useNews } from '@/lib/content-store';
 
 const ITEMS_PER_PAGE = 5;
 
 export default function NewsPage() {
+  const newsItems = useNews().map(n => ({ id: n.id, date: n.date, tag: n.category, title: n.title }));
   const [activeFilter, setActiveFilter] = useState('すべて');
   const [currentPage, setCurrentPage] = useState(1);
 

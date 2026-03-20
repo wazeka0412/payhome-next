@@ -2,32 +2,16 @@
 
 import { useState } from 'react';
 import ContentTable from '@/components/appadmin/ContentTable';
-
-interface Article {
-  id: string;
-  tag: string;
-  date: string;
-  title: string;
-}
-
-const INITIAL_ARTICLES: Article[] = [
-  { id: 'article-01', tag: '家づくりの基本', date: '2026.03.10', title: '注文住宅 vs 建売住宅 ─ あなたに合うのはどっち？' },
-  { id: 'article-02', tag: '資金計画', date: '2026.03.05', title: '住宅ローンの基本：固定金利と変動金利の選び方' },
-  { id: 'article-03', tag: '間取り', date: '2026.02.28', title: '平屋の間取り完全ガイド ─ 人気の3LDKプラン10選' },
-  { id: 'article-04', tag: '設備', date: '2026.02.20', title: 'キッチン選びで後悔しないための5つのポイント' },
-  { id: 'article-05', tag: '断熱・省エネ', date: '2026.02.15', title: 'ZEH住宅とは？メリット・デメリットを徹底解説' },
-  { id: 'article-06', tag: '土地探し', date: '2026.02.10', title: '鹿児島の土地探し完全ガイド ─ エリア別相場と選び方' },
-  { id: 'article-07', tag: '家づくりの基本', date: '2026.02.05', title: '工務店とハウスメーカーの違いを比較してみた' },
-  { id: 'article-08', tag: '資金計画', date: '2026.01.28', title: '家づくりの総費用を徹底解説 ─ 見落としがちな諸費用とは' },
-  { id: 'article-09', tag: 'メンテナンス', date: '2026.01.20', title: '新築住宅のメンテナンスカレンダー ─ いつ何をすべき？' },
-];
+import DatePicker from '@/components/appadmin/DatePicker';
+import { useArticles, articleStore } from '@/lib/content-store';
+import { type ArticleData } from '@/lib/articles-data';
 
 type EditMode = 'list' | 'add' | 'edit';
 
 export default function ArticlesAdmin() {
   const [mode, setMode] = useState<EditMode>('list');
-  const [editItem, setEditItem] = useState<Article | null>(null);
-  const [items, setItems] = useState<Article[]>(INITIAL_ARTICLES);
+  const [editItem, setEditItem] = useState<ArticleData | null>(null);
+  const items = useArticles();
 
   const columns = [
     { key: 'id', label: 'ID' },
@@ -37,7 +21,7 @@ export default function ArticlesAdmin() {
   ];
 
   const handleDelete = (item: Record<string, unknown>) => {
-    setItems((prev) => prev.filter((p) => p.id !== item.id));
+    articleStore.set(prev => prev.filter(p => p.id !== item.id));
   };
 
   if (mode === 'add' || mode === 'edit') {
@@ -46,9 +30,9 @@ export default function ArticlesAdmin() {
         item={editItem}
         onSave={(data) => {
           if (mode === 'edit' && editItem) {
-            setItems((prev) => prev.map((p) => (p.id === editItem.id ? { ...p, ...data } : p)));
+            articleStore.set(prev => prev.map(p => p.id === editItem.id ? { ...p, ...data } : p));
           } else {
-            setItems((prev) => [data as Article, ...prev]);
+            articleStore.set(prev => [data as ArticleData, ...prev]);
           }
           setMode('list');
           setEditItem(null);
@@ -65,13 +49,13 @@ export default function ArticlesAdmin() {
       columns={columns}
       data={items as unknown as Record<string, unknown>[]}
       onAdd={() => setMode('add')}
-      onEdit={(item) => { setEditItem(item as unknown as Article); setMode('edit'); }}
+      onEdit={(item) => { setEditItem(item as unknown as ArticleData); setMode('edit'); }}
       onDelete={handleDelete}
     />
   );
 }
 
-function ArticleForm({ item, onSave, onCancel }: { item: Article | null; onSave: (data: Partial<Article>) => void; onCancel: () => void }) {
+function ArticleForm({ item, onSave, onCancel }: { item: ArticleData | null; onSave: (data: Partial<ArticleData>) => void; onCancel: () => void }) {
   const [form, setForm] = useState({
     id: item?.id ?? '',
     title: item?.title ?? '',
@@ -105,10 +89,7 @@ function ArticleForm({ item, onSave, onCancel }: { item: Article | null; onSave:
               {TAGS.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">日付</label>
-            <input type="text" value={form.date} onChange={(e) => set('date', e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E8740C]/30 focus:border-[#E8740C]" placeholder="2026.03.15" />
-          </div>
+          <DatePicker label="日付" value={form.date} onChange={(v) => set('date', v)} format="dot" />
         </div>
         <div className="flex gap-3 pt-4">
           <button type="submit" className="bg-[#E8740C] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#d4680b] transition cursor-pointer">{item ? '更新する' : '追加する'}</button>

@@ -5,7 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import PageHeader from '@/components/ui/PageHeader';
 import PrefectureFilter from '@/components/ui/PrefectureFilter';
-import { events, EVENT_TYPE_STYLES, formatPeriod } from '@/lib/events-data';
+import { EVENT_TYPE_STYLES, formatPeriod } from '@/lib/events-data';
+import { useEvents } from '@/lib/content-store';
 
 const reports = [
   { title: '【レポート】鹿児島市・平屋完成見学会を開催しました', date: '2026.03.08', participants: '24名' },
@@ -16,6 +17,7 @@ const reports = [
 const EVENT_TYPES = ['すべて', '完成見学会', 'モデルハウス', 'オンライン見学会', 'ぺいほーむ特別見学会'] as const;
 
 export default function EventPage() {
+  const events = useEvents();
   const [prefecture, setPrefecture] = useState('all');
   const [typeFilter, setTypeFilter] = useState('すべて');
   const [showAdvanced, setShowAdvanced] = useState(false);

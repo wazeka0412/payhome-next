@@ -1,10 +1,12 @@
+'use client'
+
 import Link from 'next/link'
 import PageHeader from '@/components/ui/PageHeader'
-import { reviews } from '@/lib/reviews-data'
-
-export const metadata = { title: 'お客様の声' }
+import { useReviews } from '@/lib/content-store'
 
 export default function VoicePage() {
+  const reviews = useReviews()
+
   return (
     <>
       <PageHeader
