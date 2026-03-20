@@ -4,8 +4,9 @@ import { useState } from 'react';
 import ContentTable from '@/components/appadmin/ContentTable';
 import DatePicker from '@/components/appadmin/DatePicker';
 import EditableSelect from '@/components/appadmin/EditableSelect';
+import RichTextEditor from '@/components/appadmin/RichTextEditor';
 import { useInterviews, interviewStore } from '@/lib/content-store';
-import { type Interview } from '@/lib/interviews';
+import { type Interview, type InterviewBodyItem } from '@/lib/interviews';
 
 type EditMode = 'list' | 'add' | 'edit';
 
@@ -57,6 +58,47 @@ export default function InterviewsAdmin() {
   );
 }
 
+// Convert InterviewBodyItem[] to HTML for the editor
+function bodyToHtml(body: InterviewBodyItem[]): string {
+  return body.map((item) => {
+    switch (item.type) {
+      case 'p': return `<p>${item.text}</p>`;
+      case 'h2': return `<h2>${item.text}</h2>`;
+      case 'h3': return `<h3>${item.text}</h3>`;
+      case 'blockquote': return `<blockquote>${item.text}</blockquote>`;
+      case 'ul': return `<ul>${item.items.map(i => `<li>${i}</li>`).join('')}</ul>`;
+      case 'ol': return `<ol>${item.items.map(i => `<li>${i}</li>`).join('')}</ol>`;
+      case 'img': return `<p>[画像: ${item.alt}]</p>`;
+      default: return '';
+    }
+  }).join('');
+}
+
+// Convert HTML back to InterviewBodyItem[]
+function htmlToBody(html: string): InterviewBodyItem[] {
+  if (typeof window === 'undefined' || !html.trim()) return [];
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  const items: InterviewBodyItem[] = [];
+  doc.body.childNodes.forEach((node) => {
+    if (node.nodeType !== 1) {
+      const text = node.textContent?.trim();
+      if (text) items.push({ type: 'p', text });
+      return;
+    }
+    const el = node as HTMLElement;
+    const tag = el.tagName.toLowerCase();
+    const text = el.textContent?.trim() ?? '';
+    if (tag === 'h2') items.push({ type: 'h2', text });
+    else if (tag === 'h3') items.push({ type: 'h3', text });
+    else if (tag === 'blockquote') items.push({ type: 'blockquote', text });
+    else if (tag === 'ul') items.push({ type: 'ul', items: Array.from(el.querySelectorAll('li')).map(li => li.textContent?.trim() ?? '') });
+    else if (tag === 'ol') items.push({ type: 'ol', items: Array.from(el.querySelectorAll('li')).map(li => li.textContent?.trim() ?? '') });
+    else if (text) items.push({ type: 'p', text });
+  });
+  return items;
+}
+
 function InterviewForm({ item, onSave, onCancel }: { item: Interview | null; onSave: (data: Partial<Interview>) => void; onCancel: () => void }) {
   const [form, setForm] = useState({
     id: item?.id ?? '',
@@ -66,6 +108,7 @@ function InterviewForm({ item, onSave, onCancel }: { item: Interview | null; onS
     company: item?.company ?? '',
     location: item?.location ?? '',
     excerpt: item?.excerpt ?? '',
+    bodyHtml: item?.body ? bodyToHtml(item.body) : '',
   });
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
 
@@ -77,8 +120,9 @@ function InterviewForm({ item, onSave, onCancel }: { item: Interview | null; onS
         <button onClick={onCancel} className="text-sm text-gray-500 hover:text-[#E8740C] cursor-pointer">← 戻る</button>
         <h1 className="text-2xl font-bold text-gray-900">{item ? '記事を編集' : '記事を新規追加'}</h1>
       </div>
-      <form onSubmit={(e) => { e.preventDefault(); onSave({ ...form, body: item?.body ?? [] }); }} className="space-y-6 max-w-3xl">
+      <form onSubmit={(e) => { e.preventDefault(); const { bodyHtml, ...rest } = form; onSave({ ...rest, body: htmlToBody(bodyHtml) }); }} className="space-y-6 max-w-3xl">
         <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
+          <h3 className="text-sm font-bold text-[#E8740C] uppercase tracking-wider mb-4">基本情報</h3>
           <Field label="ID" value={form.id} onChange={(v) => set('id', v)} required />
           <Field label="タイトル" value={form.title} onChange={(v) => set('title', v)} required />
           <DatePicker label="日付" value={form.date} onChange={(v) => set('date', v)} format="iso" />
@@ -86,6 +130,10 @@ function InterviewForm({ item, onSave, onCancel }: { item: Interview | null; onS
           <Field label="会社名" value={form.company} onChange={(v) => set('company', v)} />
           <Field label="所在地" value={form.location} onChange={(v) => set('location', v)} />
           <Field label="概要" value={form.excerpt} onChange={(v) => set('excerpt', v)} multiline rows={3} />
+        </div>
+        <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
+          <h3 className="text-sm font-bold text-[#E8740C] uppercase tracking-wider mb-4">本文</h3>
+          <RichTextEditor label="本文" value={form.bodyHtml} onChange={(v) => set('bodyHtml', v)} />
         </div>
         <div className="flex gap-3 pt-4">
           <button type="submit" className="bg-[#E8740C] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#d4680b] transition cursor-pointer">{item ? '更新する' : '追加する'}</button>
