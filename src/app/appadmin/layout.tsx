@@ -15,6 +15,18 @@ const NAV_ITEMS = [
   { href: '/appadmin/articles', icon: '📝', label: 'お役立ち記事' },
   { href: '/appadmin/news', icon: '📢', label: 'ニュース' },
   { href: '/appadmin/magazine', icon: '📖', label: '月刊ぺいほーむ' },
+];
+
+const TOOL_NAV_ITEMS = [
+  { href: '/appadmin/media', icon: '🖼️', label: 'メディアライブラリ' },
+  { href: '/appadmin/workflow', icon: '📋', label: 'ワークフロー' },
+  { href: '/appadmin/seo', icon: '🔍', label: 'SEO設定' },
+  { href: '/appadmin/audit', icon: '📜', label: '監査ログ' },
+  { href: '/appadmin/system', icon: '🖥️', label: 'システム状態' },
+  { href: '/appadmin/backup', icon: '💾', label: 'バックアップ' },
+];
+
+const SETTINGS_NAV = [
   { href: '/appadmin/settings', icon: '⚙️', label: 'システム設定' },
 ];
 
@@ -26,7 +38,7 @@ export default function AppAdminLayout({ children }: { children: React.ReactNode
     return () => { document.body.classList.remove('pei-page-loaded'); };
   }, []);
 
-  const isActive = (item: typeof NAV_ITEMS[0]) => {
+  const isActive = (item: { href: string; exact?: boolean }) => {
     if (item.exact) return pathname === item.href;
     return pathname.startsWith(item.href);
   };
@@ -40,21 +52,60 @@ export default function AppAdminLayout({ children }: { children: React.ReactNode
           </Link>
           <p className="text-[0.65rem] text-gray-400 mt-0.5">コンテンツ管理システム</p>
         </div>
-        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-          {NAV_ITEMS.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition ${
-                isActive(item)
-                  ? 'bg-[#E8740C] text-white font-semibold'
-                  : 'text-gray-400 hover:bg-white/5 hover:text-white'
-              }`}
-            >
-              <span className="text-base">{item.icon}</span>
-              {item.label}
-            </Link>
-          ))}
+        <nav className="flex-1 px-3 py-4 overflow-y-auto">
+          <div className="space-y-0.5">
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition ${
+                  isActive(item)
+                    ? 'bg-[#E8740C] text-white font-semibold'
+                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                <span className="text-base">{item.icon}</span>
+                {item.label}
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-4 pt-4 border-t border-white/10">
+            <p className="px-4 text-[0.6rem] uppercase tracking-wider text-gray-500 mb-2">管理ツール</p>
+            <div className="space-y-0.5">
+              {TOOL_NAV_ITEMS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition ${
+                    isActive(item)
+                      ? 'bg-[#E8740C] text-white font-semibold'
+                      : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                  }`}
+                >
+                  <span className="text-base">{item.icon}</span>
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-4 pt-4 border-t border-white/10 space-y-0.5">
+            {SETTINGS_NAV.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition ${
+                  isActive(item)
+                    ? 'bg-[#E8740C] text-white font-semibold'
+                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                <span className="text-base">{item.icon}</span>
+                {item.label}
+              </Link>
+            ))}
+          </div>
         </nav>
         <div className="p-4 border-t border-white/10">
           <Link href="/admin" className="text-xs text-gray-500 hover:text-gray-300 transition">
