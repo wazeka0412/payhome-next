@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import ContentTable from '@/components/appadmin/ContentTable';
 import DatePicker from '@/components/appadmin/DatePicker';
+import ImageUploader from '@/components/appadmin/ImageUploader';
 import RichTextEditor from '@/components/appadmin/RichTextEditor';
 import { useInterviews, interviewStore } from '@/lib/content-store';
 import { useSettings } from '@/lib/settings-store';
@@ -110,6 +111,7 @@ function InterviewForm({ item, onSave, onCancel }: { item: Interview | null; onS
     excerpt: item?.excerpt ?? '',
     bodyHtml: item?.body ? bodyToHtml(item.body) : '',
   });
+  const [thumbnail, setThumbnail] = useState<string[]>(item?.thumbnail ? [item.thumbnail] : []);
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
 
   const settings = useSettings();
@@ -120,7 +122,7 @@ function InterviewForm({ item, onSave, onCancel }: { item: Interview | null; onS
         <button onClick={onCancel} className="text-sm text-gray-500 hover:text-[#E8740C] cursor-pointer">← 戻る</button>
         <h1 className="text-2xl font-bold text-gray-900">{item ? '記事を編集' : '記事を新規追加'}</h1>
       </div>
-      <form onSubmit={(e) => { e.preventDefault(); const { bodyHtml, ...rest } = form; onSave({ ...rest, body: htmlToBody(bodyHtml) }); }} className="space-y-6 max-w-3xl">
+      <form onSubmit={(e) => { e.preventDefault(); const { bodyHtml, ...rest } = form; onSave({ ...rest, body: htmlToBody(bodyHtml), thumbnail: thumbnail[0] || '' }); }} className="space-y-6 max-w-3xl">
         <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
           <h3 className="text-sm font-bold text-[#E8740C] uppercase tracking-wider mb-4">基本情報</h3>
           <Field label="ID" value={form.id} onChange={(v) => set('id', v)} required />
@@ -135,6 +137,7 @@ function InterviewForm({ item, onSave, onCancel }: { item: Interview | null; onS
           <Field label="会社名" value={form.company} onChange={(v) => set('company', v)} />
           <Field label="所在地" value={form.location} onChange={(v) => set('location', v)} />
           <Field label="概要" value={form.excerpt} onChange={(v) => set('excerpt', v)} multiline rows={3} />
+          <ImageUploader label="サムネイル画像" images={thumbnail} onChange={setThumbnail} multiple={false} />
         </div>
         <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
           <h3 className="text-sm font-bold text-[#E8740C] uppercase tracking-wider mb-4">本文</h3>

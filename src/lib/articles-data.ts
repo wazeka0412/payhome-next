@@ -5,6 +5,7 @@ export interface ArticleData {
   title: string;
   description?: string;
   body?: string;
+  thumbnail?: string;
 }
 
 export const articles: ArticleData[] = [

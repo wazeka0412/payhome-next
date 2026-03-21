@@ -16,6 +16,7 @@ export interface Interview {
   location: string;
   excerpt: string;
   body: InterviewBodyItem[];
+  thumbnail?: string;
 }
 
 export const interviews: Interview[] = [

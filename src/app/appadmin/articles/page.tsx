@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import ContentTable from '@/components/appadmin/ContentTable';
 import DatePicker from '@/components/appadmin/DatePicker';
+import ImageUploader from '@/components/appadmin/ImageUploader';
 import RichTextEditor from '@/components/appadmin/RichTextEditor';
 import { useArticles, articleStore } from '@/lib/content-store';
 import { useSettings } from '@/lib/settings-store';
@@ -66,6 +67,7 @@ function ArticleForm({ item, onSave, onCancel }: { item: ArticleData | null; onS
     description: item?.description ?? '',
     body: item?.body ?? '',
   });
+  const [thumbnail, setThumbnail] = useState<string[]>(item?.thumbnail ? [item.thumbnail] : []);
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
 
   const settings = useSettings();
@@ -77,7 +79,7 @@ function ArticleForm({ item, onSave, onCancel }: { item: ArticleData | null; onS
         <button onClick={onCancel} className="text-sm text-gray-500 hover:text-[#E8740C] cursor-pointer">← 戻る</button>
         <h1 className="text-2xl font-bold text-gray-900">{item ? '記事を編集' : '記事を新規追加'}</h1>
       </div>
-      <form onSubmit={(e) => { e.preventDefault(); onSave(form); }} className="space-y-6 max-w-3xl">
+      <form onSubmit={(e) => { e.preventDefault(); onSave({ ...form, thumbnail: thumbnail[0] || '' }); }} className="space-y-6 max-w-3xl">
         <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
           <h3 className="text-sm font-bold text-[#E8740C] uppercase tracking-wider mb-4">基本情報</h3>
           <div>
@@ -96,6 +98,7 @@ function ArticleForm({ item, onSave, onCancel }: { item: ArticleData | null; onS
             </select>
           </div>
           <DatePicker label="日付" value={form.date} onChange={(v) => set('date', v)} format="dot" />
+          <ImageUploader label="サムネイル画像" images={thumbnail} onChange={setThumbnail} multiple={false} />
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">概要</label>
             <textarea value={form.description} onChange={(e) => set('description', e.target.value)} className={cls + " resize-y"} rows={3} placeholder="記事の概要を入力" />
