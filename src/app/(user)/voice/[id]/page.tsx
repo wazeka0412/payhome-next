@@ -1,5 +1,6 @@
 import { reviews, getReviewById } from '@/lib/reviews-data'
 import VoiceDetailContent from './VoiceDetailContent'
+import TrackPageView from '@/components/tracking/TrackPageView'
 
 export function generateStaticParams() {
   return reviews.map((r) => ({ id: r.id }))
@@ -13,5 +14,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function VoiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  return <VoiceDetailContent id={id} />
+  return (
+    <>
+      <TrackPageView eventType="article_read" contentType="voice" contentId={id} />
+      <VoiceDetailContent id={id} />
+    </>
+  )
 }

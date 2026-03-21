@@ -1,5 +1,6 @@
 import { webinars, getWebinarById } from '@/lib/webinars-data';
 import WebinarDetailContent from './WebinarDetailContent';
+import TrackPageView from '@/components/tracking/TrackPageView';
 
 export function generateStaticParams() {
   return webinars.map((w) => ({ id: w.id }));
@@ -11,5 +12,10 @@ export default async function WebinarDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return <WebinarDetailContent id={id} />;
+  return (
+    <>
+      <TrackPageView eventType="event_detail_view" contentType="webinar" contentId={id} />
+      <WebinarDetailContent id={id} />
+    </>
+  );
 }

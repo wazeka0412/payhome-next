@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { LINE_URL } from '@/lib/constants';
+import { useTrackEvent } from '@/lib/use-track-event';
+import { getOrCreateAnonymousId, getUtmParams } from '@/lib/anonymous-id';
 
 const faqData = [
   { q: '本当に無料ですか？', a: 'はい、完全無料です。ぺいほーむは提携工務店からの広告費で運営しているため、ご相談者様に費用が発生することは一切ございません。紹介料・相談料もかかりません。' },
@@ -29,6 +31,11 @@ export default function ConsultationPage() {
   const [completeName, setCompleteName] = useState('');
   const [completeDetail, setCompleteDetail] = useState('');
   const completeRef = useRef<HTMLDivElement>(null);
+  const trackEvent = useTrackEvent();
+
+  useEffect(() => {
+    trackEvent({ eventType: 'consultation_start', contentType: 'page' });
+  }, [trackEvent]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -43,12 +50,28 @@ export default function ConsultationPage() {
     if (layout) details.push('間取り: ' + layout);
     setCompleteDetail(details.join(' / '));
 
+    const utm = getUtmParams();
     try {
       await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: '無料相談', name: formData.get('name'), email: formData.get('email'), phone: formData.get('phone'), area: formData.get('area'), build_area: formData.get('build_area'), budget, layout, video: formData.get('video'), message: formData.get('message') }),
+        body: JSON.stringify({
+          type: '無料相談',
+          name: formData.get('name'),
+          email: formData.get('email'),
+          phone: formData.get('phone'),
+          area: formData.get('area'),
+          build_area: formData.get('build_area'),
+          budget,
+          layout,
+          video: formData.get('video'),
+          message: formData.get('message'),
+          anonymous_id: getOrCreateAnonymousId(),
+          source_channel: utm.source || document.referrer || 'direct',
+          source_content_id: new URLSearchParams(window.location.search).get('from') || undefined,
+        }),
       });
+      trackEvent({ eventType: 'consultation_request', contentType: 'lead' });
     } catch (e) { /* silent fail */ }
 
     setIsSubmitted(true);

@@ -21,6 +21,10 @@ export interface Lead {
   status: '新規' | '対応中' | '紹介済' | '面談済' | '成約' | '失注'
   score: number
   memo?: string
+  sourceChannel?: string
+  sourceContentId?: string
+  recentViews?: Array<{ content_type: string; content_id: string; page_path: string; created_at: string }>
+  anonymousId?: string
   createdAt: string
   updatedAt: string
 }
@@ -37,6 +41,20 @@ export interface BuilderProfile {
   plan: 'フリー' | 'グロース' | 'プレミアム'
   logoUrl?: string
   isActive: boolean
+  // 構造化データ（AI推薦用）
+  priceRange?: string
+  hirayaRatio?: number
+  hirayaAnnual?: number
+  designTaste?: string[]
+  features?: string[]
+  suitableFor?: string[]
+  insulationGrade?: string
+  earthquakeGrade?: string
+  constructionMethod?: string
+  landProposal?: boolean
+  commonConcerns?: string[]
+  strengths?: string[]
+  comparisonPoints?: string[]
 }
 
 export interface Event {
@@ -90,6 +108,19 @@ function dbBuilderToBuilder(db: DbBuilder): BuilderProfile {
     plan: db.plan as BuilderProfile['plan'],
     logoUrl: db.logo_url ?? undefined,
     isActive: db.is_active,
+    priceRange: db.price_range ?? undefined,
+    hirayaRatio: db.hiraya_ratio ?? undefined,
+    hirayaAnnual: db.hiraya_annual ?? undefined,
+    designTaste: db.design_taste ?? [],
+    features: db.features ?? [],
+    suitableFor: db.suitable_for ?? [],
+    insulationGrade: db.insulation_grade ?? undefined,
+    earthquakeGrade: db.earthquake_grade ?? undefined,
+    constructionMethod: db.construction_method ?? undefined,
+    landProposal: db.land_proposal ?? false,
+    commonConcerns: db.common_concerns ?? [],
+    strengths: db.strengths ?? [],
+    comparisonPoints: db.comparison_points ?? [],
   }
 }
 
@@ -163,6 +194,10 @@ export const store = {
         selected_companies: lead.selectedCompanies,
         status: '新規',
         score: 50,
+        source_channel: lead.sourceChannel,
+        source_content_id: lead.sourceContentId,
+        recent_views: lead.recentViews || [],
+        anonymous_id: lead.anonymousId,
       })
       .select()
       .single()

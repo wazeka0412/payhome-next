@@ -1,1133 +1,751 @@
-# Payhome Platform - Requirements Specification
+# ぺいほーむ プラットフォーム 要件定義書
 
-**Version:** 1.0
-**Date:** 2026-03-21
-**Company:** wazeka Inc.
-**Product:** payhome (Housing Media Platform)
-**Contact:** Murata Shunnosuke (CEO)
-
----
-
-## Table of Contents
-
-1. [Project Overview](#1-project-overview)
-2. [System Architecture](#2-system-architecture)
-3. [Database Schema](#3-database-schema)
-4. [Authentication & Authorization](#4-authentication--authorization)
-5. [API Specification](#5-api-specification)
-6. [Page Structure & Routing](#6-page-structure--routing)
-7. [Feature Requirements by Phase](#7-feature-requirements-by-phase)
-8. [Business Logic & Data Flow](#8-business-logic--data-flow)
-9. [AI Chatbot Integration](#9-ai-chatbot-integration)
-10. [Third-Party Integrations](#10-third-party-integrations)
-11. [Design System & Branding](#11-design-system--branding)
-12. [Performance & SEO Requirements](#12-performance--seo-requirements)
-13. [Environment & Deployment](#13-environment--deployment)
-14. [Remaining Tasks](#14-remaining-tasks)
+**文書バージョン:** 3.0
+**作成日:** 2026-03-22
+**対象システム:** payhome-next
+**技術基盤:** Next.js 16.2.0 / React 19 / Supabase / Vercel
+**想定読者:** PM / エンジニア / 事業責任者
 
 ---
 
-## 1. Project Overview
+## 第1章：文書目的
 
-### 1.1 What is Payhome?
+本文書は「ぺいほーむ」プラットフォームの要件を定義する。
 
-Payhome is a Japanese housing media platform operated by wazeka Inc. It connects homebuyers with trusted local builders through YouTube video content (42,800+ subscribers, 257 videos) and an AI-powered recommendation engine.
+従来の要件定義（画面・機能の列挙）に加え、以下の観点を明示的に含む。
 
-### 1.2 Business Model
-
-The platform operates a dual-sided marketplace:
-
-- **B2C (Homebuyers):** Free access to property videos, articles, AI consultation, event bookings, and document requests.
-- **B2B (Builders/Construction Companies):** Tiered SaaS plans with pay-per-lead pricing.
-
-**Revenue Streams:**
-
-| Revenue Type | Unit Price |
-|---|---|
-| Document request (lead) | 3,000 JPY/lead |
-| Event reservation (lead) | 5,000 JPY/lead |
-| Closed deal commission | 150,000 JPY/deal |
-| Growth plan (monthly) | 50,000 JPY/mo |
-| Premium plan (monthly) | 100,000 JPY/mo |
-| Loan referral | 30,000-50,000 JPY/case |
-| Insurance referral | 20,000-50,000 JPY/case |
-
-### 1.3 Target Users
-
-| User Type | Description |
-|---|---|
-| Homebuyers | Age 35-65, primarily female (54%), looking for single-story homes ("hiraya"). Mobile-first (49.4% mobile). |
-| Builders | Local construction companies across Japan. Currently 12 active in the system. |
-| Admin | Internal wazeka staff managing leads, builders, content, and analytics. |
+- **データ要件**：何のデータを、いつ、どこに保存し、何に使うか
+- **イベント計測要件**：どの行動を追跡し、何を分析するか
+- **AI/推薦要件**：AIコンシェルジュの段階的な進化に必要な機能と前提条件
+- **開発優先順位**：データ基盤の整備を機能拡張より優先する
 
 ---
 
-## 2. System Architecture
+## 第2章：背景 / 事業目的
 
-### 2.1 Tech Stack
+### 2.1 事業定義
 
-| Layer | Technology | Version |
-|---|---|---|
-| Framework | Next.js (App Router) | 16.2.0 |
-| Language | TypeScript | ^5 |
-| Runtime | React | 19.2.4 |
-| Styling | Tailwind CSS | v4 |
-| Database | Supabase (PostgreSQL) | - |
-| Auth | NextAuth.js | v4 |
-| AI | OpenAI GPT-4o | - |
-| Email | Resend | - |
-| Payments | Stripe | ^20.4.1 |
-| Deployment | Vercel | - |
-| Domain | payhome.jp (pending) | - |
+ぺいほーむは、平屋を検討するユーザーの意思決定を支援し、その意思決定プロセスから得られるデータを蓄積・活用するAI住宅プラットフォームである。
 
-### 2.2 Project Structure
+### 2.2 プロダクトの目的
 
-```
-payhome-next/
-├── src/
-│   ├── app/
-│   │   ├── (user)/           # B2C public pages (layout with Header/Footer/ChatWidget)
-│   │   │   ├── page.tsx      # Homepage
-│   │   │   ├── about/
-│   │   │   ├── area/
-│   │   │   ├── articles/[id]/
-│   │   │   ├── builders/contact/
-│   │   │   ├── catalog/
-│   │   │   ├── company/
-│   │   │   ├── consultation/
-│   │   │   ├── event/
-│   │   │   ├── interview/[id]/
-│   │   │   ├── magazine/
-│   │   │   ├── mypage/
-│   │   │   ├── news/[id]/
-│   │   │   ├── privacy/
-│   │   │   ├── property/[id]/
-│   │   │   ├── simulator/
-│   │   │   ├── terms/
-│   │   │   ├── thanks/
-│   │   │   ├── videos/
-│   │   │   ├── voice/[id]/
-│   │   │   └── webinar/[id]/
-│   │   ├── (biz)/biz/        # B2B pages (layout with BizHeader)
-│   │   │   ├── page.tsx
-│   │   │   ├── ad/
-│   │   │   ├── articles/[id]/
-│   │   │   ├── contact/
-│   │   │   ├── news/[id]/
-│   │   │   ├── partner/
-│   │   │   ├── service/
-│   │   │   └── webinar/[id]/
-│   │   ├── admin/            # Admin panel (admin role only)
-│   │   │   ├── page.tsx
-│   │   │   ├── dashboard/
-│   │   │   ├── leads/
-│   │   │   ├── builders/
-│   │   │   └── properties/
-│   │   ├── dashboard/        # Auth-protected dashboards
-│   │   │   ├── page.tsx      # Login page
-│   │   │   ├── builder/      # Builder dashboard (builder+admin roles)
-│   │   │   │   ├── leads/
-│   │   │   │   ├── events/
-│   │   │   │   ├── billing/
-│   │   │   │   └── profile/
-│   │   │   └── user/         # User dashboard
-│   │   │       ├── favorites/
-│   │   │       ├── consultations/
-│   │   │       └── history/
-│   │   └── api/              # API routes
-│   │       ├── auth/[...nextauth]/
-│   │       ├── builders/
-│   │       ├── chat/
-│   │       ├── contact/
-│   │       ├── events/
-│   │       ├── leads/[id]/
-│   │       ├── leads/
-│   │       └── stats/
-│   ├── components/
-│   │   ├── layout/           # Header, Footer, FixedBar, LineFloat, ChatWidget, etc.
-│   │   └── ui/               # Card, FilterTabs, Pagination, PlanCard, ShareButtons, etc.
-│   ├── data/                 # Static JSON data (properties, builders, articles, etc.)
-│   ├── lib/
-│   │   ├── auth.ts           # NextAuth configuration
-│   │   ├── store.ts          # Data access layer (Supabase CRUD)
-│   │   └── supabase.ts       # Supabase client initialization
-│   └── types/
-│       ├── index.ts          # Domain type definitions
-│       └── next-auth.d.ts    # NextAuth type augmentation
-├── supabase/
-│   ├── schema.sql            # Database DDL
-│   └── seed.sql              # Sample data (12 builders, 10 leads, 4 events)
-├── public/                   # Static assets (images, favicon)
-└── docs/                     # This documentation
-```
+1. **消費者向け**：平屋検討における情報整理・比較・相談・行動支援を提供する
+2. **住宅会社向け**：意向データを伴った高精度な見込み顧客接点を提供する
+3. **データ基盤**：蓄積されるデータを基に、AI住宅コンシェルジュおよびAI営業支援に進化する
 
-### 2.3 Data Flow
+### 2.3 設計原則
 
-```
-[YouTube 42.8K subs] ──→ [Web Media (Next.js)] ──→ [AI Chatbot (GPT-4o + RAG)]
-                              │                           │
-                              ▼                           ▼
-                        [Lead Forms]               [AI Recommendations]
-                              │                           │
-                              └─────────┬─────────────────┘
-                                        ▼
-                                  [Supabase DB]
-                                   /        \
-                          [Admin Panel]   [Builder Dashboard]
-                          (KPIs, Lead     (Leads, Events,
-                           Management)    Billing, Profile)
-```
+| 原則 | 内容 |
+|------|------|
+| データファースト | すべてのユーザー接点でデータを取得・蓄積する前提で設計する |
+| 段階的進化 | MVP→データ蓄積→AI活用→SaaS化の順で段階的に進化する |
+| 構造化優先 | コンテンツ・リード・行動データはAIが処理しやすい構造化形式で保存する |
+| 匿名→実名接続 | 匿名ユーザーの行動データを、会員登録後に紐付けられる設計にする |
 
 ---
 
-## 3. Database Schema
+## 第3章：システム全体像
 
-### 3.1 Supabase Project
+### 3.1 アーキテクチャ
 
-- **Project ID:** `fochghjyvhrriglwcbqw`
-- **Region:** Northeast Asia (Tokyo)
-- **URL:** `https://fochghjyvhrriglwcbqw.supabase.co`
-
-### 3.2 Tables
-
-#### `builders` - Housing Company Profiles
-
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| id | UUID | PK, default gen_random_uuid() | |
-| name | TEXT | NOT NULL | Company name |
-| email | TEXT | NOT NULL, UNIQUE | Contact email |
-| phone | TEXT | | Phone number |
-| area | TEXT | NOT NULL | Service area |
-| address | TEXT | NOT NULL | Office address |
-| specialties | TEXT[] | DEFAULT '{}' | e.g. ["hiraya", "natural materials"] |
-| description | TEXT | | Company description |
-| website | TEXT | | Official website URL |
-| logo_url | TEXT | | Logo image URL |
-| plan | TEXT | DEFAULT 'free' | One of: free, standard, growth, premium |
-| is_active | BOOLEAN | DEFAULT true | |
-| created_at | TIMESTAMPTZ | DEFAULT now() | |
-| updated_at | TIMESTAMPTZ | DEFAULT now() | Auto-updated via trigger |
-
-#### `users` - Platform Users
-
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| id | UUID | PK, default gen_random_uuid() | |
-| email | TEXT | NOT NULL, UNIQUE | |
-| name | TEXT | NOT NULL | |
-| role | TEXT | NOT NULL, DEFAULT 'user' | One of: admin, builder, user |
-| builder_id | UUID | FK → builders(id) | Set when role='builder' |
-| avatar_url | TEXT | | Profile picture |
-| created_at | TIMESTAMPTZ | DEFAULT now() | |
-| updated_at | TIMESTAMPTZ | DEFAULT now() | |
-
-#### `leads` - Customer Inquiries
-
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| id | UUID | PK | |
-| type | TEXT | NOT NULL | See lead types below |
-| name | TEXT | NOT NULL | Customer name |
-| email | TEXT | NOT NULL | |
-| phone | TEXT | | |
-| company | TEXT | | For B2B leads |
-| area | TEXT | | Preferred area |
-| budget | TEXT | | Budget range |
-| layout | TEXT | | e.g. "3LDK" |
-| message | TEXT | | Free text message |
-| video | TEXT | | YouTube video that triggered inquiry |
-| builder_id | UUID | | Assigned builder |
-| builder_name | TEXT | | |
-| selected_companies | TEXT[] | | For catalog requests |
-| selected_services | TEXT[] | | Selected service types |
-| status | TEXT | DEFAULT 'new' | See statuses below |
-| score | INTEGER | DEFAULT 50 | Lead quality score (0-100) |
-| memo | TEXT | | Internal notes |
-| user_id | UUID | | |
-| created_at | TIMESTAMPTZ | DEFAULT now() | |
-| updated_at | TIMESTAMPTZ | DEFAULT now() | |
-
-**Lead Types (type column):**
-- `free_consultation` (無料相談)
-- `document_request` (資料請求)
-- `event_reservation` (見学会予約)
-- `builder_consultation` (工務店相談)
-- `b2b_inquiry` (B2Bお問い合わせ)
-- `partner_application` (パートナー申込)
-- `seminar_application` (セミナー申込)
-
-**Lead Statuses (status column):**
-- `new` (新規) → `in_progress` (対応中) → `referred` (紹介済) → `meeting_done` (面談済) → `closed` (成約) | `lost` (失注)
-
-#### `events` - Viewing Events / Seminars
-
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| id | UUID | PK | |
-| builder_id | UUID | NOT NULL | Hosting builder |
-| builder_name | TEXT | NOT NULL | |
-| title | TEXT | NOT NULL | Event title |
-| date | TEXT | NOT NULL | Event date |
-| location | TEXT | NOT NULL | Venue |
-| type | TEXT | NOT NULL | completion, model, special, online |
-| capacity | INTEGER | DEFAULT 10 | Max participants |
-| reservations | INTEGER | DEFAULT 0 | Current bookings |
-| is_active | BOOLEAN | DEFAULT true | |
-| created_at | TIMESTAMPTZ | DEFAULT now() | |
-| updated_at | TIMESTAMPTZ | DEFAULT now() | |
-
-#### `favorites` - User Saved Properties
-
-| Column | Type | Constraints |
-|---|---|---|
-| id | UUID | PK |
-| user_id | UUID | FK → users(id), NOT NULL |
-| property_id | TEXT | NOT NULL |
-| created_at | TIMESTAMPTZ | DEFAULT now() |
-
-#### `chat_history` - AI Chat Logs
-
-| Column | Type | Constraints |
-|---|---|---|
-| id | UUID | PK |
-| user_id | UUID | |
-| session_id | TEXT | NOT NULL |
-| role | TEXT | NOT NULL (user/assistant) |
-| content | TEXT | NOT NULL |
-| created_at | TIMESTAMPTZ | DEFAULT now() |
-
-### 3.3 Row Level Security (RLS)
-
-All tables have RLS enabled. Key policies:
-
-| Table | Policy | Rule |
-|---|---|---|
-| builders | SELECT | Public read for active builders |
-| builders | ALL | Admin only for CUD |
-| leads | ALL | Admin has full access |
-| leads | SELECT | Builders can view their assigned leads |
-| events | SELECT | Public read |
-| events | ALL | Admin only for CUD |
-| favorites | ALL | Users can manage their own favorites only |
-| chat_history | ALL | Users can access their own chat history only |
-
-### 3.4 Indexes
-
-```sql
-idx_leads_status        ON leads(status)
-idx_leads_builder_name  ON leads(builder_name)
-idx_leads_email         ON leads(email)
-idx_leads_created_at    ON leads(created_at)
-idx_events_date         ON events(date)
-idx_events_builder_id   ON events(builder_id)
-idx_favorites_user_id   ON favorites(user_id)
-idx_chat_user_id        ON chat_history(user_id)
-idx_chat_session_id     ON chat_history(session_id)
 ```
+┌─────────────────────────────────────────────────────────────┐
+│                       クライアント                            │
+│  ブラウザ（PC / タブレット / スマートフォン）                  │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ HTTPS
+┌──────────────────────────▼──────────────────────────────────┐
+│                    Vercel Edge Network                       │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────────┐  │
+│  │ SSR/SSG  │  │API Routes│  │Middleware │  │ イベント    │  │
+│  │Next.js 16│  │          │  │(認証)     │  │ 収集API    │  │
+│  └──────────┘  └──────────┘  └──────────┘  └────────────┘  │
+└────┬──────────────┬──────────────┬──────────────┬───────────┘
+     │              │              │              │
+┌────▼────┐  ┌──────▼──────┐  ┌───▼───┐  ┌──────▼──────┐
+│Supabase │  │  外部API     │  │  GA4  │  │  将来拡張    │
+│PostgreSQL│  │・OpenAI     │  │       │  │・Redis      │
+│          │  │・Stripe     │  │       │  │・BigQuery   │
+│・users   │  │・Resend     │  │       │  │・ML Pipeline│
+│・leads   │  │・Google OAuth│ │       │  │             │
+│・builders│  └─────────────┘  └───────┘  └─────────────┘
+│・events  │
+│・user_   │
+│ profiles │
+│・user_   │
+│ events   │
+│・chat_   │
+│ sessions │
+│・chat_   │
+│ messages │
+│・favorites│
+│・comparisons│
+│・content_ │
+│ engage-  │
+│ ments    │
+└──────────┘
+```
+
+### 3.2 技術スタック
+
+| 区分 | 技術 | バージョン | 用途 |
+|------|------|-----------|------|
+| フレームワーク | Next.js | 16.2.0 | SSR/SSG/API |
+| UI | React | 19.2.4 | コンポーネント |
+| 言語 | TypeScript | 5.x | 型安全 |
+| CSS | Tailwind CSS | 4.x | スタイリング |
+| DB | Supabase (PostgreSQL) | - | データ永続化 |
+| 認証 | NextAuth.js | 4.24.13 | 認証・セッション |
+| 決済 | Stripe | 20.4.1 | サブスクリプション |
+| メール | Resend | 6.9.4 | 通知メール |
+| AI/LLM | OpenAI | 6.32.0 | AIコンシェルジュ |
+| デプロイ | Vercel | - | ホスティング |
+| SEO | next-sitemap | 4.2.3 | サイトマップ |
+| 計測 | GA4 | - | アクセス解析 |
 
 ---
 
-## 4. Authentication & Authorization
+## 第4章：ユーザー区分
 
-### 4.1 NextAuth.js Configuration
+### 4.1 ロール定義
 
-- **Strategy:** JWT (not database sessions)
-- **Session Max Age:** 30 days
-- **Providers:**
-  1. **Credentials** - Email + password (stored in Supabase `users` table)
-  2. **Google OAuth** - Conditionally enabled when `GOOGLE_CLIENT_ID` is set
+| ロール | 説明 | アクセス範囲 |
+|--------|------|-------------|
+| anonymous | 未ログインユーザー | 公開ページ閲覧、AIチャット利用、フォーム送信 |
+| user | 会員登録済みユーザー | + お気に入り・比較・閲覧履歴・ユーザーダッシュボード |
+| builder | 工務店担当者 | + 工務店ダッシュボード・自社リード閲覧 |
+| admin | システム管理者 | 全機能アクセス |
 
-### 4.2 User Roles
+### 4.2 ユーザー識別子の統一設計
 
-| Role | Access Level | Description |
-|---|---|---|
-| `admin` | Full access | wazeka internal staff. Can manage all leads, builders, content. |
-| `builder` | Builder dashboard | Housing company staff. Can view their own leads, manage events, edit profile. |
-| `user` | User dashboard | Homebuyers. Can manage favorites, view consultation history. |
+| 状態 | 識別子 | 行動データの扱い |
+|------|--------|----------------|
+| 匿名（初回訪問） | anonymous_id（UUID、ブラウザLocalStorageに保存） | user_eventsにanonymous_idで記録 |
+| 会員登録時 | user_id発行 + anonymous_idを紐付け | 過去のanonymous_idの行動データをuser_idにマージ |
+| ログイン済み | user_id | user_eventsにuser_idで記録 |
 
-### 4.3 Route Protection (Middleware)
-
-| Route Pattern | Required Role | Redirect on Fail |
-|---|---|---|
-| `/admin/*` | admin | → `/dashboard` |
-| `/dashboard/builder/*` | builder or admin | → `/dashboard` |
-| `/dashboard/user/*` | any authenticated | → `/dashboard` |
-| All other routes | public | - |
-
-### 4.4 JWT Token Structure
-
-```typescript
-interface JWT {
-  sub: string       // user ID
-  role: string      // 'admin' | 'builder' | 'user'
-  builderId?: string // UUID of linked builder (for builder role)
-}
-```
-
-### 4.5 Session Object
-
-```typescript
-interface Session {
-  user: {
-    id: string
-    name: string
-    email: string
-    image?: string
-    role: string        // 'admin' | 'builder' | 'user'
-    builderId?: string  // linked builder UUID
-  }
-}
-```
-
-### 4.6 Pre-seeded Accounts
-
-| Email | Role | Notes |
-|---|---|---|
-| admin@payhome.jp | admin | 村田 聖 |
-| info@mandai.com | builder | Linked to 万代ホーム |
-| info@tamaru.com | builder | Linked to タマルハウス |
+**設計意図：** 匿名状態での閲覧・チャット行動を、会員登録後に接続することで、「この人はどんな物件を見て、何を相談して、何が気になって問い合わせたか」という一連の文脈を構築する。
 
 ---
 
-## 5. API Specification
+## 第5章：提供機能一覧
 
-### 5.1 Authentication
+### 5.1 消費者向け（toC）: 20画面
 
-```
-POST /api/auth/[...nextauth]
-GET  /api/auth/[...nextauth]
-```
-Standard NextAuth.js endpoints (signin, signout, session, csrf, providers).
+| # | パス | 画面名 | ステータス | 取得データ |
+|---|------|--------|----------|-----------|
+| 1 | / | トップページ | ✅ | page_view, video_view |
+| 2 | /property/[id] | 物件詳細 | ✅ | page_view, video_view, favorite_add |
+| 3 | /articles | 記事一覧 | ✅ | page_view |
+| 4 | /articles/[id] | 記事詳細 | ✅ | article_read, scroll_depth |
+| 5 | /interview | 取材一覧 | ✅ | page_view |
+| 6 | /interview/[id] | 取材詳細 | ✅ | article_read |
+| 7 | /voice | お客様の声一覧 | ✅ | page_view |
+| 8 | /voice/[id] | お客様の声詳細 | ✅ | article_read |
+| 9 | /webinar | セミナー一覧 | ✅ | page_view |
+| 10 | /webinar/[id] | セミナー詳細 | ✅ | event_detail_view |
+| 11 | /news | ニュース一覧 | ✅ | page_view |
+| 12 | /news/[id] | ニュース詳細 | ✅ | article_read |
+| 13 | /magazine | 月刊誌 | ✅ | page_view |
+| 14 | /event | イベント一覧 | ✅ | page_view |
+| 15 | /event/[id] | イベント詳細 | ✅ | event_detail_view |
+| 16 | /builders | 工務店一覧 | ✅ | page_view |
+| 17 | /catalog | カタログ | ✅ | page_view |
+| 18 | /simulator | ローン試算 | ✅ | simulator_use |
+| 19 | /consultation | 無料相談フォーム | ✅ | consultation_request |
+| 20 | /thanks | サンクスページ | ✅ | - |
 
-### 5.2 Leads
+### 5.2 住宅会社向け（toB）: 8画面 ✅
 
-#### `GET /api/leads`
+| # | パス | 画面名 |
+|---|------|--------|
+| 1 | /biz | Bizトップ |
+| 2 | /biz/service | サービス紹介 |
+| 3 | /biz/ad | 広告・タイアップ |
+| 4 | /biz/partner | パートナー |
+| 5 | /biz/articles | Biz記事一覧 |
+| 6 | /biz/news | Bizニュース |
+| 7 | /biz/webinar | Bizセミナー |
+| 8 | /biz/contact | お問い合わせ |
 
-Returns all leads. Supports query filters.
+### 5.3 管理画面（appadmin CMS）: 27画面 ✅
 
-**Query Parameters:**
-| Param | Type | Description |
-|---|---|---|
-| builder | string | Filter by builder_name |
-| email | string | Filter by email (exact match) |
+全コンテンツのCRUD・ページ編集・SEO管理・メディア管理・ワークフロー・監査ログ・バックアップ・システム設定
 
-**Response:** `200 OK`
-```json
-[
-  {
-    "id": "uuid",
-    "type": "free_consultation",
-    "name": "田中太郎",
-    "email": "tanaka@example.com",
-    "status": "new",
-    "score": 50,
-    "createdAt": "2026-03-20T10:00:00Z",
-    ...
-  }
-]
-```
+### 5.4 ダッシュボード: 7画面
 
-#### `POST /api/leads`
-
-Create a new lead.
-
-**Request Body:**
-```json
-{
-  "type": "document_request",
-  "name": "田中太郎",
-  "email": "tanaka@example.com",
-  "phone": "090-1234-5678",
-  "area": "鹿児島市",
-  "budget": "2000万円台",
-  "layout": "3LDK",
-  "message": "平屋に興味があります"
-}
-```
-
-**Response:** `201 Created`
-
-#### `GET /api/leads/[id]`
-
-Returns a single lead by UUID.
-
-**Response:** `200 OK` | `404 Not Found`
-
-#### `PATCH /api/leads/[id]`
-
-Update lead status, score, or memo.
-
-**Request Body:**
-```json
-{
-  "status": "in_progress",
-  "score": 75,
-  "memo": "Called back, scheduled meeting"
-}
-```
-
-**Response:** `200 OK` | `404 Not Found`
-
-### 5.3 Contact Form
-
-#### `POST /api/contact`
-
-Creates a lead from the public contact form.
-
-**Request Body:**
-```json
-{
-  "name": "string",
-  "email": "string",
-  "phone": "string",
-  "type": "string",
-  "message": "string"
-}
-```
-
-**Response:** `200 OK` with `{ "id": "uuid" }`
-
-### 5.4 Builders
-
-#### `GET /api/builders`
-
-Returns all active builders ordered by name.
-
-**Response:** `200 OK`
-```json
-[
-  {
-    "id": "uuid",
-    "name": "万代ホーム",
-    "email": "info@mandai.com",
-    "area": "鹿児島県全域",
-    "address": "鹿児島市...",
-    "specialties": ["hiraya", "natural_materials"],
-    "plan": "standard",
-    "isActive": true,
-    ...
-  }
-]
-```
-
-### 5.5 Events
-
-#### `GET /api/events`
-
-Returns all events. Supports builder filter.
-
-**Query Parameters:**
-| Param | Type | Description |
-|---|---|---|
-| builder | string | Filter by builder_id |
-
-#### `POST /api/events`
-
-Create a new event.
-
-**Request Body:**
-```json
-{
-  "builderId": "uuid",
-  "builderName": "万代ホーム",
-  "title": "完成見学会",
-  "date": "2026-04-15",
-  "location": "鹿児島市...",
-  "type": "completion",
-  "capacity": 10
-}
-```
-
-### 5.6 Stats (Admin Dashboard)
-
-#### `GET /api/stats`
-
-Returns aggregated KPIs.
-
-**Query Parameters:**
-| Param | Type | Description |
-|---|---|---|
-| builder | string | If set, returns builder-specific stats |
-
-**Response (Admin - no builder param):**
-```json
-{
-  "totalLeads": 45,
-  "catalogLeads": 20,
-  "eventLeads": 10,
-  "consultationLeads": 15,
-  "totalBuilders": 12,
-  "totalEvents": 8,
-  "activeEvents": 4
-}
-```
-
-**Response (Builder - with builder param):**
-```json
-{
-  "totalLeads": 8,
-  "catalog": 3,
-  "event": 2,
-  "consultation": 3,
-  "converted": 1,
-  "costPerLead": 3750,
-  "industryAvgCostPerLead": 15000
-}
-```
-
-### 5.7 AI Chat
-
-#### `POST /api/chat`
-
-Streaming Server-Sent Events (SSE) endpoint for AI chat.
-
-**Request Body:**
-```json
-{
-  "messages": [
-    { "role": "user", "content": "予算2000万で平屋はありますか？" }
-  ]
-}
-```
-
-**Response:** `text/event-stream` (SSE)
-
-The AI uses a Japanese-language system prompt focused on housing consultation. It recommends properties and builders, then guides users to conversion points (consultation, document request, event booking).
+| # | パス | 画面名 | ステータス |
+|---|------|--------|----------|
+| 1 | /dashboard | TOP | 🔧 |
+| 2 | /dashboard/builder | 工務店KPI | 🔧 |
+| 3 | /dashboard/builder/leads | リード管理 | 🔧 |
+| 4 | /dashboard/builder/events | イベント管理 | 🔧 |
+| 5 | /dashboard/builder/profile | プロフィール | 🔧 |
+| 6 | /dashboard/builder/billing | 請求管理 | 📋 |
+| 7 | /dashboard/user | ユーザーダッシュボード | 📋→🔧（優先度引き上げ） |
 
 ---
 
-## 6. Page Structure & Routing
+## 第6章：機能要件
 
-### 6.1 Public Pages (B2C)
+### 6.1 消費者向け機能（実装済み ✅）
 
-| Route | Page | Key Features |
-|---|---|---|
-| `/` | Homepage | Hero section, featured content, reviews, news, articles grid |
-| `/about` | About Payhome | Mission, team, history |
-| `/area` | Area Search | 7 regions with prefecture filters, property cards |
-| `/articles` | Articles List | Filterable article grid, pagination |
-| `/articles/[id]` | Article Detail | Full article with share buttons |
-| `/builders` | Builder List | 12 builders with area filter |
-| `/builders/contact` | Builder Inquiry | Contact form for specific builder |
-| `/catalog` | Document Request | Multi-builder checkbox selection, bulk request form |
-| `/company` | Company Info | wazeka Inc. details |
-| `/consultation` | Free Consultation | LP with 3 benefits, 4-step process, FAQ, form, LINE |
-| `/event` | Event Listing | Active events with modal booking form |
-| `/interview/[id]` | Interview Detail | Builder interviews with photos |
-| `/magazine` | Digital Magazine | Monthly Payhome magazine |
-| `/mypage` | User Account | Favorites, history, settings (requires auth) |
-| `/news/[id]` | News Detail | Company news articles |
-| `/privacy` | Privacy Policy | Legal page |
-| `/property/[id]` | Property Detail | YouTube embed, specs, pricing, builder info, FAQ, CTAs |
-| `/simulator` | Loan Simulator | Real-time mortgage calculator |
-| `/terms` | Terms of Service | Legal page |
-| `/thanks` | Confirmation | Post-form-submission thank you page |
-| `/videos` | Video Gallery | All 257 YouTube videos |
-| `/voice/[id]` | Customer Reviews | Testimonials |
-| `/webinar/[id]` | Webinar Detail | Online seminar details and registration |
+現在実装済みの機能は維持する。詳細は第5章の画面一覧を参照。
 
-### 6.2 Business Pages (B2B)
+### 6.2 ユーザーダッシュボード（優先度引き上げ）
 
-| Route | Page | Key Features |
-|---|---|---|
-| `/biz` | B2B Homepage | Stats, services, case studies, partner CTA |
-| `/biz/ad` | Advertising | Tie-up menus, ad formats, pricing |
-| `/biz/articles/[id]` | B2B Articles | Marketing knowledge content |
-| `/biz/contact` | Business Inquiry | B2B contact form |
-| `/biz/news/[id]` | Industry News | B2B news articles |
-| `/biz/partner` | Partner Recruitment | 3 plans, ROI simulator, application form |
-| `/biz/service` | Service Overview | Plans, pricing table, FAQ |
-| `/biz/webinar/[id]` | B2B Webinars | Industry seminars |
+お気に入り・比較・閲覧履歴は後回しではなく、データ蓄積の中核として優先実装する。
 
-### 6.3 Admin Pages
+| 機能 | 説明 | Phase |
+|------|------|-------|
+| お気に入り管理 | 物件・工務店をお気に入りに追加・解除。一覧表示 | Phase 1 |
+| 比較リスト | 物件・工務店を比較リストに追加。並べて比較 | Phase 2 |
+| 閲覧履歴 | 過去に閲覧した物件・記事・工務店の履歴 | Phase 1 |
+| 相談履歴 | 過去のAIチャット会話の一覧・再開 | Phase 2 |
+| マイプロフィール | 家族構成・予算・希望エリア等の自己申告 | Phase 2 |
 
-| Route | Page | Key Features |
-|---|---|---|
-| `/admin` | Admin Home | Navigation to sub-sections |
-| `/admin/dashboard` | KPI Dashboard | Lead counts, conversions, builder stats |
-| `/admin/leads` | Lead Management | Table view, status updates, filtering, memos |
-| `/admin/builders` | Builder Management | Builder list, plan management, account creation |
-| `/admin/properties` | Property Management | Property data CRUD, publish toggle |
+### 6.3 リード拡張
 
-### 6.4 Dashboard Pages (Auth Required)
-
-| Route | Required Role | Key Features |
-|---|---|---|
-| `/dashboard` | - | Login page (email/password + Google OAuth) |
-| `/dashboard/builder/leads` | builder | View assigned leads, update statuses |
-| `/dashboard/builder/events` | builder | Create/manage events, view reservations |
-| `/dashboard/builder/billing` | builder | Monthly invoices, payment history |
-| `/dashboard/builder/profile` | builder | Edit company profile, logo, specialties |
-| `/dashboard/user/favorites` | user | Saved properties, comparison tool |
-| `/dashboard/user/consultations` | user | Consultation request history |
-| `/dashboard/user/history` | user | Browsing and chat history |
+| 追加フィールド | 内容 | 取得方法 | Phase |
+|---------------|------|---------|-------|
+| source_channel | 流入チャネル（YouTube/SEO/SNS/直接） | UTMパラメータ・referrer | Phase 1 |
+| source_content_id | 流入元コンテンツID | 直前ページのコンテンツID | Phase 1 |
+| recent_views | 直前閲覧履歴（最大10件） | user_eventsから集計 | Phase 1 |
+| chat_summary | 直前チャット要約 | chat_sessionsから取得 | Phase 2 |
+| interest_tags | 関心タグ（平屋/ZEH/デザイン等） | 閲覧・チャットから推定 | Phase 2 |
+| concerns | 不安要素（予算/土地/業者選び等） | チャットから抽出 | Phase 2 |
+| comparison_targets | 比較対象の工務店・物件 | comparison_historyから | Phase 2 |
+| recommended_builders | 推薦候補の工務店 | 推薦ロジックの出力 | Phase 2 |
+| recommendation_reason | 推薦理由 | 推薦ロジックの出力 | Phase 2 |
+| consideration_phase | 検討フェーズ（情報収集/比較/決定直前） | 行動パターンから推定 | Phase 2 |
+| temperature | 温度感（0-100） | 行動スコアリング | Phase 1 |
+| conversion_reason | コンバージョン理由 | フォーム送信時の文脈分析 | Phase 2 |
 
 ---
 
-## 7. Feature Requirements by Phase
+## 第7章：データ要件
 
-### Phase 0 - Launch Prep (Current Phase)
+### 7.1 データモデル一覧
 
-**Status: Infrastructure ~70% complete**
+| # | テーブル名 | 用途 | ステータス |
+|---|-----------|------|----------|
+| 1 | users | ユーザー認証・基本情報 | ✅ 既存 |
+| 2 | leads | リード（問い合わせ） | ✅ 既存→拡張 |
+| 3 | builders | 工務店情報 | ✅ 既存→拡張 |
+| 4 | events | 見学会・イベント | ✅ 既存 |
+| 5 | user_profiles | ユーザー属性・意向 | 📋 新設 |
+| 6 | user_events | 行動イベントログ | 📋 新設 |
+| 7 | chat_sessions | チャットセッション | 📋 新設 |
+| 8 | chat_messages | チャットメッセージ | 📋 新設 |
+| 9 | favorites | お気に入り | 📋 新設 |
+| 10 | comparisons | 比較履歴 | 📋 新設 |
+| 11 | content_engagements | コンテンツエンゲージメント集計 | 📋 新設 |
+| 12 | builder_recommendations | 工務店推薦履歴 | 📋 新設 |
 
-| ID | Task | Status | Notes |
-|---|---|---|---|
-| 0-1 | Supabase project creation | DONE | Project ID: fochghjyvhrriglwcbqw |
-| 0-2 | DB tables + RLS | DONE | 6 tables, 9 indexes, seed data |
-| 0-3 | store.ts Supabase migration | DONE | All CRUD operations async |
-| 0-4 | NextAuth.js implementation | DONE | Credentials + Google OAuth |
-| 0-5 | Login page wiring | DONE | 3-role login flow |
-| 0-6 | Middleware route protection | DONE | Role-based access |
-| 0-7 | Environment variables | DONE | .env.local configured |
-| 0-8 | Vercel deployment | PENDING | CLI auth in progress |
-| 0-9 | Domain setup (payhome.jp) | TODO | |
-| 0-10 | error.tsx / not-found.tsx | TODO | Error boundary pages |
-| 0-11 | OGP images (@vercel/og) | TODO | Social share cards |
-| 0-12 | sitemap.xml / robots.txt | TODO | next-sitemap configured |
-| 0-13 | localhost URL replacement | TODO | Replace all hardcoded localhost |
+### 7.2 新設テーブル定義
 
-### Phase 1 - Launch & Initial Sales (Month 1-3)
+#### user_profiles テーブル
 
-**Builder Dashboard MVP:**
-- Lead detail view with customer info, preferences, inquiry source
-- Status pipeline: new → contacted → hearing → introduced → meeting → contracted/lost
-- Event creation form with capacity tracking
-- Reservation list per event
-- Company profile editor (name, area, specialties, logo upload)
-- Monthly billing summary with PDF generation
+| カラム | 型 | 説明 | 取得方法 |
+|--------|-----|------|---------|
+| id | uuid | PK | 自動 |
+| user_id | uuid | FK(users) | 認証時 |
+| family_structure | text | 家族構成（夫婦のみ/子育て中/シニア等） | 自己申告 or チャット推定 |
+| age_range | text | 年齢層（30代/40代/50代/60代以上） | 自己申告 or チャット推定 |
+| planned_timing | text | 建築予定時期（半年以内/1年以内/未定等） | 自己申告 or チャット推定 |
+| has_land | boolean | 土地の有無 | 自己申告 |
+| preferred_area | text | 希望エリア | 自己申告 or フォーム |
+| budget_range | text | 予算帯（2000万以下/2000-3000万/3000万以上） | 自己申告 or チャット推定 |
+| hiraya_preference | integer | 平屋希望度（1-5） | 行動から推定 |
+| design_orientation | text[] | デザイン志向（モダン/和風/ナチュラル/シンプル） | 閲覧傾向から推定 |
+| performance_orientation | text[] | 性能志向（断熱/耐震/ZEH/省エネ） | 閲覧傾向から推定 |
+| lifestyle_priorities | text[] | 暮らしの優先事項（老後配慮/子育て/コスト重視/家事動線/収納） | 自己申告 or チャット推定 |
+| consideration_phase | text | 検討フェーズ（情報収集/比較検討/決定直前/契約後） | 行動パターンから推定 |
+| temperature | integer | 温度感（0-100） | 行動スコアリング |
+| created_at | timestamptz | 作成日時 | 自動 |
+| updated_at | timestamptz | 更新日時 | 自動 |
 
-**Content & Data:**
-- 200 property articles (AI-drafted from YouTube videos, human-reviewed)
-- RAG knowledge base with 200+ property records
-- Builder data collection via Google Forms
-- YouTube description links to web (257 videos)
+#### user_events テーブル
 
-**Marketing:**
-- GA4 + GTM integration
-- Facebook Pixel + CAPI
-- Google Ads campaigns
-- Meta retargeting ads
+| カラム | 型 | 説明 |
+|--------|-----|------|
+| id | uuid | PK |
+| user_id | uuid | FK(users)、NULL可（匿名時） |
+| anonymous_id | text | 匿名ユーザー識別子 |
+| event_type | text | イベント種別（後述） |
+| content_type | text | コンテンツ種別（property/article/builder/event等） |
+| content_id | text | コンテンツID |
+| metadata | jsonb | 追加情報（滞在時間・スクロール深度等） |
+| page_url | text | ページURL |
+| referrer | text | リファラ |
+| device_type | text | デバイス種別 |
+| created_at | timestamptz | イベント発生日時 |
 
-### Phase 2 - Expansion (Month 3-12)
+#### chat_sessions テーブル
 
-**User My Page:**
-- Favorites list with property thumbnails, pricing, layout
-- Comparison table (up to 3 properties side-by-side)
-- Consultation request history with status tracking
-- AI chat conversation history
-- Saved loan simulations
-- Notification preferences (new properties, events, magazine)
+| カラム | 型 | 説明 |
+|--------|-----|------|
+| id | uuid | PK |
+| user_id | uuid | FK(users)、NULL可 |
+| anonymous_id | text | 匿名ユーザー識別子 |
+| source_page | text | 会話開始ページ |
+| started_at | timestamptz | 開始日時 |
+| ended_at | timestamptz | 終了日時 |
+| message_count | integer | メッセージ数 |
+| category | text | 会話カテゴリ（資金相談/工務店探し/間取り相談/性能比較/一般質問） |
+| inferred_intent | text | 推定意図（情報収集/比較検討/具体相談/クレーム） |
+| extracted_tags | text[] | 抽出タグ（平屋/3LDK/ZEH/鹿児島/2000万等） |
+| conversation_summary | text | 会話要約（AI自動生成） |
+| recommended_action | text | 推薦アクション（見学会予約/資料請求/相談等） |
+| lead_conversion | boolean | リード化したか |
+| lead_id | uuid | リード化した場合のlead ID |
+| next_best_action | text | 次に取るべきアクション（将来） |
+| created_at | timestamptz | 作成日時 |
 
-**Builder Dashboard Expansion:**
-- Analytics dashboard (page views, AI recommendation count, area ranking)
-- Monthly report PDF with branded header
-- AI chat log viewer (Premium plan only)
-- Performance benchmarks vs. industry average
+#### chat_messages テーブル
 
-**AI Enhancements:**
-- LINE Messaging API integration (webhook-based AI chat)
-- Voice input support (Web Speech API)
-- Personalized recommendations based on browsing + chat history
-- Automated article generation pipeline
+| カラム | 型 | 説明 |
+|--------|-----|------|
+| id | uuid | PK |
+| session_id | uuid | FK(chat_sessions) |
+| role | text | 'user' or 'assistant' |
+| content | text | メッセージ内容 |
+| tokens_used | integer | 使用トークン数 |
+| created_at | timestamptz | 送信日時 |
 
-### Phase 3 - National Expansion (Year 1-3)
+#### favorites テーブル
 
-**Franchise Partner Dashboard:**
-- Regional KPI dashboard
-- Builder contract management
-- Content management with HQ approval workflow
-- Revenue/royalty tracking (70% partner / 30% HQ)
+| カラム | 型 | 説明 |
+|--------|-----|------|
+| id | uuid | PK |
+| user_id | uuid | FK(users) |
+| content_type | text | 'property' / 'builder' / 'article' / 'event' |
+| content_id | text | コンテンツID |
+| created_at | timestamptz | 追加日時 |
 
-**Advanced AI:**
-- AI agent: end-to-end flow (consultation → matching → scheduling → loan → insurance)
-- CG room tour generation from floor plans
+#### comparisons テーブル
 
-**Data Business:**
-- Anonymized demand reports (area/budget/layout trends)
-- Monthly subscription to builders (50,000-100,000 JPY/company/month)
+| カラム | 型 | 説明 |
+|--------|-----|------|
+| id | uuid | PK |
+| user_id | uuid | FK(users) |
+| content_type | text | 'property' / 'builder' |
+| content_ids | text[] | 比較対象のID配列 |
+| comparison_axes | text[] | 比較軸（価格/間取り/性能/デザイン等） |
+| created_at | timestamptz | 作成日時 |
 
----
+#### content_engagements テーブル（集計テーブル）
 
-## 8. Business Logic & Data Flow
+| カラム | 型 | 説明 |
+|--------|-----|------|
+| id | uuid | PK |
+| content_type | text | コンテンツ種別 |
+| content_id | text | コンテンツID |
+| total_views | integer | 総閲覧数 |
+| unique_views | integer | ユニーク閲覧数 |
+| avg_duration | integer | 平均滞在時間（秒） |
+| favorite_count | integer | お気に入り数 |
+| comparison_count | integer | 比較追加数 |
+| lead_count | integer | リード化数 |
+| period | date | 集計期間（日次） |
 
-### 8.1 Lead Lifecycle
+#### builder_recommendations テーブル
 
-```
-[Form Submission / AI Chat / LINE]
-        │
-        ▼
-   Lead Created (status: new, score: 50)
-        │
-        ▼
-   Admin Reviews → Assigns to Builder
-        │
-        ▼
-   Status: in_progress
-        │
-   ┌────┴────┐
-   ▼         ▼
-referred   (direct contact)
-   │
-   ▼
-meeting_done
-   │
-   ┌──┴──┐
-   ▼     ▼
-closed  lost
-```
+| カラム | 型 | 説明 |
+|--------|-----|------|
+| id | uuid | PK |
+| user_id | uuid | FK(users) |
+| builder_id | text | 推薦工務店ID |
+| score | decimal | 推薦スコア |
+| reason | text | 推薦理由 |
+| source | text | 推薦元（AI/ルールベース/手動） |
+| clicked | boolean | クリックされたか |
+| created_at | timestamptz | 推薦日時 |
 
-### 8.2 Lead Scoring
+### 7.3 既存テーブルの拡張
 
-- Default score: 50
-- Admin can manually adjust (0-100)
-- Future: automated scoring based on engagement signals
+#### builders テーブル追加カラム
 
-### 8.3 Billing Calculation (Per Builder)
+CMS入稿時にAI推薦用の構造化データを登録する。
 
-```
-Monthly Invoice =
-  (document_request_count × 3,000) +
-  (event_reservation_count × 5,000) +
-  (closed_deal_count × 150,000) +
-  monthly_plan_fee
-```
-
-### 8.4 Data Type Conversion
-
-The codebase uses **snake_case** in the database and **camelCase** in the frontend. Conversion functions are in `src/lib/store.ts`:
-
-- `dbLeadToLead()` - converts DB lead to frontend Lead type
-- `dbBuilderToBuilder()` - converts DB builder to frontend BuilderProfile type
-- `dbEventToEvent()` - converts DB event to frontend Event type
-
-### 8.5 Conversion Points (CTAs)
-
-Every property detail page includes 3 CTA buttons + LINE link:
-
-1. **Free Consultation** → `/consultation` (commission: 150,000 JPY on deal)
-2. **Request Documents** → `/catalog` (fee: 3,000 JPY/request)
-3. **Book Event** → `/event` (fee: 5,000 JPY/booking)
-4. **LINE Chat** → `line.me/R/ti/p/@253gzmoh` (free)
-
-A persistent **Fixed Bar** at the bottom of all pages also provides these CTAs.
-
----
-
-## 9. AI Chatbot Integration
-
-### 9.1 Current Implementation
-
-- **Endpoint:** `POST /api/chat`
-- **Model:** GPT-4o
-- **Response format:** Server-Sent Events (streaming)
-- **Language:** Japanese only
-- **System prompt:** Housing consultation focused
-
-### 9.2 Chat Widget
-
-- **Location:** Bottom-right floating widget on all B2C pages
-- **Trigger:** Click to open chat panel
-- **Initial message:** Greeting with example questions
-- **Behavior:** Recommends properties → guides to CTA
-
-### 9.3 Future RAG Architecture
-
-```
-User Query
-    │
-    ▼
-[Embedding Model] → Vector Search (pgvector in Supabase)
-    │
-    ▼
-[Top-K Property Matches]
-    │
-    ▼
-[GPT-4o with Context] → Streaming Response
-    │
-    ▼
-[Auto-insert CTA links]
-```
-
-**Required for RAG:**
-- Enable `pgvector` extension in Supabase
-- Create `properties` table with `embedding VECTOR(1536)` column
-- Build ingestion pipeline: property data → embedding → upsert
-- Modify `/api/chat` to include vector search results in context
+| 追加カラム | 型 | 説明 |
+|-----------|-----|------|
+| price_range | text | 対応価格帯（1500-2500万/2500-4000万等） |
+| hiraya_ratio | integer | 平屋の施工比率（%） |
+| hiraya_annual | integer | 年間平屋施工数 |
+| design_taste | text[] | デザインテイスト（モダン/和風/ナチュラル/シンプル/北欧） |
+| insulation_grade | text | 断熱等級（4/5/6/7） |
+| earthquake_grade | text | 耐震等級（1/2/3） |
+| ua_value_range | text | UA値の範囲 |
+| features | text[] | 特徴（家事動線/回遊動線/収納/中庭/吹き抜け/勾配天井） |
+| suitable_for | text[] | 向いている顧客像（子育て世帯/シニア/共働き/二世帯） |
+| land_proposal | boolean | 土地提案の可否 |
+| common_concerns | text[] | よくある不安（価格/工期/アフター等） |
+| strengths | text[] | 強み |
+| weaknesses | text[] | 弱み・注意点 |
+| comparison_points | text[] | 他社比較時の観点 |
 
 ---
 
-## 10. Third-Party Integrations
+## 第8章：AI / チャット / 推薦要件
 
-### 10.1 Configured
+### 8.1 AIチャット（コンシェルジュ）の段階的進化
 
-| Service | Purpose | Status |
-|---|---|---|
-| Supabase | Database + Auth adapter | Active |
-| OpenAI | AI Chatbot (GPT-4o) | Active |
-| NextAuth.js | Authentication | Active |
+#### MVP（Phase 1）
 
-### 10.2 Planned
+| 機能 | 説明 | 前提条件 |
+|------|------|---------|
+| FAQ応答 | 平屋の基本知識・よくある質問に回答 | システムプロンプトにFAQを含める |
+| 基本ヒアリング | 予算・エリア・家族構成・建築時期を聞き取る | プロンプトにヒアリング項目を定義 |
+| コンテンツ提案 | 関連する動画・記事を提案 | コンテンツデータをRAGに登録 |
+| 相談導線接続 | 会話の中で見学会予約・資料請求・無料相談を案内 | CTA用のリンクをプロンプトに含める |
+| 会話ログ保存 | 全メッセージをchat_messages、セッション情報をchat_sessionsに保存 | DB設計・API実装 |
 
-| Service | Purpose | Phase | Notes |
-|---|---|---|---|
-| Vercel | Hosting + CDN | 0 | Deployment pending |
-| Google OAuth | Social login | 0 | Requires GOOGLE_CLIENT_ID/SECRET |
-| Google Analytics 4 | Analytics | 0 | Requires NEXT_PUBLIC_GA_ID |
-| Google Search Console | SEO | 0 | Domain verification needed |
-| Facebook Pixel | Ad tracking | 0 | Requires NEXT_PUBLIC_FB_PIXEL_ID |
-| Resend | Transactional email | 1 | Lead notifications, invoices |
-| Stripe | Payment processing | 1 | Monthly plan billing |
-| LINE Messaging API | LINE chatbot | 2 | Webhook integration |
-| Cloudflare R2 | File storage | 1 | Images, PDFs (S3-compatible) |
+#### 次フェーズ（Phase 2）
 
-### 10.3 Environment Variables
+| 機能 | 説明 | 前提条件 |
+|------|------|---------|
+| ユーザータイプ診断 | 会話内容からユーザーのタイプ（コスト重視/性能重視/デザイン重視等）を判定 | user_profilesへの書き込み |
+| 工務店推薦 | ユーザーの関心に合った工務店を理由付きで推薦 | builders構造化データ + 推薦ロジック |
+| 見学会推薦 | 近い日程の見学会・関心に合うイベントを案内 | eventsデータのRAG登録 |
+| 次アクション提案 | 検討フェーズに応じた次のステップを提案 | user_profilesの検討フェーズ参照 |
+| 会話要約の自動生成 | セッション終了時にconversation_summaryを自動生成 | GPTによる要約処理 |
+| リード化判定 | 会話内容から「この人はリード化すべきか」を判定し、lead_conversionフラグを設定 | 判定ロジック実装 |
+| 意向抽出 | 会話からextracted_tags・inferred_intentを抽出 | GPTによるタグ抽出処理 |
 
-```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=https://fochghjyvhrriglwcbqw.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<key>
-SUPABASE_SERVICE_ROLE_KEY=<key>
+#### 将来フェーズ（Phase 3）
 
-# NextAuth
-NEXTAUTH_URL=https://payhome.jp  # Update after domain setup
-NEXTAUTH_SECRET=<generated-secret>
+| 機能 | 説明 | 前提条件 |
+|------|------|---------|
+| AI住宅コンシェルジュ | ユーザーの検討フェーズ・行動履歴・プロフィールを踏まえた高度な対話 | 十分な行動データの蓄積 |
+| AI営業マン | 住宅会社側に「この顧客にはこう提案すべき」を提示 | リード+行動+チャット+プロフィールの統合 |
+| 商談前要約生成 | リードの行動履歴・チャット内容・意向を1ページに自動要約 | chat_sessions + user_events + user_profiles |
+| 工務店別提案最適化 | 工務店の強み×顧客の関心を掛け合わせた提案文を自動生成 | builders構造化データ + ユーザーデータ |
+| next best action推定 | ユーザーごとに「次にすべきこと」を推定して表示 | 行動パターン分析 + 成約者データ |
 
-# OAuth (optional, enable when ready)
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
+### 8.2 推薦ロジック
 
-# AI
-OPENAI_API_KEY=<key>
+#### Phase 2での初期推薦
 
-# Email
-RESEND_API_KEY=<key>
+```
+入力:
+  - user_profilesの属性（エリア・予算・家族構成・デザイン志向）
+  - user_eventsの閲覧傾向（よく見る物件の特徴）
+  - chat_sessionsのextracted_tags
 
-# Analytics
-NEXT_PUBLIC_GA_ID=
-NEXT_PUBLIC_FB_PIXEL_ID=
+処理:
+  - buildersの構造化データとマッチング
+  - スコア計算（属性一致 × 閲覧類似度 × 地理的近さ）
 
-# Site
-NEXT_PUBLIC_SITE_URL=https://payhome.jp
+出力:
+  - builder_recommendationsに記録
+  - 推薦工務店3社 + 推薦理由
 ```
 
 ---
 
-## 11. Design System & Branding
+## 第9章：CMS / 管理画面要件
 
-### 11.1 Color Palette
+### 9.1 CMS構造化データの方針
 
-| Token | Hex | Usage |
-|---|---|---|
-| Primary | `#E8740C` | Buttons, links, accents |
-| Accent | `#D4660A` | Hover states, emphasis |
-| Dark | `#3D2200` | Text, headings |
-| Light | `#FFF8F0` | Backgrounds |
-| Light Gray | `#F5F0EB` | Card backgrounds, borders |
-| LINE Green | `#06C755` | LINE CTA buttons |
+CMSは単なる入稿管理ではなく、**AIが理解・推薦しやすい構造化項目を登録する基盤**として設計する。
 
-### 11.2 Typography
+### 9.2 コンテンツ別の構造化項目
 
-| Type | Font Family | Weights |
-|---|---|---|
-| Body / Sans | Noto Sans JP | 400, 500, 600, 700 |
-| Headings | Montserrat | 600, 700, 800 |
+#### 物件（property）に追加すべき構造化項目
 
-### 11.3 Character ("Pei-kun")
+| 項目 | 型 | 用途 |
+|------|-----|------|
+| design_taste | text[] | デザインテイスト分類 |
+| lifestyle_fit | text[] | 向いている暮らし方（子育て/シニア/共働き/趣味重視） |
+| key_features | text[] | 特徴タグ（中庭/吹き抜け/回遊動線/大収納等） |
+| target_audience | text[] | 想定ターゲット |
 
-The site features a mascot character with various animations:
-- Peek-in animation (appears from screen edge)
-- Back-to-top button integration
-- Greeting on first visit
-- Easter egg on logo click
-- Touch/tap reaction
+#### 記事（article）に追加すべき構造化項目
 
-### 11.4 Responsive Breakpoints
+| 項目 | 型 | 用途 |
+|------|-----|------|
+| related_concerns | text[] | 関連する不安・疑問 |
+| consideration_phase | text | 対象の検討フェーズ |
+| related_builder_ids | text[] | 関連工務店 |
 
-Three-tier responsive design:
-- **Mobile:** < 768px (priority - 49.4% of traffic)
-- **Tablet:** 768px - 1024px
-- **Desktop:** > 1024px
+#### 工務店（builder）の構造化項目
 
-**Important UX Notes:**
-- Target audience is 55+ (57% of viewers). Use minimum **16px** body text and **48px** tap targets.
-- Fixed bottom bar: 4 CTA buttons on desktop, 2 on mobile
-- LINE floating button: icon-only below 480px
+第7章の builders テーブル追加カラムを参照。
 
-### 11.5 Custom Animations (Tailwind)
+### 9.3 管理画面の拡張要件
 
-```
-pulse-slow: 2s ease-in-out infinite  (LINE button)
-bounce-slow: 2.5s ease-in-out infinite  (chat bubble)
-chat-ring: 2s ease-out 1  (chat button ring effect)
-chat-wiggle: 3s ease-in-out infinite  (character wiggle)
-fade-in-section: entrance animation for sections
-card-hover: lift effect on card hover
-```
+| 機能 | 内容 | Phase |
+|------|------|-------|
+| チャット分析ダッシュボード | セッション数・完了率・リード化率・抽出タグ分布 | Phase 2 |
+| 行動分析ダッシュボード | コンテンツ別エンゲージメント・ファネル分析 | Phase 2 |
+| リード詳細の拡張 | 行動履歴・チャット要約・推薦理由の表示 | Phase 2 |
+| 工務店向けレポート生成 | 月次リード分析・コンテンツ効果レポート | Phase 2 |
 
 ---
 
-## 12. Performance & SEO Requirements
+## 第10章：イベント計測 / 分析要件
 
-### 12.1 Core Web Vitals Targets
+### 10.1 追跡対象イベント一覧
 
-| Metric | Target |
-|---|---|
-| LCP (Largest Contentful Paint) | < 2.5s |
-| FID (First Input Delay) | < 100ms |
-| CLS (Cumulative Layout Shift) | < 0.1 |
+| イベント名 | 発火タイミング | 送信先 | Phase |
+|-----------|---------------|--------|-------|
+| page_view | ページ表示 | GA4 + user_events | Phase 1 |
+| top_view | トップページ表示 | GA4 | Phase 1 |
+| article_read | 記事ページで一定スクロール | GA4 + user_events | Phase 1 |
+| video_view | YouTube動画再生開始 | GA4 + user_events | Phase 1 |
+| builder_detail_view | 工務店詳細ページ表示 | GA4 + user_events | Phase 1 |
+| event_detail_view | イベント詳細ページ表示 | GA4 + user_events | Phase 1 |
+| favorite_add | お気に入り追加 | user_events | Phase 1 |
+| favorite_remove | お気に入り解除 | user_events | Phase 1 |
+| comparison_add | 比較リスト追加 | user_events | Phase 2 |
+| chat_start | AIチャット開始 | GA4 + chat_sessions | Phase 1 |
+| chat_complete | AIチャット終了（5メッセージ以上） | GA4 + chat_sessions | Phase 1 |
+| chat_to_lead | チャットからリードへ転換 | GA4 + chat_sessions | Phase 2 |
+| reservation_submit | 見学会予約フォーム送信 | GA4 + leads | Phase 1 |
+| catalog_request | 資料請求フォーム送信 | GA4 + leads | Phase 1 |
+| consultation_request | 無料相談フォーム送信 | GA4 + leads | Phase 1 |
+| simulator_use | ローンシミュレーター利用 | GA4 + user_events | Phase 1 |
+| line_click | LINE友だち追加クリック | GA4 | Phase 1 |
+| tel_click | 電話番号クリック | GA4 | Phase 1 |
 
-### 12.2 SEO
+### 10.2 GA4カスタムディメンション
 
-- **Language:** `lang="ja"` on `<html>`
-- **Meta:** Unique title and description per page
-- **OGP:** Open Graph + Twitter Card meta tags per page
-- **Structured Data:** Schema.org JSON-LD (Organization, Article, Product, Event, FAQPage)
-- **Sitemap:** Auto-generated via `next-sitemap`
-- **Robots:** Allow all crawlers
-
-### 12.3 Image Optimization
-
-- Use `next/image` for all images
-- WebP format preferred
-- Lazy loading for below-fold images
-- Placeholder blur for hero images
-
----
-
-## 13. Environment & Deployment
-
-### 13.1 Development
-
-```bash
-npm run dev     # Start dev server on port 3000
-npm run build   # Production build
-npm run start   # Start production server
-npm run lint    # ESLint check
-```
-
-### 13.2 Deployment Pipeline
-
-```
-Local Development
-      │
-      ▼
-  git push → GitHub Repository
-      │
-      ▼
-  Vercel Auto-Deploy
-      │
-      ├── Preview (PR branches)
-      └── Production (main branch)
-```
-
-### 13.3 Vercel Configuration
-
-- **Framework:** Next.js (auto-detected)
-- **Build Command:** `next build`
-- **Output Directory:** `.next`
-- **Node.js Version:** 20.x
-- **Environment Variables:** Must be set in Vercel Dashboard (see Section 10.3)
+| ディメンション | 値の例 | 用途 |
+|---------------|--------|------|
+| user_type | anonymous / user / builder | ユーザー区分別分析 |
+| consideration_phase | 情報収集 / 比較検討 / 決定直前 | フェーズ別分析 |
+| content_category | property / article / builder / event | コンテンツ種別分析 |
+| source_channel | youtube / seo / sns / direct | 流入経路別分析 |
 
 ---
 
-## 14. Remaining Tasks
+## 第11章：非機能要件
 
-### 14.1 Immediate (Phase 0 Completion)
+### 11.1 パフォーマンス
 
-| Priority | Task | Description |
-|---|---|---|
-| P0 | Vercel deployment | Complete CLI auth + first deploy |
-| P0 | Domain setup | Configure payhome.jp DNS → Vercel |
-| P0 | localhost replacement | Replace all hardcoded `localhost:3000` URLs |
-| P1 | Error pages | Create `error.tsx` and `not-found.tsx` |
-| P1 | OGP images | Generate dynamic social share images |
-| P1 | Sitemap/robots | Verify next-sitemap output |
-| P1 | GA4 integration | Add tracking script to layout |
-| P1 | Search Console | Verify domain ownership |
+| 項目 | 要件 |
+|------|------|
+| 初回ページ読み込み（LCP） | 3秒以内 |
+| ページ遷移 | 1秒以内 |
+| API応答時間 | 500ms以内 |
+| AIチャット初回応答 | 3秒以内 |
+| イベント送信 | 非同期、ページ表示をブロックしない |
 
-### 14.2 Phase 1 Development Priorities
+### 11.2 セキュリティ
 
-| Priority | Feature | Estimated Effort |
-|---|---|---|
-| P0 | Builder dashboard - Lead view | 1 week |
-| P0 | Builder dashboard - Event CRUD | 3 days |
-| P0 | Admin dashboard - KPI cards (real data) | 3 days |
-| P0 | Lead notification emails (Resend) | 2 days |
-| P1 | Builder profile editor | 3 days |
-| P1 | Billing summary page | 1 week |
-| P1 | Stripe integration for monthly plans | 1 week |
-| P1 | Image upload (Cloudflare R2) | 3 days |
-| P2 | Property data import pipeline | 1 week |
-| P2 | RAG vector search setup | 1 week |
+| 項目 | 要件 | ステータス |
+|------|------|----------|
+| HTTPS通信 | 全通信TLS暗号化 | ✅ |
+| JWT認証 | 30日間有効 | ✅ |
+| RBAC | admin/builder/user/anonymous 4段階 | ✅ |
+| XSS対策 | HTMLサニタイザー | ✅ |
+| 行動データ分離 | 個人情報と行動ログを分離保存 | Phase 1 |
+| 同意管理 | データ取得に関する同意取得 | Phase 1 |
+| 監査ログ | 管理操作の記録 | ✅ |
 
-### 14.3 Known Technical Debt
+### 11.3 可用性・スケーラビリティ
 
-| Issue | Location | Notes |
-|---|---|---|
-| Static JSON data | `src/data/` | Properties, articles, news are hardcoded JSON. Need migration to Supabase. |
-| Password storage | `src/lib/auth.ts` | Currently accepts 4+ char password for dev. Must implement bcrypt hashing. |
-| No email verification | Auth flow | Users are auto-created without email confirmation. |
-| Hardcoded localhost | Various files | Some API calls and links reference `localhost:3000`. |
-| No rate limiting | API routes | Public endpoints need rate limiting (especially `/api/chat`). |
-| No input validation | API routes | Need Zod schema validation on all POST/PATCH endpoints. |
-| No CSRF protection | Contact forms | NextAuth handles its own CSRF, but custom forms need protection. |
-| Image optimization | Components | Some `<img>` tags should be migrated to `next/image`. |
+| 項目 | 要件 |
+|------|------|
+| 稼働率 | 99.9%以上 |
+| サーバーレス | Vercel Edge Functions |
+| DB | Supabase接続プーリング |
+| CDN | Vercel CDN |
+| イベントバッファ | user_eventsの書き込みはバッチ化して負荷軽減 |
+
+### 11.4 レスポンシブ・SEO
+
+| 項目 | 要件 | ステータス |
+|------|------|----------|
+| モバイルファースト | 375px〜対応 | ✅ |
+| メタタグ | 全ページ設定 | ✅ |
+| OGP | SNSシェア用画像 | ✅ |
+| サイトマップ | 自動生成 | ✅ |
+| 構造化データ（JSON-LD） | 物件・イベント・記事 | 📋 |
 
 ---
 
-## Appendix A: Key File Reference
+## 第12章：外部連携要件
 
-| File | Purpose |
-|---|---|
-| `src/lib/supabase.ts` | Supabase client (browser + server) |
-| `src/lib/store.ts` | Data access layer (all CRUD operations) |
-| `src/lib/auth.ts` | NextAuth.js configuration |
-| `src/middleware.ts` | Route protection middleware |
-| `src/types/index.ts` | Domain type definitions (Property, Builder, Lead, Event, ChatMessage) |
-| `src/types/next-auth.d.ts` | NextAuth type augmentation |
-| `supabase/schema.sql` | Complete database DDL |
-| `supabase/seed.sql` | Sample data for development |
-| `src/app/api/chat/route.ts` | AI chat streaming endpoint |
-| `src/app/dashboard/page.tsx` | Login page |
+| サービス | 用途 | ステータス | Phase |
+|---------|------|----------|-------|
+| Supabase | DB・ストレージ | ✅ | - |
+| NextAuth | 認証 | ✅ | - |
+| Google OAuth | ソーシャルログイン | ✅ | - |
+| OpenAI GPT-4o | AIコンシェルジュ | ✅ | - |
+| GA4 | アクセス解析・カスタムイベント | 🔧 | Phase 1 |
+| Resend | リード通知メール | 🔧 | Phase 1 |
+| Stripe | 工務店サブスクリプション | 📋 | Phase 3 |
+| LINE Messaging API | 友だち追加・通知 | 📋 | Phase 2 |
 
-## Appendix B: Supabase SQL Commands
+### 12.1 API一覧
 
-**Reset and recreate database:**
-```sql
--- Run in Supabase SQL Editor
--- 1. Drop all tables
-DROP TABLE IF EXISTS chat_history CASCADE;
-DROP TABLE IF EXISTS favorites CASCADE;
-DROP TABLE IF EXISTS events CASCADE;
-DROP TABLE IF EXISTS leads CASCADE;
-DROP TABLE IF EXISTS users CASCADE;
-DROP TABLE IF EXISTS builders CASCADE;
+| メソッド | エンドポイント | 認証 | ステータス |
+|---------|---------------|------|----------|
+| GET/POST | /api/auth/[...nextauth] | - | ✅ |
+| POST | /api/contact | 不要 | ✅ |
+| GET | /api/leads | 必要 | ✅ |
+| POST | /api/leads | 必要 | ✅ |
+| GET/PATCH | /api/leads/[id] | 必要 | ✅ |
+| GET | /api/builders | 不要 | ✅ |
+| GET/POST | /api/events | 不要/必要 | ✅ |
+| GET | /api/stats | 必要 | ✅ |
+| POST | /api/chat | 不要 | ✅→拡張 |
+| POST | /api/events/track | 不要 | 📋 Phase 1 |
+| GET/POST | /api/favorites | 必要 | 📋 Phase 1 |
+| GET/POST | /api/comparisons | 必要 | 📋 Phase 2 |
+| GET | /api/recommendations | 必要 | 📋 Phase 2 |
+| GET | /api/user/profile | 必要 | 📋 Phase 2 |
+| PATCH | /api/user/profile | 必要 | 📋 Phase 2 |
 
--- 2. Run schema.sql contents
--- 3. Run seed.sql contents
-```
+---
 
-**Check table data:**
-```sql
-SELECT COUNT(*) FROM builders;  -- Expected: 12
-SELECT COUNT(*) FROM leads;     -- Expected: 10
-SELECT COUNT(*) FROM events;    -- Expected: 4
-SELECT COUNT(*) FROM users;     -- Expected: 3
-```
+## 第13章：MVP / 次フェーズ / 将来構想
 
-## Appendix C: Glossary
+### Phase 0（完了 ✅）
+- 消費者向け全ページ（20画面）
+- 住宅会社向け全ページ（8画面）
+- CMS管理画面（27画面）
+- リード獲得フォーム
+- 認証基盤
+- AIチャット基盤
+- 工務店ダッシュボード（読み取り中心）
 
-| Japanese Term | English | Context |
-|---|---|---|
-| 平屋 (hiraya) | Single-story house | Primary content focus |
-| 工務店 (koumuten) | Builder / Construction company | B2B clients |
-| 見学会 (kengakukai) | Open house / Viewing event | Lead generation channel |
-| 資料請求 (shiryou-seikyuu) | Document request | Lead generation channel |
-| 無料相談 (muryou-soudan) | Free consultation | Lead generation channel |
-| 成約 (seiyaku) | Closed deal / Contract signed | Revenue trigger |
-| 失注 (shitchuu) | Lost deal | Lead terminal state |
-| 間取り (madori) | Floor plan / Layout | e.g. 3LDK |
-| 坪単価 (tsubo-tanka) | Price per tsubo (3.3m2) | Property pricing metric |
-| 断熱等級 (dannetsu-toukyuu) | Insulation grade | Building performance |
-| 耐震等級 (taishin-toukyuu) | Earthquake resistance grade | Building performance |
+### Phase 1：データ基盤構築（最優先）
+
+| 項目 | なぜ今やるか |
+|------|-------------|
+| ユーザー識別子統一（anonymous_id → user_id接続） | 行動データの連続性の基盤。これなしにデータは使えない |
+| user_eventsテーブル + イベント送信API | AIが学習するデータの根幹。早く始めるほどデータが溜まる |
+| chat_sessions / chat_messagesテーブル | チャットログなしに意向抽出・要約は不可能 |
+| チャットログ保存機能 | 既存APIチャットの拡張。ログをDBに保存する |
+| リードと行動データの紐付け | リードに「直前閲覧」「流入元」を付与。住宅会社への価値向上 |
+| お気に入り機能（favorites） | ユーザーの明示的関心表明。データとしても推薦材料としても重要 |
+| 閲覧履歴表示 | ユーザー体験の向上 + データの可視化 |
+| GA4カスタムイベント計測設計 | ファネル分析・CV率計測の基盤 |
+| CMS構造化データ項目追加 | AI推薦のマッチング材料。後から追加するとデータ欠損 |
+| Resendによるリード通知メール | 工務店への即時通知。運用の基本 |
+
+### Phase 2：AI活用開始
+
+| 項目 | 内容 |
+|------|------|
+| user_profilesテーブル | 段階的プロフィール構築 |
+| 比較リスト機能 | 物件・工務店の比較 |
+| AIチャット拡張（推薦・診断・要約） | 意向抽出・タグ付け・推薦・要約 |
+| 推薦ロジック初期版 | 閲覧傾向 × 工務店構造化データ |
+| 意向データ付きリード | 関心タグ・チャット要約・行動文脈をリードに付与 |
+| スコアリング可視化 | 行動データに基づく温度感の自動計算 |
+| 管理画面分析ダッシュボード | チャット分析・行動分析・ファネル分析 |
+| 工務店向けレポート基盤 | 月次リードレポート・コンテンツ効果レポート |
+
+### Phase 3：AI本格稼働・SaaS化
+
+| 項目 | 内容 |
+|------|------|
+| AI住宅コンシェルジュ | 検討フェーズ認識 + 行動文脈 + パーソナライズ対話 |
+| AI営業マン | 住宅会社向け提案支援 |
+| 商談前要約自動生成 | チャット + 行動 + プロフィールの統合要約 |
+| 営業改善SaaS | 成約パターン分析・最適提案 |
+| Stripe決済連携 | 工務店サブスクリプション |
+| CRM連携 | 外部CRMへのデータ連携 |
+| エリア拡大 | 九州全域 → 中国・四国 |
+
+---
+
+## 第14章：開発優先順位
+
+### 最優先（Phase 1）
+
+| 優先度 | 実装項目 | 理由 |
+|--------|---------|------|
+| S | ユーザー識別子の統一（anonymous_id） | 全データの接続基盤 |
+| S | user_eventsテーブル + イベント送信API | AIデータの根幹 |
+| S | chat_sessions / chat_messages保存 | 意向推定の材料 |
+| S | リードへの流入チャネル・直前閲覧の付与 | リード品質向上の即効性が高い |
+| A | お気に入り機能 | ユーザーの関心表明データ |
+| A | 閲覧履歴機能 | データ蓄積 + UX向上 |
+| A | GA4カスタムイベント設計・実装 | 計測なしに改善はできない |
+| A | CMS構造化データ項目追加 | AI推薦の材料。後からだと過去データが欠損 |
+| B | Resendリード通知メール | 運用の基本 |
+| B | CMS → Supabase永続化 | 現在TSファイルに依存している部分の移行 |
+
+### 次点（Phase 2）
+
+| 優先度 | 実装項目 |
+|--------|---------|
+| A | AIチャット拡張（意向抽出・タグ付け・要約） |
+| A | 推薦ロジック初期版 |
+| A | 意向データ付きリード |
+| B | user_profilesテーブル |
+| B | 比較リスト機能 |
+| B | 管理画面分析ダッシュボード |
+| B | 工務店向けレポート基盤 |
+| B | スコアリング可視化 |
+
+### 後回しでよい
+
+| 項目 | 理由 |
+|------|------|
+| Stripe請求管理の高度化 | パートナー数が少ない段階では手動対応で十分 |
+| 複雑な課金UI | まず価値を証明してから |
+| 全国展開前提の仕様 | 九州で十分なデータを蓄積してから |
+| 高度な自動化（リード自動配分等） | データとルールが十分に揃ってから |
+| CRM連携 | 工務店側のCRM利用状況を調査してから |
+
+---
+
+## 第15章：KPI / 評価指標
+
+### 15.1 プラットフォーム全体KPI
+
+| カテゴリ | KPI | 現在値 | 目標値（6ヶ月） |
+|---------|-----|--------|----------------|
+| 集客 | 月間WEB PV | 計測中 | 50,000 |
+| 集客 | YouTube月間視聴回数 | 152,228 | 300,000 |
+| リード | 月間リード獲得数 | - | 50件 |
+| 成約 | リード→成約転換率 | - | 15% |
+| B2B | パートナー工務店数 | 12社 | 25社 |
+
+### 15.2 AI / チャットKPI
+
+| KPI | 定義 | 目標値 |
+|-----|------|--------|
+| AI相談開始率 | サイト訪問者のうちチャットを開始した割合 | 5% |
+| AI相談完了率 | チャット開始者のうち5メッセージ以上会話した割合 | 60% |
+| AI経由CV率 | チャット完了者のうちリード化した割合 | 15% |
+| チャット→予約率 | チャット後に見学会予約した割合 | 8% |
+| チャット→資料請求率 | チャット後に資料請求した割合 | 12% |
+| チャット→離脱率 | チャット後に何もアクションせず離脱した割合 | 65%以下 |
+
+### 15.3 コンテンツ→CV率
+
+| KPI | 定義 |
+|-----|------|
+| 動画→CV率 | 動画視聴者のうちリード化した割合 |
+| 記事→CV率 | 記事閲覧者のうちリード化した割合 |
+| 工務店詳細→CV率 | 工務店詳細閲覧者のうちリード化した割合 |
+| イベント詳細→CV率 | イベント詳細閲覧者のうち予約した割合 |
+
+### 15.4 ユーザー行動KPI
+
+| KPI | 定義 |
+|-----|------|
+| お気に入り率 | 物件詳細閲覧者のうちお気に入りした割合 |
+| 比較追加率 | 物件詳細閲覧者のうち比較リストに追加した割合 |
+| 推薦クリック率 | 推薦表示回数のうちクリックされた割合 |
+| 会員登録率 | 訪問者のうち会員登録した割合 |
+
+### 15.5 成約者分析KPI
+
+| KPI | 定義 | 用途 |
+|-----|------|------|
+| 成約者の平均閲覧コンテンツ数 | 成約に至った人が平均何件のコンテンツを見たか | コンテンツ戦略の指標 |
+| 成約者の平均相談回数 | 成約者が平均何回AIチャットを使ったか | AIの貢献度評価 |
+| 成約者の閲覧コンテンツ傾向 | 成約者がよく見たコンテンツのカテゴリ | コンテンツ制作の優先順位 |
+| 成約者の検討期間 | 初回訪問〜成約までの日数 | ファネル最適化 |
+
+---
+
+*本文書は payhome-next コードベース（2026-03-22時点）の実装状態および将来構想に基づいて作成されたものです。*

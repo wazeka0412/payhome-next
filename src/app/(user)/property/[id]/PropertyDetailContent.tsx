@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import PropertySummary from '@/components/property/PropertySummary';
@@ -8,11 +9,20 @@ import { LINE_URL } from '@/lib/constants';
 import { useProperties, useEvents } from '@/lib/content-store';
 import { EVENT_TYPE_STYLES, formatPeriod } from '@/lib/events-data';
 import { notFound } from 'next/navigation';
+import { useTrackEvent } from '@/lib/use-track-event';
+import FavoriteButton from '@/components/ui/FavoriteButton';
 
 export default function PropertyDetailContent({ id }: { id: string }) {
   const properties = useProperties();
   const events = useEvents();
   const property = properties.find((p) => p.id === id);
+  const trackEvent = useTrackEvent();
+
+  useEffect(() => {
+    if (property) {
+      trackEvent({ eventType: 'property_detail_view', contentType: 'property', contentId: id });
+    }
+  }, [id, property, trackEvent]);
 
   if (!property) notFound();
 
@@ -89,7 +99,10 @@ export default function PropertyDetailContent({ id }: { id: string }) {
               <span className="text-xs font-semibold text-[#E8740C] bg-[#E8740C]/10 px-2 py-0.5 rounded">ルームツアー</span>
             </div>
             <h1 className="text-xl md:text-2xl font-bold text-[#3D2200] mb-2">{property.title}</h1>
-            <p className="text-sm text-gray-400">{property.views}再生</p>
+            <div className="flex items-center gap-3">
+              <p className="text-sm text-gray-400">{property.views}再生</p>
+              <FavoriteButton contentType="property" contentId={id} />
+            </div>
           </div>
 
           {/* Property Summary Cards */}

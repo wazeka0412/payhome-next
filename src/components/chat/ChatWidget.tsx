@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
+import { getOrCreateAnonymousId } from '@/lib/anonymous-id'
+import { useTrackEvent } from '@/lib/use-track-event'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -13,8 +15,10 @@ export default function ChatWidget() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [sessionId, setSessionId] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const trackEvent = useTrackEvent()
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -35,14 +39,30 @@ export default function ChatWidget() {
     setInput('')
     setIsLoading(true)
 
+    // 初回メッセージ時にchat_startイベントを送信
+    if (messages.length === 0) {
+      trackEvent({ eventType: 'chat_start', contentType: 'chat' })
+    }
+
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: newMessages }),
+        body: JSON.stringify({
+          messages: newMessages,
+          sessionId,
+          anonymousId: getOrCreateAnonymousId(),
+          sourcePage: window.location.pathname,
+        }),
       })
 
       if (!res.ok) throw new Error('Failed')
+
+      // レスポンスヘッダからセッションIDを取得
+      const newSessionId = res.headers.get('X-Chat-Session-Id')
+      if (newSessionId && !sessionId) {
+        setSessionId(newSessionId)
+      }
 
       const reader = res.body?.getReader()
       const decoder = new TextDecoder()
@@ -76,6 +96,11 @@ export default function ChatWidget() {
             }
           } catch {}
         }
+      }
+
+      // 5メッセージ以上でchat_completeイベント
+      if (newMessages.length >= 5) {
+        trackEvent({ eventType: 'chat_complete', contentType: 'chat', metadata: { messageCount: newMessages.length + 1 } })
       }
     } catch (err) {
       console.error('Chat error:', err)
@@ -172,7 +197,7 @@ export default function ChatWidget() {
               </div>
             ))}
 
-            {/* 考え中インジケーター（ストリーミング開始前に表示） */}
+            {/* 考え中インジケーター */}
             {isLoading && (messages.length === 0 || messages[messages.length - 1]?.content === '') && (
               <div className="flex justify-start">
                 <div className="w-7 h-7 rounded-full bg-orange-50 flex items-center justify-center overflow-hidden shrink-0 mr-2 mt-1 border border-orange-200">

@@ -32,6 +32,11 @@ export interface DbLead {
   score: number
   memo?: string
   user_id?: string
+  source_channel?: string
+  source_content_id?: string
+  recent_views?: Array<{ content_type: string; content_id: string; page_path: string; created_at: string }>
+  anonymous_id?: string
+  chat_session_id?: string
   created_at: string
   updated_at: string
 }
@@ -49,6 +54,20 @@ export interface DbBuilder {
   logo_url?: string
   plan: string
   is_active: boolean
+  // 構造化データ（AI推薦用）
+  price_range?: string
+  hiraya_ratio?: number
+  hiraya_annual?: number
+  design_taste?: string[]
+  features?: string[]
+  suitable_for?: string[]
+  insulation_grade?: string
+  earthquake_grade?: string
+  construction_method?: string
+  land_proposal?: boolean
+  common_concerns?: string[]
+  strengths?: string[]
+  comparison_points?: string[]
   created_at: string
   updated_at: string
 }

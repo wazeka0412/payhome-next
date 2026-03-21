@@ -5,8 +5,12 @@ import { getToken } from 'next-auth/jwt'
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // /admin/*, /appadmin/* は admin ロールのみ
+  // 開発環境では /appadmin と /admin のアクセスを許可
+  const isDev = process.env.NODE_ENV === 'development'
+
+  // /admin/*, /appadmin/* は admin ロールのみ（本番環境）
   if (pathname.startsWith('/admin') || pathname.startsWith('/appadmin')) {
+    if (isDev) return NextResponse.next()
     const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
     if (!token) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
