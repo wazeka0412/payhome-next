@@ -35,6 +35,11 @@ export default function ArticlesAdmin() {
           if (mode === 'edit' && editItem) {
             articleStore.set(prev => prev.map(p => p.id === editItem.id ? { ...p, ...data } : p));
           } else {
+            const newId = (data as { id?: string }).id;
+            if (newId && items.some(i => i.id === newId)) {
+              alert('このIDは既に使用されています。別のIDを入力してください。');
+              return;
+            }
             articleStore.set(prev => [data as ArticleData, ...prev]);
           }
           setMode('list');
@@ -97,7 +102,7 @@ function ArticleForm({ item, onSave, onCancel }: { item: ArticleData | null; onS
               {settings.articleTags.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
-          <DatePicker label="日付" value={form.date} onChange={(v) => set('date', v)} format="dot" />
+          <DatePicker label="日付" value={form.date} onChange={(v) => set('date', v)} format="iso" />
           <ImageUploader label="サムネイル画像" images={thumbnail} onChange={setThumbnail} multiple={false} />
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">概要</label>

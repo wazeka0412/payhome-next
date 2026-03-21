@@ -77,6 +77,7 @@ export default function ImageUploader({ label, images, onChange, multiple = true
           accept="image/*"
           multiple={multiple}
           className="hidden"
+          aria-label="画像をアップロード"
           onChange={(e) => handleFiles(e.target.files)}
         />
       </div>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import ContentTable from '@/components/appadmin/ContentTable';
 import RichTextEditor from '@/components/appadmin/RichTextEditor';
+import FormField from '@/components/appadmin/FormField';
 import { useReviews, reviewStore } from '@/lib/content-store';
 import { type Review } from '@/lib/reviews-data';
 
@@ -34,6 +35,11 @@ export default function ReviewsAdmin() {
           if (mode === 'edit' && editItem) {
             reviewStore.set((prev) => prev.map((p) => (p.id === editItem.id ? { ...p, ...data } : p)));
           } else {
+            const newId = (data as { id?: string }).id;
+            if (newId && items.some(i => i.id === newId)) {
+              alert('このIDは既に使用されています。別のIDを入力してください。');
+              return;
+            }
             reviewStore.set((prev) => [data as Review, ...prev]);
           }
           setMode('list');
@@ -82,26 +88,26 @@ function ReviewForm({ item, onSave, onCancel }: { item: Review | null; onSave: (
       <form onSubmit={(e) => { e.preventDefault(); onSave(form); }} className="space-y-6 max-w-3xl">
         <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
           <h3 className="text-sm font-bold text-[#E8740C] uppercase tracking-wider mb-4">お客様情報</h3>
-          <Field label="ID" value={form.id} onChange={(v) => set('id', v)} required />
+          <FormField label="ID" value={form.id} onChange={(v) => set('id', v)} required />
           <div className="grid grid-cols-2 gap-4">
-            <Field label="お名前" value={form.name} onChange={(v) => set('name', v)} required />
-            <Field label="エリア" value={form.area} onChange={(v) => set('area', v)} />
-            <Field label="年代" value={form.age} onChange={(v) => set('age', v)} />
-            <Field label="家族構成" value={form.family} onChange={(v) => set('family', v)} />
+            <FormField label="お名前" value={form.name} onChange={(v) => set('name', v)} required />
+            <FormField label="エリア" value={form.area} onChange={(v) => set('area', v)} />
+            <FormField label="年代" value={form.age} onChange={(v) => set('age', v)} />
+            <FormField label="家族構成" value={form.family} onChange={(v) => set('family', v)} />
           </div>
         </div>
         <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
           <h3 className="text-sm font-bold text-[#E8740C] uppercase tracking-wider mb-4">住宅情報</h3>
           <div className="grid grid-cols-2 gap-4">
-            <Field label="住宅タイプ" value={form.propertyType} onChange={(v) => set('propertyType', v)} />
-            <Field label="工務店" value={form.builder} onChange={(v) => set('builder', v)} />
-            <Field label="予算" value={form.budget} onChange={(v) => set('budget', v)} />
-            <Field label="建築期間" value={form.duration} onChange={(v) => set('duration', v)} />
+            <FormField label="住宅タイプ" value={form.propertyType} onChange={(v) => set('propertyType', v)} />
+            <FormField label="工務店" value={form.builder} onChange={(v) => set('builder', v)} />
+            <FormField label="予算" value={form.budget} onChange={(v) => set('budget', v)} />
+            <FormField label="建築期間" value={form.duration} onChange={(v) => set('duration', v)} />
           </div>
         </div>
         <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
           <h3 className="text-sm font-bold text-[#E8740C] uppercase tracking-wider mb-4">コンテンツ</h3>
-          <Field label="一言コメント" value={form.text} onChange={(v) => set('text', v)} multiline rows={2} />
+          <FormField label="一言コメント" value={form.text} onChange={(v) => set('text', v)} multiline rows={2} />
           <RichTextEditor label="本文" value={form.body} onChange={(v) => set('body', v)} />
         </div>
         <div className="flex gap-3 pt-4">
@@ -109,16 +115,6 @@ function ReviewForm({ item, onSave, onCancel }: { item: Review | null; onSave: (
           <button type="button" onClick={onCancel} className="px-6 py-3 text-gray-600 cursor-pointer">キャンセル</button>
         </div>
       </form>
-    </div>
-  );
-}
-
-function Field({ label, value, onChange, required, placeholder, multiline, rows }: { label: string; value: string; onChange: (v: string) => void; required?: boolean; placeholder?: string; multiline?: boolean; rows?: number }) {
-  const cls = "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E8740C]/30 focus:border-[#E8740C]";
-  return (
-    <div>
-      <label className="block text-xs font-medium text-gray-500 mb-1">{label}{required && <span className="text-red-500 ml-0.5">*</span>}</label>
-      {multiline ? <textarea value={value} onChange={(e) => onChange(e.target.value)} className={cls + " resize-y"} rows={rows || 3} placeholder={placeholder} /> : <input type="text" value={value} onChange={(e) => onChange(e.target.value)} className={cls} required={required} placeholder={placeholder} />}
     </div>
   );
 }

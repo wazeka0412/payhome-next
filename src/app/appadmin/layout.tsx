@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
+import ErrorBoundary from '@/components/appadmin/ErrorBoundary';
 
 const NAV_ITEMS = [
   { href: '/appadmin', icon: '📊', label: 'ダッシュボード', exact: true },
@@ -114,7 +115,7 @@ export default function AppAdminLayout({ children }: { children: React.ReactNode
         </div>
       </aside>
       <main className="flex-1 overflow-auto">
-        <div className="p-8">{children}</div>
+        <div className="p-8"><ErrorBoundary>{children}</ErrorBoundary></div>
       </main>
     </div>
   );

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import ContentTable from '@/components/appadmin/ContentTable';
 import ImageUploader from '@/components/appadmin/ImageUploader';
 import DatePicker from '@/components/appadmin/DatePicker';
+import FormField from '@/components/appadmin/FormField';
 import { useMagazine, magazineStore } from '@/lib/content-store';
 import { type MagazineIssue } from '@/lib/magazine-data';
 
@@ -34,6 +35,11 @@ export default function MagazineAdmin() {
           if (mode === 'edit' && editItem) {
             magazineStore.set(prev => prev.map(p => p.id === editItem.id ? { ...p, ...data } : p));
           } else {
+            const newId = (data as { id?: string }).id;
+            if (newId && items.some(i => i.id === newId)) {
+              alert('このIDは既に使用されています。別のIDを入力してください。');
+              return;
+            }
             magazineStore.set(prev => [data as MagazineIssue, ...prev]);
           }
           setMode('list');
@@ -81,18 +87,18 @@ function MagazineForm({ item, onSave, onCancel }: { item: MagazineIssue | null; 
         onSave({
           ...form,
           coverImage: coverImages[0] ?? '',
-          contents: form.contents.split('\n').filter(Boolean),
+          contents: (form.contents || '').split('\n').filter(Boolean),
         });
       }} className="space-y-6 max-w-3xl">
         <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
           <h3 className="text-sm font-bold text-[#E8740C] uppercase tracking-wider mb-4">基本情報</h3>
-          <Field label="ID" value={form.id} onChange={(v) => set('id', v)} required placeholder="mag-2026-04" />
+          <FormField label="ID" value={form.id} onChange={(v) => set('id', v)} required placeholder="mag-2026-04" />
           <div className="grid grid-cols-2 gap-4">
-            <Field label="号" value={form.issue} onChange={(v) => set('issue', v)} required placeholder="2026年4月号" />
+            <FormField label="号" value={form.issue} onChange={(v) => set('issue', v)} required placeholder="2026年4月号" />
             <DatePicker label="発行日" value={form.publishDate} onChange={(v) => set('publishDate', v)} format="dot" />
           </div>
-          <Field label="特集タイトル" value={form.title} onChange={(v) => set('title', v)} required />
-          <Field label="概要" value={form.description} onChange={(v) => set('description', v)} multiline rows={2} />
+          <FormField label="特集タイトル" value={form.title} onChange={(v) => set('title', v)} required />
+          <FormField label="概要" value={form.description} onChange={(v) => set('description', v)} multiline rows={2} />
           <div>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -116,23 +122,13 @@ function MagazineForm({ item, onSave, onCancel }: { item: MagazineIssue | null; 
         </div>
         <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
           <h3 className="text-sm font-bold text-[#E8740C] uppercase tracking-wider mb-4">目次</h3>
-          <Field label="掲載内容（1行1項目）" value={form.contents} onChange={(v) => set('contents', v)} multiline rows={6} />
+          <FormField label="掲載内容（1行1項目）" value={form.contents} onChange={(v) => set('contents', v)} multiline rows={6} />
         </div>
         <div className="flex gap-3 pt-4">
           <button type="submit" className="bg-[#E8740C] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#d4680b] transition cursor-pointer">{item ? '更新する' : '追加する'}</button>
           <button type="button" onClick={onCancel} className="px-6 py-3 text-gray-600 cursor-pointer">キャンセル</button>
         </div>
       </form>
-    </div>
-  );
-}
-
-function Field({ label, value, onChange, required, placeholder, multiline, rows }: { label: string; value: string; onChange: (v: string) => void; required?: boolean; placeholder?: string; multiline?: boolean; rows?: number }) {
-  const cls = "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E8740C]/30 focus:border-[#E8740C]";
-  return (
-    <div>
-      <label className="block text-xs font-medium text-gray-500 mb-1">{label}{required && <span className="text-red-500 ml-0.5">*</span>}</label>
-      {multiline ? <textarea value={value} onChange={(e) => onChange(e.target.value)} className={cls + " resize-y"} rows={rows || 3} placeholder={placeholder} /> : <input type="text" value={value} onChange={(e) => onChange(e.target.value)} className={cls} required={required} placeholder={placeholder} />}
     </div>
   );
 }

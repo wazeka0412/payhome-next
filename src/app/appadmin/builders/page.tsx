@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import ContentTable from '@/components/appadmin/ContentTable';
+import FormField from '@/components/appadmin/FormField';
 import { useBuilders, builderStore } from '@/lib/content-store';
 import { type BuilderData } from '@/lib/builders-data';
 
@@ -37,6 +38,11 @@ export default function BuildersAdmin() {
           if (mode === 'edit' && editItem) {
             builderStore.set(prev => prev.map(p => p.id === editItem.id ? { ...p, ...data } : p));
           } else {
+            const newId = (data as { id?: string }).id;
+            if (newId && items.some(i => i.id === newId)) {
+              alert('このIDは既に使用されています。別のIDを入力してください。');
+              return;
+            }
             builderStore.set(prev => [data as BuilderData, ...prev]);
           }
           setMode('list');
@@ -82,29 +88,20 @@ function BuilderForm({ item, onSave, onCancel }: { item: BuilderData | null; onS
         onSave({ ...form, specialties: form.specialties.split(',').map(s => s.trim()).filter(Boolean), annualBuilds: Number(form.annualBuilds) || 0 });
       }} className="space-y-6 max-w-3xl">
         <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
-          <Field label="ID" value={form.id} onChange={(v) => set('id', v)} required />
-          <Field label="工務店名" value={form.name} onChange={(v) => set('name', v)} required />
+          <FormField label="ID" value={form.id} onChange={(v) => set('id', v)} required />
+          <FormField label="工務店名" value={form.name} onChange={(v) => set('name', v)} required />
           <div className="grid grid-cols-2 gap-4">
-            <Field label="都道府県" value={form.area} onChange={(v) => set('area', v)} />
-            <Field label="地域" value={form.region} onChange={(v) => set('region', v)} />
+            <FormField label="都道府県" value={form.area} onChange={(v) => set('area', v)} />
+            <FormField label="地域" value={form.region} onChange={(v) => set('region', v)} />
           </div>
-          <Field label="得意分野（カンマ区切り）" value={form.specialties} onChange={(v) => set('specialties', v)} placeholder="平屋, ZEH, デザイン" />
-          <Field label="年間施工棟数" value={form.annualBuilds} onChange={(v) => set('annualBuilds', v)} />
+          <FormField label="得意分野（カンマ区切り）" value={form.specialties} onChange={(v) => set('specialties', v)} placeholder="平屋, ZEH, デザイン" />
+          <FormField label="年間施工棟数" value={form.annualBuilds} onChange={(v) => set('annualBuilds', v)} />
         </div>
         <div className="flex gap-3 pt-4">
           <button type="submit" className="bg-[#E8740C] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#d4680b] transition cursor-pointer">{item ? '更新する' : '追加する'}</button>
           <button type="button" onClick={onCancel} className="px-6 py-3 text-gray-600 cursor-pointer">キャンセル</button>
         </div>
       </form>
-    </div>
-  );
-}
-
-function Field({ label, value, onChange, required, placeholder }: { label: string; value: string; onChange: (v: string) => void; required?: boolean; placeholder?: string }) {
-  return (
-    <div>
-      <label className="block text-xs font-medium text-gray-500 mb-1">{label}{required && <span className="text-red-500 ml-0.5">*</span>}</label>
-      <input type="text" value={value} onChange={(e) => onChange(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E8740C]/30 focus:border-[#E8740C]" required={required} placeholder={placeholder} />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import ContentTable from '@/components/appadmin/ContentTable';
 import DatePicker from '@/components/appadmin/DatePicker';
 import ImageUploader from '@/components/appadmin/ImageUploader';
 import RichTextEditor from '@/components/appadmin/RichTextEditor';
+import FormField from '@/components/appadmin/FormField';
 import { useInterviews, interviewStore } from '@/lib/content-store';
 import { useSettings } from '@/lib/settings-store';
 import { type Interview, type InterviewBodyItem } from '@/lib/interviews';
@@ -36,6 +37,11 @@ export default function InterviewsAdmin() {
           if (mode === 'edit' && editItem) {
             interviewStore.set((prev) => prev.map((p) => (p.id === editItem.id ? { ...p, ...data } : p)));
           } else {
+            const newId = (data as { id?: string }).id;
+            if (newId && items.some(i => i.id === newId)) {
+              alert('このIDは既に使用されています。別のIDを入力してください。');
+              return;
+            }
             interviewStore.set((prev) => [data as Interview, ...prev]);
           }
           setMode('list');
@@ -125,8 +131,8 @@ function InterviewForm({ item, onSave, onCancel }: { item: Interview | null; onS
       <form onSubmit={(e) => { e.preventDefault(); const { bodyHtml, ...rest } = form; onSave({ ...rest, body: htmlToBody(bodyHtml), thumbnail: thumbnail[0] || '' }); }} className="space-y-6 max-w-3xl">
         <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
           <h3 className="text-sm font-bold text-[#E8740C] uppercase tracking-wider mb-4">基本情報</h3>
-          <Field label="ID" value={form.id} onChange={(v) => set('id', v)} required />
-          <Field label="タイトル" value={form.title} onChange={(v) => set('title', v)} required />
+          <FormField label="ID" value={form.id} onChange={(v) => set('id', v)} required />
+          <FormField label="タイトル" value={form.title} onChange={(v) => set('title', v)} required />
           <DatePicker label="日付" value={form.date} onChange={(v) => set('date', v)} format="iso" />
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">カテゴリー</label>
@@ -134,9 +140,9 @@ function InterviewForm({ item, onSave, onCancel }: { item: Interview | null; onS
               {settings.interviewCategories.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
-          <Field label="会社名" value={form.company} onChange={(v) => set('company', v)} />
-          <Field label="所在地" value={form.location} onChange={(v) => set('location', v)} />
-          <Field label="概要" value={form.excerpt} onChange={(v) => set('excerpt', v)} multiline rows={3} />
+          <FormField label="会社名" value={form.company} onChange={(v) => set('company', v)} />
+          <FormField label="所在地" value={form.location} onChange={(v) => set('location', v)} />
+          <FormField label="概要" value={form.excerpt} onChange={(v) => set('excerpt', v)} multiline rows={3} />
           <ImageUploader label="サムネイル画像" images={thumbnail} onChange={setThumbnail} multiple={false} />
         </div>
         <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
@@ -148,16 +154,6 @@ function InterviewForm({ item, onSave, onCancel }: { item: Interview | null; onS
           <button type="button" onClick={onCancel} className="px-6 py-3 text-gray-600 cursor-pointer">キャンセル</button>
         </div>
       </form>
-    </div>
-  );
-}
-
-function Field({ label, value, onChange, required, placeholder, multiline, rows }: { label: string; value: string; onChange: (v: string) => void; required?: boolean; placeholder?: string; multiline?: boolean; rows?: number }) {
-  const cls = "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E8740C]/30 focus:border-[#E8740C]";
-  return (
-    <div>
-      <label className="block text-xs font-medium text-gray-500 mb-1">{label}{required && <span className="text-red-500 ml-0.5">*</span>}</label>
-      {multiline ? <textarea value={value} onChange={(e) => onChange(e.target.value)} className={cls + " resize-y"} rows={rows || 3} placeholder={placeholder} /> : <input type="text" value={value} onChange={(e) => onChange(e.target.value)} className={cls} required={required} placeholder={placeholder} />}
     </div>
   );
 }
