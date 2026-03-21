@@ -37,6 +37,10 @@ export interface WebinarData {
   keyPoints?: { title: string; description: string }[];
   testimonials?: string[];
   notice?: string;
+  publishDate?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  ogpImage?: string;
 }
 
 export const webinars: WebinarData[] = [

@@ -17,6 +17,11 @@ export interface Interview {
   excerpt: string;
   body: InterviewBodyItem[];
   thumbnail?: string;
+  status?: string;
+  publishDate?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  ogpImage?: string;
 }
 
 export const interviews: Interview[] = [

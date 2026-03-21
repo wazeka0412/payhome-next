@@ -17,6 +17,11 @@ export interface EventData {
     label: string;
     value: string;
   }[];
+  status?: string;
+  publishDate?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  ogpImage?: string;
 }
 
 export const EVENT_TYPE_STYLES: Record<EventData['type'], { bg: string; text: string }> = {

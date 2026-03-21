@@ -7,6 +7,10 @@ export interface MagazineIssue {
   publishDate: string;
   contents: string[];
   isLatest: boolean;
+  status?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  ogpImage?: string;
 }
 
 export const magazineIssues: MagazineIssue[] = [

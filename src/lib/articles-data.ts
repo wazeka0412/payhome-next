@@ -6,6 +6,11 @@ export interface ArticleData {
   description?: string;
   body?: string;
   thumbnail?: string;
+  status?: string;
+  publishDate?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  ogpImage?: string;
 }
 
 export const articles: ArticleData[] = [

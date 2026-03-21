@@ -5,6 +5,11 @@ export interface NewsItem {
   category: string;
   description: string;
   body: string;
+  status?: string;
+  publishDate?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  ogpImage?: string;
 }
 
 export const newsItems: NewsItem[] = [

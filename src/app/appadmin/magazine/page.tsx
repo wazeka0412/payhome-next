@@ -72,6 +72,11 @@ function MagazineForm({ item, onSave, onCancel }: { item: MagazineIssue | null; 
     publishDate: item?.publishDate ?? '',
     contents: item?.contents?.join('\n') ?? '',
     isLatest: item?.isLatest ?? false,
+    status: (item as unknown as Record<string, unknown>)?.status as string ?? '下書き',
+    scheduledPublishDate: (item as unknown as Record<string, unknown>)?.scheduledPublishDate as string ?? '',
+    seoTitle: (item as unknown as Record<string, unknown>)?.seoTitle as string ?? '',
+    seoDescription: (item as unknown as Record<string, unknown>)?.seoDescription as string ?? '',
+    ogpImage: (item as unknown as Record<string, unknown>)?.ogpImage as string ?? '',
   });
   const [coverImages, setCoverImages] = useState<string[]>(item?.coverImage ? [item.coverImage] : []);
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
@@ -90,6 +95,24 @@ function MagazineForm({ item, onSave, onCancel }: { item: MagazineIssue | null; 
           contents: (form.contents || '').split('\n').filter(Boolean),
         });
       }} className="space-y-6 max-w-3xl">
+        <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
+          <h3 className="text-sm font-bold text-[#E8740C] uppercase tracking-wider mb-4">公開設定</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">ステータス</label>
+              <select value={form.status} onChange={(e) => set('status', e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E8740C]/30 focus:border-[#E8740C]">
+                <option value="下書き">下書き</option>
+                <option value="レビュー待ち">レビュー待ち</option>
+                <option value="公開予定">公開予定</option>
+                <option value="公開中">公開中</option>
+                <option value="非公開">非公開</option>
+              </select>
+            </div>
+            {form.status === '公開予定' && (
+              <DatePicker label="公開予定日" value={form.scheduledPublishDate} onChange={(v) => set('scheduledPublishDate', v)} format="iso" />
+            )}
+          </div>
+        </div>
         <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
           <h3 className="text-sm font-bold text-[#E8740C] uppercase tracking-wider mb-4">基本情報</h3>
           <FormField label="ID" value={form.id} onChange={(v) => set('id', v)} required placeholder="mag-2026-04" />
@@ -123,6 +146,12 @@ function MagazineForm({ item, onSave, onCancel }: { item: MagazineIssue | null; 
         <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
           <h3 className="text-sm font-bold text-[#E8740C] uppercase tracking-wider mb-4">目次</h3>
           <FormField label="掲載内容（1行1項目）" value={form.contents} onChange={(v) => set('contents', v)} multiline rows={6} />
+        </div>
+        <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
+          <h3 className="text-sm font-bold text-[#E8740C] uppercase tracking-wider mb-4">SEO設定</h3>
+          <FormField label="SEOタイトル" value={form.seoTitle} onChange={(v) => set('seoTitle', v)} placeholder="ページタイトル（空欄時は記事タイトルを使用）" />
+          <FormField label="メタディスクリプション" value={form.seoDescription} onChange={(v) => set('seoDescription', v)} multiline rows={2} placeholder="メタディスクリプション（空欄時は概要を使用）" />
+          <FormField label="OGP画像URL" value={form.ogpImage} onChange={(v) => set('ogpImage', v)} placeholder="OGP画像URL（空欄時はサムネイルを使用）" />
         </div>
         <div className="flex gap-3 pt-4">
           <button type="submit" className="bg-[#E8740C] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#d4680b] transition cursor-pointer">{item ? '更新する' : '追加する'}</button>

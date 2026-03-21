@@ -16,6 +16,9 @@ const NAV_ITEMS = [
   { href: '/appadmin/articles', icon: '📝', label: 'お役立ち記事' },
   { href: '/appadmin/news', icon: '📢', label: 'ニュース' },
   { href: '/appadmin/magazine', icon: '📖', label: '月刊ぺいほーむ' },
+  { href: '/appadmin/homepage', icon: '🏠', label: 'ホームページ' },
+  { href: '/appadmin/faq', icon: '❓', label: 'FAQ管理' },
+  { href: '/appadmin/about', icon: '📄', label: 'About管理' },
 ];
 
 const TOOL_NAV_ITEMS = [
