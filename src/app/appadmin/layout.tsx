@@ -21,6 +21,16 @@ const NAV_ITEMS = [
   { href: '/appadmin/about', icon: '📄', label: 'About管理' },
 ];
 
+const BIZ_NAV_ITEMS = [
+  { href: '/appadmin/biz-homepage', icon: '🏢', label: 'Bizトップページ' },
+  { href: '/appadmin/biz-service', icon: '💼', label: 'サービスページ' },
+  { href: '/appadmin/biz-ad', icon: '📺', label: '広告・タイアップ' },
+  { href: '/appadmin/biz-partner', icon: '🤝', label: 'パートナー' },
+  { href: '/appadmin/biz-news', icon: '📰', label: 'Bizニュース' },
+  { href: '/appadmin/biz-articles', icon: '📑', label: 'Bizお役立ち記事' },
+  { href: '/appadmin/biz-webinars', icon: '🎤', label: 'Bizセミナー' },
+];
+
 const TOOL_NAV_ITEMS = [
   { href: '/appadmin/media', icon: '🖼️', label: 'メディアライブラリ' },
   { href: '/appadmin/workflow', icon: '📋', label: 'ワークフロー' },
@@ -72,6 +82,26 @@ export default function AppAdminLayout({ children }: { children: React.ReactNode
                 {item.label}
               </Link>
             ))}
+          </div>
+
+          <div className="mt-4 pt-4 border-t border-white/10">
+            <p className="px-4 text-[0.6rem] uppercase tracking-wider text-gray-500 mb-2">Biz（工務店向け）</p>
+            <div className="space-y-0.5">
+              {BIZ_NAV_ITEMS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition ${
+                    isActive(item)
+                      ? 'bg-[#E8740C] text-white font-semibold'
+                      : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                  }`}
+                >
+                  <span className="text-base">{item.icon}</span>
+                  {item.label}
+                </Link>
+              ))}
+            </div>
           </div>
 
           <div className="mt-4 pt-4 border-t border-white/10">

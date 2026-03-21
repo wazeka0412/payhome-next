@@ -12,6 +12,9 @@ export interface BizWebinar {
   speakers?: { name: string; role: string }[];
   participants?: string;
   keyPoints?: string[];
+  seoTitle?: string;
+  seoDescription?: string;
+  ogpImage?: string;
 }
 
 export const bizWebinars: BizWebinar[] = [

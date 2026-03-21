@@ -5,6 +5,11 @@ export interface BizNewsItem {
   title: string;
   excerpt: string;
   body: string;
+  status?: string;
+  publishDate?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  ogpImage?: string;
 }
 
 export const bizNewsItems: BizNewsItem[] = [

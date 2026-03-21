@@ -10,6 +10,9 @@ import { newsItems as initialNews, type NewsItem } from './news-data';
 import { builders as initialBuilders, type BuilderData } from './builders-data';
 import { articles as initialArticles, type ArticleData } from './articles-data';
 import { magazineIssues as initialMagazine, type MagazineIssue } from './magazine-data';
+import { bizNewsItems, type BizNewsItem } from './biz-news-data';
+import { bizArticleItems, type BizArticleItem } from './biz-articles-data';
+import { bizWebinars, type BizWebinar } from './biz-webinars-data';
 
 // ---------------------------------------------------------------------------
 // Window global to ensure singleton state across Next.js route chunks
@@ -78,6 +81,9 @@ export const newsStore      = createStore<NewsItem>('news', initialNews);
 export const builderStore   = createStore<BuilderData>('builders', initialBuilders);
 export const articleStore   = createStore<ArticleData>('articles', initialArticles);
 export const magazineStore  = createStore<MagazineIssue>('magazine', initialMagazine);
+export const bizNewsStore    = createStore<BizNewsItem>('bizNews', bizNewsItems);
+export const bizArticleStore = createStore<BizArticleItem>('bizArticles', bizArticleItems);
+export const bizWebinarStore = createStore<BizWebinar>('bizWebinars', bizWebinars);
 
 // ---------------------------------------------------------------------------
 // React hooks  — each returns the live array and re-renders on change
@@ -91,3 +97,6 @@ export function useNews()        { return useSyncExternalStore(newsStore.subscri
 export function useBuilders()    { return useSyncExternalStore(builderStore.subscribe,   builderStore.get,   () => initialBuilders); }
 export function useArticles()    { return useSyncExternalStore(articleStore.subscribe,   articleStore.get,   () => initialArticles); }
 export function useMagazine()    { return useSyncExternalStore(magazineStore.subscribe,  magazineStore.get,  () => initialMagazine); }
+export function useBizNews()     { return useSyncExternalStore(bizNewsStore.subscribe,   bizNewsStore.get,   () => bizNewsItems); }
+export function useBizArticles() { return useSyncExternalStore(bizArticleStore.subscribe, bizArticleStore.get, () => bizArticleItems); }
+export function useBizWebinars() { return useSyncExternalStore(bizWebinarStore.subscribe, bizWebinarStore.get, () => bizWebinars); }
