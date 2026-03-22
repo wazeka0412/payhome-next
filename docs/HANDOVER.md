@@ -426,14 +426,29 @@ npm start
 
 | Document | Path | Description |
 |----------|------|-------------|
+| **Strategy & Requirements** | | |
 | Business Strategy (JP) | `docs/BUSINESS_STRATEGY.md` | Full business strategy with market analysis, revenue model, roadmap |
 | Business Strategy (EN) | `docs/BUSINESS_STRATEGY_EN.md` | English translation |
 | Requirements (JP) | `docs/REQUIREMENTS.md` | Full requirements: data models, AI specs, event tracking, KPIs |
 | Requirements (EN) | `docs/REQUIREMENTS_EN.md` | English translation |
 | Current Issues | `docs/00_CURRENT_ISSUES.md` | Analysis of what was wrong with the v1 documents |
 | Implementation Plan | `docs/04_IMPLEMENTATION_PLAN.md` | Prioritized implementation items + AI data collection matrix |
+| **Business Operation Rules (IMPORTANT for engineers)** | | |
+| Lead Management Rules | `docs/lead_management_rules.docx` / `_en.docx` | Scoring formula, status transitions, SLA, multi-builder routing, duplicate handling |
+| Email Notification Spec | `docs/email_notification_spec.docx` / `_en.docx` | 7 email types: triggers, subject, body, recipient routing, retry logic |
+| Form Specification | `docs/form_specification.docx` / `_en.docx` | Validation rules, required fields, post-submission flow, chat-to-lead conversion |
+| AI Chat Operation Rules | `docs/ai_chat_operation_rules.docx` / `_en.docx` | Session limits, cost controls, prohibited topics, quality rules, widget display rules |
+| Data Handling Rules | `docs/data_handling_rules.docx` / `_en.docx` | PII restrictions, retention periods, anonymous merge rules, favorites limits, privacy |
+| Platform Operation Rules | `docs/platform_operation_rules.docx` / `_en.docx` | Role management, KPI calculations, event management, CMS workflow, campaigns, LINE/social |
+| **Other Documents** | | |
+| Operations Manual | `docs/operations_manual.docx` | Inquiry response flow, lead handover flow, SLA definitions |
+| Listing Standards | `docs/listing_standards.docx` | Builder listing requirements, expression rules, quality management |
+| Contract Template | `docs/contract_template.docx` | Listing agreement + lead referral fee agreement templates |
+| Sales Deck | `docs/payhome_sales_deck.pptx` | B2B sales presentation (12 slides) |
 | DB Migration | `supabase/migrations/001_data_foundation.sql` | Phase 1 schema changes |
 | This Handover | `docs/HANDOVER.md` | You are here |
+
+**Note for engineers:** When implementing any feature, check the Business Operation Rules documents first. They contain the business logic (scoring formulas, email triggers, validation rules, session limits, etc.) that you need to implement correctly. The Requirements document tells you *what to build*; these documents tell you *how it should behave*.
 
 ---
 
