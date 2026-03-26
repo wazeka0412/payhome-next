@@ -4,6 +4,30 @@
 
 ---
 
+## 🔥 Revenue-Driven Feature Priorities (Updated 2026-03-26)
+
+Feature priorities based on revenue impact toward ¥100M annual target.
+
+### Must Ship (Before May 1 Launch)
+- F-01 to F-06: Production-ready forms, notifications, AI chat
+- F-04: **50 builders real data entry** (zero revenue without this)
+
+### High Priority (During May)
+- **F-07: Bulk catalog request — 3 builders at once (+¥9.6M/yr)**
+- **F-08: Open house "seats remaining" + "this weekend" (+¥19.2M/yr)**
+- F-09: Builder comparison (2-3 side-by-side)
+- F-10: Filter search (area × price × features)
+
+### Medium Priority (June-July)
+- F-12: Consumer follow-up email automation (+¥5M/yr)
+- F-13: "Built with this builder" testimonials
+- F-14: AI chat → builder recommendation
+
+### Lower Priority (August+)
+- F-17 to F-23: GA4, dashboards, advanced AI
+
+---
+
 ## 1. Immediate — Phase 1 (Data Foundation)
 
 Items marked ✅ are already implemented. Remaining items are ready for the next sprint.

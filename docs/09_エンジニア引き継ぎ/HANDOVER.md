@@ -472,4 +472,74 @@ npm start
 
 ---
 
+## 15. Revenue-Driven Feature Priorities (Updated 2026-03-26)
+
+The platform's revenue model is performance-based. Every feature should be evaluated by its revenue impact.
+
+### Revenue Structure (Target: ¥100M/year)
+| Revenue Source | Unit Price | Monthly Target | Annual Target | Share |
+|---|---|---|---|---|
+| Catalog requests | ¥8,000/lead | 150 leads | 1,800 | 11% |
+| Open house visits | ¥80,000/visit | 70 visits | 840 | 53% |
+| Contract commission | 4% of ¥25M avg | 2.5/month | 30 | 24% |
+| Listing fees (from Aug) | ¥40,000/month | 30 builders | - | 11% |
+
+### Feature Tiers by Revenue Impact
+
+**Tier 1 — Must Ship by May 1 (Launch)**
+| ID | Feature | Revenue Impact | Status |
+|---|---|---|---|
+| F-01 | Catalog request form (production) | Foundation for ¥14.4M/yr | ✅ Built, needs prod test |
+| F-02 | Open house reservation form (production) | Foundation for ¥67.2M/yr | ✅ Built, needs prod test |
+| F-03 | Consultation form (production) | Lead acquisition funnel | ✅ Built, needs prod test |
+| F-04 | Builder pages — 50 builders real data | Prerequisite for all revenue | ❌ CMS data entry needed |
+| F-05 | Lead notification email (Resend) | Builder trust | ✅ Built, needs prod config |
+| F-06 | AI chat (production prompts) | Chat → lead conversion | ✅ Built, needs prompt tuning |
+
+**Tier 2 — Ship in May (1.5-3x revenue multiplier)**
+| ID | Feature | Revenue Impact | Est. Effort |
+|---|---|---|---|
+| F-07 | **Bulk catalog request (up to 3 builders)** | **+¥9.6M/yr** | 1 week |
+| F-08 | **Open house "seats remaining" + "this weekend" section** | **+¥19.2M/yr** | 1 week |
+| F-09 | **Builder comparison (2-3 side-by-side)** | Improves CV rate | 2 weeks |
+| F-10 | **Filter search (area × price × features)** | UX improvement for 50 builders | 1 week |
+| F-11 | **Favorites enhancement (event notifications)** | Return visit rate | 3 days |
+
+**Tier 3 — Ship June-July (conversion rate improvement)**
+| ID | Feature | Revenue Impact | Est. Effort |
+|---|---|---|---|
+| F-12 | Consumer follow-up email series (9 emails) | +¥5M/yr (collection improvement) | 1 week |
+| F-13 | "Built with this builder" testimonial section | Contract rate improvement | 1 week |
+| F-14 | AI chat → builder recommendation | Chat → open house CV | 2 weeks |
+| F-15 | Open house calendar view | Discovery rate improvement | 1 week |
+| F-16 | LINE notification for builders | Response speed improvement | 1 week |
+
+**Tier 4 — August onwards (scale phase)**
+| ID | Feature | Est. Effort |
+|---|---|---|
+| F-17 | GA4 custom events | 1 week |
+| F-18 | User dashboard (live data) | 2 weeks |
+| F-19 | Builder dashboard (production) | 3 weeks |
+| F-20 | CMS structured data forms | 2 weeks |
+| F-21 | AI intent extraction / conversation summary | 3 weeks |
+| F-22 | User profile registration | 2 weeks |
+| F-23 | Lead auto-scoring | 2 weeks |
+
+### Key Implementation Note: F-07 (Bulk Catalog Request)
+This is the highest-ROI feature. Implementation:
+1. Add multi-select checkboxes to builder list/comparison page
+2. Store selected builder IDs in state (max 3)
+3. Show floating "Request catalogs from X builders" CTA
+4. On submit, create one lead per selected builder via POST /api/leads
+5. Send notification email to each selected builder
+6. Redirect to thank-you page showing all requested builders
+
+### Key Implementation Note: F-08 (Seats Remaining)
+1. Add `capacity` and `reserved_count` fields to events data
+2. Display "残り{capacity - reserved_count}組" badge on event cards
+3. Add "今週末の見学会" section to homepage (filter events by this weekend's dates)
+4. When reserved_count >= capacity, show "満席" and disable reservation button
+
+---
+
 *This handover document was created on 2026-03-22. For questions about design intent, refer to the business strategy and requirements documents. The codebase is the source of truth for implementation details.*

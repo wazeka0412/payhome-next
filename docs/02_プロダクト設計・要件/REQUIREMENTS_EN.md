@@ -655,6 +655,30 @@ Refer to the builders table additional columns in Chapter 7.
 
 ---
 
+## Revenue-Driven Feature Requirements (Added 2026-03-26)
+
+### Bulk Catalog Request (F-07)
+- Users can select up to 3 builders from the builder list or comparison page
+- A single form submission sends catalog requests to all selected builders
+- Lead notification emails are sent individually to each builder
+- One record per builder is created in the leads table
+- source_type is set to "bulk_catalog_request"
+
+### Open House Seats Remaining (F-08)
+- Add capacity and reserved_count fields to events data
+- Calculate and display remaining seats = capacity - reserved_count
+- Show "Almost full" badge when remaining seats are 3 or fewer
+- Show "Full" and disable reservation button when remaining seats = 0
+- Add "This Weekend's Open Houses" section to the homepage
+
+### Builder Comparison (F-09)
+- Users can select 2-3 builders to display a comparison table
+- Comparison items: price per tsubo, service area, hiraya track record, design taste, performance
+- Display "Request catalogs from all" button on the comparison page
+- Record comparison_history event in user_events
+
+---
+
 ## Chapter 14: Development Priority
 
 ### Top Priority (Phase 1)
