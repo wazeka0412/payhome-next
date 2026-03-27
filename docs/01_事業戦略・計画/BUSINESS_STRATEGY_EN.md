@@ -159,14 +159,19 @@ The core insight: **the user's consideration behavior itself becomes a data asse
 
 ### 5.2 Competitive Differentiation
 
+**Critical market development (January 2026):** Japan's only hiraya-specialized portal, "e-Hiraya net" (operated by Lib Work, launched in 2020), was permanently closed on January 31, 2026. **There is now zero hiraya-specialized platforms in Japan. Payhome will be the first and only hiraya-focused AI platform in the country.**
+
+The closure of e-Hiraya net validates that a traditional listing-only portal approach cannot sustain value in the hiraya market. Payhome's differentiated approach — YouTube first-party content × AI × data accumulation — is the correct strategy, as proven by the failure of the listing-only model.
+
 | Competitor Type | Examples | How Payhome Differs |
 |----------------|----------|---------------------|
 | General housing portals | SUUMO / HOME'S | Not hiraya-specialized. No video content. No decision-process support. Lead-referral model |
+| Hiraya-specialized portal (closed) | e-Hiraya net (Lib Work) *Closed 2026/1/31* | Listing-only model that failed to sustain. Lacked YouTube, AI, and data accumulation infrastructure. Demonstrates the limitations of the listing approach |
 | Housing YouTubers | Individual channels | Video only. No integrated Web/CRM/AI platform. No data accumulation infrastructure |
 | Housing consultants | In-person services | Cannot scale. No digital data trails. Person-dependent |
 | AI housing services | Generic AI chat | No hiraya first-party content. Shallow domain knowledge. No user behavioral data |
 
-**Payhome's fundamental differentiation:** Hiraya first-party content × User behavioral data × AI utilization. No existing player holds all three.
+**Payhome's fundamental differentiation:** Hiraya first-party content × User behavioral data × AI utilization. No existing player holds all three. With the closure of e-Hiraya net, Payhome is Japan's only hiraya-specialized platform — a powerful message for builders and investors alike.
 
 ---
 
@@ -403,8 +408,10 @@ Behavioral events are recorded at each step for funnel retention analysis and im
 |----------|----------|------|
 | Current | 12 | Kagoshima city area |
 | 6 months | 25 | All Kagoshima + Fukuoka city |
-| 1 year | 50 | Major Kyushu cities |
+| 1 year | 50 | Major Kyushu cities (all prefectures) |
 | 2 years | 100 | All of Kyushu |
+
+**Geographic strategy note:** With the closure of e-Hiraya net (Lib Work, headquartered in Kumamoto) on January 31, 2026, there are zero competing hiraya-specialized platforms across all of Kyushu. Payhome can target all Kyushu prefectures — including Fukuoka, Kumamoto, Saga, and Oita — from day one without geographic restrictions.
 
 ### 9.4 Risks and Mitigations
 
@@ -413,7 +420,7 @@ Behavioral events are recorded at each step for funnel retention analysis and im
 | YouTube dependency | High | Diversify to SEO, SNS, LINE. Build YouTube-independent value through web data accumulation |
 | Data not accumulating | High | Prioritize data foundation in Phase 1. User DB, event tracking, chat logs are MVP-critical |
 | Builder churn | Medium | Performance-based pricing to reduce risk. Demonstrate lead quality through intent data |
-| Competitive imitation | Medium | First-mover advantage through data accumulation. Hiraya-specific first-party content is not quickly replicable |
+| Competitive imitation | Medium | First-mover advantage through data accumulation. Hiraya-specific first-party content is not quickly replicable. The closure of e-Hiraya net (Lib Work, 2026/1/31) proves that a listing-only approach cannot sustain a hiraya-specialized platform; Payhome's YouTube + AI + data approach is the validated differentiator |
 | Personal data risk | High | Supabase RLS + behavioral/personal data separation + audit logs + consent management |
 
 ---

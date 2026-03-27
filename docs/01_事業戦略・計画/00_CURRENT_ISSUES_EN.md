@@ -18,7 +18,7 @@ This document analyzes the problems found in the v1 business strategy and requir
 - Only quantitative metrics: "42,841 YouTube subscribers" and "257 videos"
 - No deep analysis of the hiraya-specialized market positioning
 - No mention of data accumulation as a competitive moat
-- Competitor comparison limited to 3 entries (SUUMO / HOME'S / Housing YouTubers) — too shallow
+- Competitor comparison limited to 3 entries (SUUMO / HOME'S / Housing YouTubers) — too shallow (Note: fixed in v2.0. Additionally, Japan's only hiraya-specialized portal, e-Hiraya net (Lib Work), was closed on January 31, 2026. There is now zero hiraya-specialized platforms in Japan. Payhome will be the first and only)
 
 ### 1.3 Revenue model had zero data/AI future revenue
 - All 10 revenue items were existing "production services" / "listing fees" / "referral" types

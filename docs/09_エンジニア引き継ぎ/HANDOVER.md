@@ -20,6 +20,8 @@ Payhome is a three-sided AI housing platform focused on the **hiraya (single-sto
 
 This distinction matters for every engineering decision: **data capture and structure must be considered in every feature.**
 
+**Market context (as of January 2026):** Japan's only other hiraya-specialized portal, "e-Hiraya net" (operated by Lib Work, launched 2020), was permanently closed on January 31, 2026. Payhome is now the only hiraya-specialized platform in Japan. The closure of e-Hiraya net — which used a traditional listing-only approach — validates Payhome's differentiated strategy of YouTube content + AI + behavioral data accumulation.
+
 ---
 
 ## 2. Tech Stack
