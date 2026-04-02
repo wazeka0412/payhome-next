@@ -23,6 +23,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             { href: '/admin/leads', icon: '👥', label: 'リード管理' },
             { href: '/admin/properties', icon: '🏠', label: '物件データ管理' },
             { href: '/admin/builders', icon: '🏗', label: '工務店管理' },
+            { href: '/admin/reports', icon: '📈', label: '月次レポート' },
           ].map((item) => (
             <Link
               key={item.href}

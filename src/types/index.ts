@@ -106,3 +106,68 @@ export interface ChatMessage {
   timestamp: string;
   propertyIds?: string[];
 }
+
+// Monthly Report (月次レポート)
+export interface MonthlyReport {
+  id: string;
+  reportMonth: string;
+  reportType: 'platform' | 'builder';
+  builderId?: string;
+  metrics: PlatformMetrics | BuilderMetrics;
+  generatedAt: string;
+}
+
+export interface PlatformMetrics {
+  visitors: {
+    total: number;
+    unique: number;
+    byDevice: Record<string, number>;
+    bySource: Record<string, number>;
+  };
+  content: {
+    propertyViews: number;
+    articleReads: number;
+    videoViews: number;
+    topProperties: { id: string; title: string; views: number }[];
+  };
+  engagement: {
+    favoritesAdded: number;
+    comparisonsCreated: number;
+    simulatorUses: number;
+    lineClicks: number;
+    telClicks: number;
+  };
+  chat: {
+    sessionsStarted: number;
+    sessionsCompleted: number;
+    completionRate: number;
+    toLeadConversions: number;
+  };
+  leads: {
+    total: number;
+    byType: Record<string, number>;
+    byStatus: Record<string, number>;
+    conversionRate: number;
+  };
+  monthOverMonth: {
+    visitorsChange: number;
+    leadsChange: number;
+    chatChange: number;
+  };
+}
+
+export interface BuilderMetrics {
+  builderName: string;
+  propertyViews: number;
+  topProperties: { id: string; title: string; views: number }[];
+  leads: {
+    total: number;
+    byType: Record<string, number>;
+  };
+  chatMentions: number;
+  favoritesCount: number;
+  monthOverMonth: {
+    viewsChange: number;
+    leadsChange: number;
+  };
+}
