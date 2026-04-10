@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 import MobileMenu from './MobileMenu';
 
 const NAV_CONTENT = [
@@ -28,8 +29,8 @@ const NAV_CONTENT = [
   {
     label: 'サービス',
     items: [
+      { href: '/diagnosis', label: '🤖 AI家づくり診断' },
       { href: '/consultation', label: '無料住宅相談' },
-      { href: '/catalog', label: '資料請求' },
       { href: '/event', label: '見学会・イベント予約' },
       { href: '/builders', label: '工務店一覧' },
       { href: '/simulator', label: 'ローンシミュレーター' },
@@ -38,6 +39,7 @@ const NAV_CONTENT = [
 ];
 
 export default function Header() {
+  const { data: session } = useSession();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -163,19 +165,52 @@ export default function Header() {
               </div>
             ))}
 
-            {/* Phase 2: マイページリンク（ユーザーログイン導入後に有効化） */}
-            {/* <Link
-              href="/mypage"
-              className="text-sm text-gray-600 hover:text-[#E8740C] transition hidden md:block"
+            {/* AI診断 primary CTA */}
+            <Link
+              href="/diagnosis"
+              className="ml-2 bg-gradient-to-r from-[#E8740C] to-[#F5A623] text-white px-4 py-2 rounded-full text-sm font-bold hover:opacity-90 transition shadow-sm"
             >
-              マイページ
-            </Link> */}
+              🤖 AI診断
+            </Link>
+
+            {/* 会員メニュー */}
+            {session?.user ? (
+              <div className="ml-2 flex items-center gap-2">
+                <Link
+                  href="/mypage"
+                  className="text-sm text-gray-700 hover:text-[#E8740C] px-3 py-2 rounded-lg hover:bg-[#FFF8F0] transition font-medium"
+                >
+                  マイページ
+                </Link>
+                <button
+                  onClick={() => signOut({ callbackUrl: '/' })}
+                  className="text-xs text-gray-500 hover:text-[#E8740C] transition"
+                >
+                  ログアウト
+                </button>
+              </div>
+            ) : (
+              <div className="ml-2 flex items-center gap-1">
+                <Link
+                  href="/login"
+                  className="text-sm text-gray-700 hover:text-[#E8740C] px-3 py-2 rounded-lg hover:bg-[#FFF8F0] transition font-medium"
+                >
+                  ログイン
+                </Link>
+                <Link
+                  href="/signup"
+                  className="text-sm border border-[#E8740C] text-[#E8740C] px-3 py-2 rounded-full font-bold hover:bg-[#FFF8F0] transition"
+                >
+                  会員登録
+                </Link>
+              </div>
+            )}
 
             <Link
               href="/biz"
-              className="ml-3 bg-[#E8740C] text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-[#D4660A] transition-colors shadow-sm"
+              className="ml-2 text-xs text-gray-500 hover:text-[#E8740C] underline transition hidden xl:block"
             >
-              広告掲載をお考えの企業様
+              企業様はこちら
             </Link>
           </nav>
 

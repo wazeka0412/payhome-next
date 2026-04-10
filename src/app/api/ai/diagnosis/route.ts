@@ -3,6 +3,7 @@ import { getToken } from 'next-auth/jwt'
 import { createServerClient } from '@/lib/supabase'
 import { classifyUserType } from '@/lib/diagnosis-questions'
 import { builders as buildersData } from '@/lib/builders-data'
+import { localInsert, localUpsert } from '@/lib/local-store'
 
 /**
  * POST /api/ai/diagnosis
@@ -42,25 +43,35 @@ export async function POST(request: NextRequest) {
       if (token?.sub) userId = token.sub
     } catch {}
 
-    const { data: session, error: sessionError } = await supabase
-      .from('diagnosis_sessions')
-      .insert({
-        anonymous_id: anonymous_id || null,
-        user_id: userId || null,
-        answers,
-        user_type: userType,
-        recommended_builders: recommendedBuilders.map(b => ({
-          builder_id: b.id,
-          score: b.score,
-          reason: b.reason,
-        })),
-        completed_at: new Date().toISOString(),
-      })
-      .select()
-      .single()
+    const sessionRecord = {
+      anonymous_id: anonymous_id || null,
+      user_id: userId || null,
+      answers,
+      user_type: userType,
+      recommended_builders: recommendedBuilders.map(b => ({
+        builder_id: b.id,
+        score: b.score,
+        reason: b.reason,
+      })),
+      completed_at: new Date().toISOString(),
+    }
 
-    if (sessionError) {
-      console.error('diagnosis insert error:', sessionError)
+    let session: { id: string } | null = null
+    let usedLocalFallback = false
+
+    try {
+      const { data, error } = await supabase
+        .from('diagnosis_sessions')
+        .insert(sessionRecord)
+        .select()
+        .single()
+      if (error) throw error
+      session = data as { id: string }
+    } catch (err) {
+      console.warn('[diagnosis] Supabase unreachable, using local fallback:', (err as Error).message)
+      usedLocalFallback = true
+      const inserted = await localInsert('diagnosis_sessions', sessionRecord)
+      session = { id: inserted.id }
     }
 
     // 4. Update user_profiles if logged in
@@ -81,9 +92,17 @@ export async function POST(request: NextRequest) {
         updated_at: new Date().toISOString(),
       }
 
-      await supabase
-        .from('user_profiles')
-        .upsert(profileUpdate, { onConflict: 'user_id' })
+      if (!usedLocalFallback) {
+        try {
+          await supabase
+            .from('user_profiles')
+            .upsert(profileUpdate, { onConflict: 'user_id' })
+        } catch {
+          await localUpsert('user_profiles', profileUpdate, 'user_id')
+        }
+      } else {
+        await localUpsert('user_profiles', profileUpdate, 'user_id')
+      }
     }
 
     return Response.json(
