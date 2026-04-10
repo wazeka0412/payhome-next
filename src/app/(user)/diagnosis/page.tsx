@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useSession } from 'next-auth/react'
 import {
   DIAGNOSIS_QUESTIONS,
@@ -101,7 +102,14 @@ export default function DiagnosisPage() {
         <div className="max-w-2xl mx-auto px-4 py-16">
           <div className="text-center mb-8">
             <Link href="/" className="inline-block mb-4">
-              <span className="text-3xl font-bold text-[#E8740C]">ぺいほーむ</span>
+              <Image
+                src="/images/logo.png"
+                alt="ぺいほーむ"
+                width={180}
+                height={48}
+                className="h-12 w-auto mx-auto"
+                priority
+              />
             </Link>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               AI家づくり診断
