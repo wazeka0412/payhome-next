@@ -4,6 +4,7 @@ import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { getOrCreateAnonymousId } from '@/lib/anonymous-id'
 
 function SignupForm() {
@@ -85,7 +86,14 @@ function SignupForm() {
         {/* Header */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-block mb-4">
-            <h1 className="text-3xl font-bold text-[#E8740C]">ぺいほーむ</h1>
+            <Image
+              src="/images/logo.png"
+              alt="ぺいほーむ"
+              width={180}
+              height={48}
+              className="h-12 w-auto mx-auto"
+              priority
+            />
           </Link>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">会員登録</h2>
           <p className="text-sm text-gray-600">

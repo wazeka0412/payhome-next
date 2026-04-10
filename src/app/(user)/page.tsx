@@ -3,18 +3,22 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import Card from '@/components/ui/Card';
 import MobileMarquee from '@/components/ui/MobileMarquee';
 import CampaignSection from '@/components/layout/CampaignSection';
+import { videos } from '@/lib/videos-data';
+import { builders } from '@/lib/builders-data';
+import { saleHomes, SALE_HOME_STATUS_LABELS } from '@/lib/sale-homes-data';
+import { lands, LAND_STATUS_LABELS } from '@/lib/lands-data';
+import { features } from '@/lib/features-data';
 
 /* ── Data ─────────────────────────────────────────── */
 
 const reviews = [
-  { name: 'A様ご家族', area: '鹿児島市', text: '動画で見た平屋に一目惚れ。ぺいほーむに相談したら、すぐに同じ工務店を紹介してもらえました。動画で間取りを確認していたので、打ち合わせもスムーズでした。' },
-  { name: 'B様ご夫婦', area: '福岡市', text: '住宅展示場を何件も回るのが大変でしたが、ぺいほーむの動画で効率よく比較できました。価格や設備の情報も記事で詳しく分かるのが良かったです。' },
-  { name: 'C様', area: '熊本市', text: 'セカンドライフの平屋を探していました。AIチャットで「バリアフリーの平屋」と聞いたら、ぴったりの物件を3つも紹介してくれました。' },
-  { name: 'D様ご家族', area: '宮崎市', text: '初めての家づくりで不安でしたが、ぺいほーむの動画と記事で基礎知識を学べました。紹介してもらった工務店さんも親切で、大満足の家が建ちました。' },
-  { name: 'E様', area: '大分市', text: '予算2,000万円台で平屋を探していましたが、ぺいほーむで理想の間取りを見つけることができました。ローンシミュレーターも便利でした。' },
+  { name: 'A様ご家族', area: '鹿児島市', text: '動画で見た平屋に一目惚れ。AI診断で同じ工務店を紹介してもらえました。動画で間取りを確認していたので、見学会もスムーズでした。' },
+  { name: 'B様ご夫婦', area: '福岡市', text: '住宅展示場を何件も回るのが大変でしたが、ぺいほーむの動画と比較機能で効率よく工務店を比較できました。' },
+  { name: 'C様', area: '熊本市', text: 'セカンドライフの平屋を探していました。AI診断で「シニア向けバリアフリーの平屋」とぴったりの物件を3社も紹介してくれました。' },
+  { name: 'D様ご家族', area: '宮崎市', text: '初めての家づくりで不安でしたが、ぺいほーむの動画と特集で基礎知識を学べました。紹介してもらった工務店さんも親切で、大満足の家が建ちました。' },
+  { name: 'E様', area: '大分市', text: '予算2,000万円台で平屋を探していましたが、ぺいほーむで理想の間取りを見つけることができました。' },
 ];
 
 function ReviewCard({ review }: { review: typeof reviews[0] }) {
@@ -39,107 +43,49 @@ function ReviewCard({ review }: { review: typeof reviews[0] }) {
 
 const featuredSlides = [
   {
+    id: '10',
     youtubeId: '0gxkNh2BC0A',
-    title: '【ルームツアー】小さなかわいい平屋。。',
+    title: '小さなかわいい平屋',
     views: '99万回視聴',
-    desc: 'チャンネル最高再生数99万回！コンパクトで愛らしい平屋のルームツアー。',
+    desc: 'チャンネル最高再生数99万回。コンパクトで愛らしい平屋のルームツアー。',
   },
   {
+    id: '11',
     youtubeId: 'm_ndZJfV8a0',
-    title: '【ルームツアー】老後も安心して過ごせる最先端の平屋',
+    title: '老後も安心して過ごせる最先端の平屋',
     views: '91万回視聴',
-    desc: '91万回視聴の大人気動画。老後も安心して暮らせる最先端の平屋をご紹介。',
+    desc: '91万回視聴の大人気動画。老後も安心して暮らせる最先端の平屋。',
   },
   {
+    id: '12',
     youtubeId: 'YhgQSfYYUJ0',
-    title: '【ルームツアー】完璧な間取りのお洒落で超かわいい平屋',
+    title: '完璧な間取りのお洒落で超かわいい平屋',
     views: '78万回視聴',
-    desc: '78万回視聴！完璧な間取りとおしゃれなデザインが詰まった平屋。',
+    desc: '78万回視聴。完璧な間取りとおしゃれなデザインが詰まった平屋。',
   },
 ];
 
-const latestVideos = [
+// 会員特典5項目
+const memberBenefits = [
   {
-    id: '01',
-    youtubeId: 'lPIxPVV2jm4',
-    title: '【平屋ルームツアー】おひとり様の理想を叶えた平家',
-    views: '13万回視聴',
+    title: '間取り図フル解像度で閲覧',
+    desc: '全物件の間取り図をフルHD品質で。寸法・収納配置・採光まで確認可能。',
   },
   {
-    id: '02',
-    youtubeId: 'eWbyhRr-K1w',
-    title: '【平屋ルームツアー】まるで\u201C高級ホテル\u201D豪華すぎるシンプルな平屋',
-    views: '1万回視聴',
+    title: 'AI家づくり診断 結果保存',
+    desc: '10問の診断結果と推薦工務店3社をマイページに永久保存。',
   },
   {
-    id: '03',
-    youtubeId: 'TESbCN-am3k',
-    title: '【平屋ルームツアー】令和時代に爆発的人気な間取りの平屋',
-    views: '1.8万回視聴',
-  },
-];
-
-const interviews = [
-  {
-    id: 'interview-01',
-    company: '○○工務店（鹿児島市）',
-    title: '「住む人の暮らし」から逆算する家づくりとは',
-    excerpt:
-      '地元の素材を活かし、住む人のライフスタイルに寄り添う設計哲学を聞きました。',
+    title: '工務店3社のAIレコメンド',
+    desc: 'あなたの好みに合う工務店を、診断結果と閲覧履歴からAIが提案。',
   },
   {
-    id: 'interview-02',
-    company: '△△ハウス（福岡市）',
-    title: '年間200棟を手がけるハウスメーカーの品質管理',
-    excerpt: '大量供給と品質を両立させる仕組みの裏側に迫ります。',
-  },
-];
-
-const newsItems = [
-  {
-    id: '01',
-    date: '2026.03.18',
-    tag: 'お知らせ',
-    title: 'ウェビナー「九州の住宅トレンド2026」開催のお知らせ',
+    title: 'お気に入り保存（無制限）',
+    desc: '物件・工務店・建売・土地を上限なくお気に入り登録できます。',
   },
   {
-    id: '02',
-    date: '2026.03.15',
-    tag: '業界',
-    title: '2026年度の住宅省エネ基準改正について解説',
-  },
-  {
-    id: '03',
-    date: '2026.03.10',
-    tag: 'コラム',
-    title: '「良い工務店」の見分け方 ― 10のチェックポイント',
-  },
-  {
-    id: '04',
-    date: '2026.03.05',
-    tag: 'お知らせ',
-    title: '月刊ぺいほーむ 3月号を公開しました',
-  },
-];
-
-const articles = [
-  {
-    id: 'article-01',
-    tag: '基礎知識',
-    date: '2026.03.16',
-    title: '注文住宅の相場はいくら？鹿児島県の最新データ',
-  },
-  {
-    id: 'article-02',
-    tag: '住宅ローン',
-    date: '2026.03.12',
-    title: '住宅ローン審査に通るための5つのポイント',
-  },
-  {
-    id: 'article-03',
-    tag: '間取り',
-    date: '2026.03.08',
-    title: '失敗しない間取りの考え方｜プロが教える動線設計',
+    title: '工務店比較機能（最大3社）',
+    desc: '坪単価・性能・実績まで12項目で並べて比較できます。',
   },
 ];
 
@@ -160,7 +106,6 @@ export default function HomePage() {
     );
   }, []);
 
-  // Autoplay
   useEffect(() => {
     const timer = setInterval(nextSlide, 5000);
     return () => clearInterval(timer);
@@ -179,16 +124,22 @@ export default function HomePage() {
     }
   };
 
+  // データ抽出
+  const latestVideos = videos.slice(0, 6);
+  const topBuilders = [...builders].sort((a, b) => b.annualBuilds - a.annualBuilds).slice(0, 6);
+  const topSaleHomes = saleHomes.filter((s) => s.status === 'available').slice(0, 4);
+  const topLands = lands.filter((l) => l.status === 'available').slice(0, 3);
+  const topFeatures = features.slice(0, 6);
+
   return (
     <>
       {/* ===== 1. HERO ===== */}
       <section className="bg-gradient-to-br from-[#E8740C] via-[#F5A623] to-[#E8740C] text-white py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 items-center">
-            {/* Left content */}
             <div>
               <p className="text-sm font-semibold tracking-widest uppercase opacity-80 mb-3">
-                Housing Media
+                Housing Portal
               </p>
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight mb-4">
                 家づくりを、
@@ -196,54 +147,47 @@ export default function HomePage() {
                 もっと楽しく、もっと身近に。
               </h1>
               <p className="text-sm md:text-base opacity-90 leading-relaxed mb-6">
-                ぺいほーむは鹿児島・九州を拠点に、工務店・ハウスメーカーの魅力を
+                ぺいほーむは鹿児島・九州の住宅情報を網羅する住宅ポータル。
                 <br className="hidden md:inline" />
-                動画と記事で届ける住宅メディアです。
+                AI診断で自分に合う工務店を見つけ、見学会で実物を体感できます。
               </p>
               <div className="flex flex-wrap gap-3 mb-8">
                 <Link
-                  href="/videos"
+                  href="/diagnosis"
                   className="bg-white text-[#E8740C] font-bold px-8 py-3 rounded-full text-sm hover:bg-gray-100 transition text-center max-w-[280px] w-full"
                 >
-                  最新動画を見る
+                  AI家づくり診断をはじめる
                 </Link>
                 <Link
-                  href="/about"
+                  href="/videos"
                   className="border border-white/40 text-white font-bold px-8 py-3 rounded-full text-sm hover:bg-white/10 transition text-center max-w-[280px] w-full"
                 >
-                  ぺいほーむとは
+                  動画コンテンツを見る
                 </Link>
               </div>
               <div className="flex gap-8 md:gap-12">
                 <div>
-                  <div className="text-2xl md:text-3xl font-extrabold font-mono">
-                    4.28万+
-                  </div>
+                  <div className="text-2xl md:text-3xl font-extrabold font-mono">4.28万+</div>
                   <div className="text-xs opacity-80 mt-1">YouTube登録者数</div>
                 </div>
                 <div>
-                  <div className="text-2xl md:text-3xl font-extrabold font-mono">
-                    257本
-                  </div>
-                  <div className="text-xs opacity-80 mt-1">公開動画数</div>
+                  <div className="text-2xl md:text-3xl font-extrabold font-mono">42本</div>
+                  <div className="text-xs opacity-80 mt-1">公開ルームツアー</div>
                 </div>
                 <div>
-                  <div className="text-2xl md:text-3xl font-extrabold font-mono">
-                    100+
-                  </div>
-                  <div className="text-xs opacity-80 mt-1">取材企業数</div>
+                  <div className="text-2xl md:text-3xl font-extrabold font-mono">12社</div>
+                  <div className="text-xs opacity-80 mt-1">提携工務店</div>
                 </div>
               </div>
             </div>
 
-            {/* Right visual */}
             <div className="relative">
               <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl">
                 <iframe
                   width="100%"
                   height="100%"
-                  src="https://www.youtube.com/embed/lPIxPVV2jm4"
-                  title="【平屋ルームツアー】おひとり様の理想を叶えた平家"
+                  src="https://www.youtube.com/embed/0gxkNh2BC0A"
+                  title="小さなかわいい平屋"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
@@ -264,71 +208,46 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== キャンペーン告知 ===== */}
+      {/* ===== 2. ポータル開設記念キャンペーン ===== */}
       <CampaignSection />
 
-      {/* ===== 2. はじめての方へ ===== */}
+      {/* ===== 3. 3ステップで家づくり ===== */}
       <section className="py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <p className="text-center text-xs font-semibold tracking-widest text-[#E8740C] uppercase mb-2">
-            FOR BEGINNERS
+            HOW IT WORKS
           </p>
-          <h2 className="text-2xl font-bold text-center text-[#3D2200] mb-3">
-            はじめての方へ
+          <h2 className="text-2xl md:text-3xl font-bold text-center text-[#3D2200] mb-3">
+            ぺいほーむの使い方
           </h2>
           <p className="text-center text-sm text-gray-500 max-w-xl mx-auto mb-10 leading-relaxed">
-            ぺいほーむは、家づくりを考えるすべての方に役立つ情報を
+            動画で比べて、AIに相談して、実物を体感する。
             <br />
-            動画と記事でわかりやすくお届けする住宅メディアです。
+            あなたの理想の家が見つかるまで、最短2分から始められます。
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-[900px] mx-auto">
             {[
-              {
-                num: 1,
-                title: '動画で家を見る',
-                desc: 'プロが撮影した平屋のルームツアー動画で、間取りや内装をリアルに体感できます。',
-              },
-              {
-                num: 2,
-                title: '記事で詳しく知る',
-                desc: '価格・間取り図・設備メーカーなど、動画では伝えきれない詳細情報を記事で確認。',
-              },
-              {
-                num: 3,
-                title: '無料で相談する',
-                desc: '気になる家があれば、ぺいほーむに無料相談。あなたに合った工務店を厳選してご紹介します。',
-              },
+              { num: 1, title: 'AI家づくり診断', desc: '10問・約2分。家族構成・予算・好みからあなたに合う工務店3社をAIが提案します。', cta: '診断する', href: '/diagnosis' },
+              { num: 2, title: '動画で比較・特集で深堀り', desc: 'プロが撮影したルームツアー動画と、エリア・サイズ別特集で気になる物件を絞り込み。', cta: '動画を見る', href: '/videos' },
+              { num: 3, title: '見学会で実物を体感', desc: 'モデルハウス・完成見学会の予約で、動画では伝わらない広さや素材感を実体験。', cta: '見学会を予約', href: '/event' },
             ].map((step) => (
-              <div
-                key={step.num}
-                className="bg-[#FFF8F0] rounded-2xl py-7 px-5 text-center"
-              >
+              <div key={step.num} className="bg-[#FFF8F0] rounded-2xl py-7 px-5 text-center">
                 <div className="w-14 h-14 bg-[#E8740C]/10 rounded-full mx-auto mb-3.5 flex items-center justify-center">
-                  <span className="text-xl font-extrabold text-[#E8740C]">
-                    {step.num}
-                  </span>
+                  <span className="text-xl font-extrabold text-[#E8740C]">{step.num}</span>
                 </div>
-                <h4 className="text-[0.95rem] font-bold mb-2">{step.title}</h4>
-                <p className="text-[0.8rem] text-gray-500 leading-relaxed">
-                  {step.desc}
-                </p>
+                <h4 className="text-base font-bold mb-2 text-[#3D2200]">{step.title}</h4>
+                <p className="text-xs text-gray-500 leading-relaxed mb-4">{step.desc}</p>
+                <Link href={step.href} className="text-xs font-bold text-[#E8740C] hover:underline">
+                  {step.cta} →
+                </Link>
               </div>
             ))}
-          </div>
-          <div className="text-center mt-8">
-            <Link
-              href="/consultation"
-              className="inline-block bg-[#E8740C] text-white font-bold px-10 py-4 rounded-full text-base hover:bg-[#D4660A] transition"
-            >
-              無料相談の詳細はこちら &rarr;
-            </Link>
           </div>
         </div>
       </section>
 
-      {/* ===== 3. 注目コンテンツ (PICK UP slider) ===== */}
+      {/* ===== 4. 注目コンテンツ (PICK UP slider) ===== */}
       <section className="py-16 md:py-20 bg-[#F5F0EB] relative overflow-hidden">
-        {/* Decorative character */}
         <Image
           src="/images/pei_think.png"
           alt=""
@@ -339,363 +258,283 @@ export default function HomePage() {
         />
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-[#E8740C]/10 text-[#E8740C] text-xs font-bold px-4 py-1.5 rounded-full mb-3">
-              <Image
-                src="/images/logo_face.png"
-                alt=""
-                width={20}
-                height={20}
-                className="w-5 h-5"
-              />
-              PICK UP
-            </div>
-            <h2 className="text-2xl font-bold text-[#3D2200] mt-3">
-              注目コンテンツ
-            </h2>
-            <p className="text-sm text-gray-500 mt-2">
-              ぺいほーむで今もっとも注目されている動画をピックアップ
-            </p>
+            <p className="text-xs font-semibold tracking-widest text-[#E8740C] uppercase mb-2">PICK UP</p>
+            <h2 className="text-2xl font-bold text-[#3D2200]">注目の動画コンテンツ</h2>
+            <p className="text-sm text-gray-500 mt-2">ぺいほーむで今もっとも見られているルームツアー</p>
           </div>
 
-          {/* Slider */}
-          <div
-            className="relative"
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-          >
+          <div className="relative" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
             <div className="overflow-hidden rounded-2xl">
-              <div
-                className="flex transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-              >
+              <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
                 {featuredSlides.map((slide) => (
-                  <a
-                    key={slide.youtubeId}
-                    href={`https://www.youtube.com/watch?v=${slide.youtubeId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    key={slide.id}
+                    href={`/videos/${slide.id}`}
                     className="w-full flex-shrink-0 block bg-white rounded-2xl overflow-hidden shadow-sm"
                   >
                     <div className="grid md:grid-cols-2">
-                      {/* Image side */}
                       <div className="relative aspect-video overflow-hidden">
-                        <img
-                          src={`https://img.youtube.com/vi/${slide.youtubeId}/maxresdefault.jpg`}
-                          alt={slide.title}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
+                        <img src={`https://img.youtube.com/vi/${slide.youtubeId}/maxresdefault.jpg`} alt={slide.title} className="w-full h-full object-cover" loading="lazy" />
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-14 h-14 bg-black/50 rounded-full flex items-center justify-center text-white text-xl backdrop-blur-sm">
-                            ▶
-                          </div>
+                          <div className="w-14 h-14 bg-black/50 rounded-full flex items-center justify-center text-white text-xl backdrop-blur-sm">▶</div>
                         </div>
                         <div className="absolute bottom-2 left-2 flex items-center gap-1">
-                          <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded">
-                            人気
-                          </span>
-                          <span className="bg-black/60 text-white text-xs px-2 py-0.5 rounded">
-                            {slide.views}
-                          </span>
+                          <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded">人気</span>
+                          <span className="bg-black/60 text-white text-xs px-2 py-0.5 rounded">{slide.views}</span>
                         </div>
                       </div>
-                      {/* Text side */}
                       <div className="p-6 flex flex-col justify-center">
-                        <span className="text-xs font-semibold text-[#E8740C] bg-[#E8740C]/10 px-2 py-0.5 rounded w-fit">
-                          ルームツアー
-                        </span>
-                        <h3 className="text-lg font-bold mt-3 line-clamp-2">
-                          {slide.title}
-                        </h3>
-                        <p className="text-sm text-gray-500 mt-2 line-clamp-2">
-                          {slide.desc}
-                        </p>
+                        <span className="text-xs font-semibold text-[#E8740C] bg-[#E8740C]/10 px-2 py-0.5 rounded w-fit">ルームツアー</span>
+                        <h3 className="text-lg font-bold mt-3 line-clamp-2 text-[#3D2200]">{slide.title}</h3>
+                        <p className="text-sm text-gray-500 mt-2 line-clamp-2">{slide.desc}</p>
                       </div>
                     </div>
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>
 
-            {/* Prev / Next */}
-            <button
-              onClick={prevSlide}
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full shadow-md flex items-center justify-center text-gray-600 hover:bg-white transition z-10"
-              aria-label="前へ"
-            >
-              &#8249;
-            </button>
-            <button
-              onClick={nextSlide}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full shadow-md flex items-center justify-center text-gray-600 hover:bg-white transition z-10"
-              aria-label="次へ"
-            >
-              &#8250;
-            </button>
+            <button onClick={prevSlide} className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full shadow-md flex items-center justify-center text-gray-600 hover:bg-white transition z-10" aria-label="前へ">&#8249;</button>
+            <button onClick={nextSlide} className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full shadow-md flex items-center justify-center text-gray-600 hover:bg-white transition z-10" aria-label="次へ">&#8250;</button>
 
-            {/* Dots */}
             <div className="flex justify-center gap-2 mt-4">
               {featuredSlides.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentSlide(i)}
-                  className={`w-3 h-3 rounded-full transition-colors ${
-                    i === currentSlide ? 'bg-[#E8740C]' : 'bg-gray-300'
-                  }`}
-                  aria-label={`スライド ${i + 1}`}
-                />
+                <button key={i} onClick={() => setCurrentSlide(i)} className={`w-3 h-3 rounded-full transition-colors ${i === currentSlide ? 'bg-[#E8740C]' : 'bg-gray-300'}`} aria-label={`スライド ${i + 1}`} />
               ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* ===== 4. 最新動画 ===== */}
+      {/* ===== 5. 最新動画 ===== */}
       <section className="py-16 md:py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
-          <p className="text-xs font-semibold tracking-widest text-[#E8740C] uppercase mb-2">
-            Videos
-          </p>
-          <h2 className="text-2xl font-bold text-[#3D2200] mb-8">最新動画</h2>
-          <MobileMarquee desktopGridClass="grid md:grid-cols-3 gap-6">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <p className="text-xs font-semibold tracking-widest text-[#E8740C] uppercase mb-2">VIDEOS</p>
+              <h2 className="text-2xl font-bold text-[#3D2200]">最新の動画コンテンツ</h2>
+            </div>
+            <Link href="/videos" className="hidden md:block text-sm text-[#E8740C] font-bold hover:underline">すべて見る →</Link>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {latestVideos.map((video) => (
-              <Card
-                key={video.id}
-                href={`/property/${video.id}`}
-                imageSrc={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`}
-                imageAlt={video.title}
-                tag="ルームツアー"
-                meta={video.views}
-                title={video.title}
-                showPlay
-              />
+              <Link key={video.id} href={`/videos/${video.id}`} className="block bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-md transition">
+                <div className="relative aspect-video bg-gray-200">
+                  <img src={`https://img.youtube.com/vi/${video.youtubeId}/mqdefault.jpg`} alt={video.title} className="w-full h-full object-cover" loading="lazy" />
+                  <div className="absolute top-2 left-2 bg-black/70 text-white text-xs font-bold px-2 py-0.5 rounded">▶ {video.views}</div>
+                </div>
+                <div className="p-4">
+                  <h3 className="text-sm font-bold text-[#3D2200] mb-2 line-clamp-2 min-h-[2.5rem]">{video.title}</h3>
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>{video.builder}</span>
+                    {video.tsubo > 0 && <span>{video.tsubo}坪</span>}
+                  </div>
+                </div>
+              </Link>
             ))}
-          </MobileMarquee>
-          <div className="text-center mt-8">
-            <Link
-              href="/videos"
-              className="inline-block border-2 border-[#E8740C] text-[#E8740C] font-bold px-8 py-3 rounded-full text-sm hover:bg-[#E8740C] hover:text-white transition"
-            >
+          </div>
+          <div className="text-center mt-8 md:hidden">
+            <Link href="/videos" className="inline-block border-2 border-[#E8740C] text-[#E8740C] font-bold px-8 py-3 rounded-full text-sm hover:bg-[#E8740C] hover:text-white transition">
               動画一覧を見る
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ===== 5. 取材レポート PICK UP ===== */}
+      {/* ===== 6. 特集 ===== */}
       <section className="py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4">
-          <p className="text-xs font-semibold tracking-widest text-[#E8740C] uppercase mb-2">
-            Interview
-          </p>
-          <h2 className="text-2xl font-bold text-[#3D2200] mb-8">
-            取材レポート
-          </h2>
-          {/* PC: 横型カード2列 / モバイル: 縦型カード無限マーキー（旧サイトと同一） */}
-          <div className="hidden md:grid md:grid-cols-2 gap-6">
-            {interviews.map((item) => (
-              <Link
-                key={item.id}
-                href="/interview"
-                className="group flex bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
-              >
-                <div className="w-48 flex-shrink-0 flex flex-col items-center justify-center" style={{ background: 'linear-gradient(135deg, #FFF8F0, #FDEBD0)' }}>
-                  <img src="/images/pei_think.png" alt="" style={{ width: '40px', height: '40px', objectFit: 'contain', opacity: 0.5, marginBottom: '4px' }} />
-                  <span style={{ color: '#ccc', fontSize: '0.75rem' }}>取材写真</span>
-                </div>
-                <div className="p-5 flex-1">
-                  <p className="text-xs text-[#E8740C] font-semibold mb-1">
-                    {item.company}
-                  </p>
-                  <h3 className="text-sm font-bold mb-2 group-hover:text-[#E8740C] transition-colors">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs text-gray-500 line-clamp-2">
-                    {item.excerpt}
-                  </p>
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <p className="text-xs font-semibold tracking-widest text-[#E8740C] uppercase mb-2">FEATURES</p>
+              <h2 className="text-2xl font-bold text-[#3D2200]">特集から探す</h2>
+              <p className="text-sm text-gray-500 mt-2">エリア・サイズ・工務店別にぺいほーむが厳選</p>
+            </div>
+            <Link href="/features" className="hidden md:block text-sm text-[#E8740C] font-bold hover:underline">すべて見る →</Link>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {topFeatures.map((feature) => (
+              <Link key={feature.id} href={`/features/${feature.id}`} className="group block rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition border border-gray-100">
+                <div className={`relative h-32 bg-gradient-to-br ${feature.heroColor} flex items-end p-5`}>
+                  <div className="text-white">
+                    <p className="text-xs opacity-80 mb-1">{feature.subtitle}</p>
+                    <h3 className="text-lg font-bold leading-tight">{feature.title}</h3>
+                  </div>
                 </div>
               </Link>
             ))}
           </div>
-          {/* モバイル: 縦型カード無限マーキー */}
-          <div className="md:hidden">
-            <MobileMarquee desktopGridClass="grid grid-cols-2 gap-4">
-              {interviews.map((item) => (
-                <Link
-                  key={item.id}
-                  href="/interview"
-                  className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow block"
-                >
-                  <div className="aspect-[4/3] flex flex-col items-center justify-center" style={{ background: 'linear-gradient(135deg, #FFF8F0, #FDEBD0)' }}>
-                    <img src="/images/pei_think.png" alt="" style={{ width: '40px', height: '40px', objectFit: 'contain', opacity: 0.5, marginBottom: '4px' }} />
-                    <span style={{ color: '#ccc', fontSize: '0.75rem' }}>取材写真</span>
+        </div>
+      </section>
+
+      {/* ===== 7. 工務店一覧 PICKUP ===== */}
+      <section className="py-16 md:py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <p className="text-xs font-semibold tracking-widest text-[#E8740C] uppercase mb-2">BUILDERS</p>
+              <h2 className="text-2xl font-bold text-[#3D2200]">提携工務店</h2>
+              <p className="text-sm text-gray-500 mt-2">ぺいほーむが取材した実力派工務店</p>
+            </div>
+            <Link href="/builders" className="hidden md:block text-sm text-[#E8740C] font-bold hover:underline">12社すべて見る →</Link>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {topBuilders.map((b) => (
+              <Link key={b.id} href={`/builders/${b.id}`} className="block bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md hover:border-[#E8740C]/30 transition">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-extrabold text-[#3D2200] truncate">{b.name}</h3>
+                    <p className="text-[11px] text-gray-500 mt-0.5">{b.region}</p>
                   </div>
-                  <div className="p-3">
-                    <p className="text-xs text-[#E8740C] font-semibold mb-1">
-                      {item.company}
-                    </p>
-                    <h3 className="text-sm font-bold line-clamp-2 group-hover:text-[#E8740C] transition-colors">
-                      {item.title}
-                    </h3>
+                  <div className="text-right shrink-0 ml-3">
+                    <p className="text-[10px] text-gray-500">年間</p>
+                    <p className="text-lg font-extrabold text-[#E8740C] leading-none">{b.annualBuilds}<span className="text-xs ml-0.5">棟</span></p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 line-clamp-2 mb-3 min-h-[2rem]">{b.catchphrase}</p>
+                <div className="flex flex-wrap gap-1">
+                  {b.specialties.slice(0, 4).map((s) => (
+                    <span key={s} className="text-[10px] bg-[#FFF8F0] text-[#E8740C] px-2 py-0.5 rounded font-semibold">{s}</span>
+                  ))}
+                </div>
+              </Link>
+            ))}
+          </div>
+          <div className="text-center mt-8 md:hidden">
+            <Link href="/builders" className="inline-block border-2 border-[#E8740C] text-[#E8740C] font-bold px-8 py-3 rounded-full text-sm hover:bg-[#E8740C] hover:text-white transition">
+              工務店一覧を見る
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== 8. 販売中の建売 ===== */}
+      <section className="py-16 md:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <p className="text-xs font-semibold tracking-widest text-[#E8740C] uppercase mb-2">SALE HOMES</p>
+              <h2 className="text-2xl font-bold text-[#3D2200]">販売中の分譲戸建</h2>
+              <p className="text-sm text-gray-500 mt-2">提携工務店の建売情報</p>
+            </div>
+            <Link href="/sale-homes" className="hidden md:block text-sm text-[#E8740C] font-bold hover:underline">すべて見る →</Link>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {topSaleHomes.map((home) => {
+              const status = SALE_HOME_STATUS_LABELS[home.status];
+              return (
+                <Link key={home.id} href={`/sale-homes/${home.id}`} className="block bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md hover:border-[#E8740C]/30 transition">
+                  <div className="relative aspect-[4/3] bg-gradient-to-br from-[#FFF8F0] via-[#FFF3E6] to-[#FFECD4] flex items-center justify-center">
+                    <div className="text-center text-[#E8740C]/40">
+                      <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                      </svg>
+                    </div>
+                    <span className={`absolute top-2 left-2 text-[9px] font-bold px-2 py-0.5 rounded-full ${status.color}`}>{status.label}</span>
+                  </div>
+                  <div className="p-4">
+                    <p className="text-[10px] text-gray-500">{home.city}</p>
+                    <h3 className="text-xs font-bold text-[#3D2200] mb-2 line-clamp-2 min-h-[2rem]">{home.title}</h3>
+                    <p className="text-lg font-extrabold text-[#E8740C]">{home.price.toLocaleString()}<span className="text-[10px] ml-1">万円</span></p>
+                    <p className="text-[10px] text-gray-500 mt-1">{home.layout} / {home.tsubo}坪</p>
                   </div>
                 </Link>
-              ))}
-            </MobileMarquee>
+              );
+            })}
           </div>
-          <div className="text-center mt-8">
-            <Link
-              href="/interview"
-              className="inline-block border-2 border-[#E8740C] text-[#E8740C] font-bold px-8 py-3 rounded-full text-sm hover:bg-[#E8740C] hover:text-white transition"
-            >
-              取材一覧を見る
+          <div className="text-center mt-8 md:hidden">
+            <Link href="/sale-homes" className="inline-block border-2 border-[#E8740C] text-[#E8740C] font-bold px-8 py-3 rounded-full text-sm hover:bg-[#E8740C] hover:text-white transition">
+              建売情報を見る
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ===== 6. 月刊ぺいほーむ ===== */}
+      {/* ===== 9. 取扱中の土地 ===== */}
       <section className="py-16 md:py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-8">
-            <p className="text-xs font-semibold tracking-widest text-[#E8740C] uppercase mb-2">
-              Digital Magazine
-            </p>
-            <h2 className="text-2xl font-bold text-[#3D2200]">
-              月刊ぺいほーむ
-            </h2>
-          </div>
-          <div className="grid md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
-            <div className="bg-gray-100 rounded-2xl aspect-[3/4] flex items-center justify-center text-gray-400">
-              Cover Image
-            </div>
+          <div className="flex items-end justify-between mb-8">
             <div>
-              <span className="text-xs font-semibold text-[#E8740C] bg-[#E8740C]/10 px-2 py-0.5 rounded">
-                最新号
-              </span>
-              <h3 className="text-lg font-bold mt-3">
-                月刊ぺいほーむ 2026年3月号
-              </h3>
-              <p className="text-sm text-gray-600 mt-2 leading-relaxed">
-                特集「鹿児島・九州の注目工務店10選」—
-                地元の気候風土を知り尽くした工務店が提案する、次世代の家づくり。
-              </p>
-              <ul className="mt-4 space-y-1.5 text-sm text-gray-600">
-                <li>・鹿児島の注目工務店10選</li>
-                <li>・住宅ローン金利の最新トレンド</li>
-                <li>・施主インタビュー：建てて1年後のリアル</li>
-                <li>・ぺいほーむ取材の裏側</li>
-              </ul>
-              <Link
-                href="/magazine"
-                className="inline-block bg-[#E8740C] text-white font-bold px-8 py-3 rounded-full text-sm hover:bg-[#D4660A] transition mt-6"
-              >
-                詳しく見る
-              </Link>
+              <p className="text-xs font-semibold tracking-widest text-[#E8740C] uppercase mb-2">LANDS</p>
+              <h2 className="text-2xl font-bold text-[#3D2200]">取扱中の土地情報</h2>
+              <p className="text-sm text-gray-500 mt-2">工務店プランと組み合わせ可能な提携土地</p>
             </div>
+            <Link href="/lands" className="hidden md:block text-sm text-[#E8740C] font-bold hover:underline">すべて見る →</Link>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {topLands.map((land) => {
+              const status = LAND_STATUS_LABELS[land.status];
+              return (
+                <Link key={land.id} href={`/lands/${land.id}`} className="block bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md hover:border-[#E8740C]/30 transition">
+                  <div className="relative aspect-[4/3] bg-gradient-to-br from-emerald-50 via-emerald-100 to-emerald-200 flex items-center justify-center">
+                    <div className="text-center text-emerald-700/40">
+                      <svg className="w-14 h-14 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M5 8l6-6 6 6M5 8v12a1 1 0 001 1h12a1 1 0 001-1V8M5 8h14" />
+                      </svg>
+                      <p className="text-xs font-semibold mt-1">{land.tsubo}坪</p>
+                    </div>
+                    <span className={`absolute top-2 left-2 text-[9px] font-bold px-2 py-0.5 rounded-full ${status.color}`}>{status.label}</span>
+                  </div>
+                  <div className="p-4">
+                    <p className="text-[10px] text-gray-500">{land.city}</p>
+                    <h3 className="text-xs font-bold text-[#3D2200] mb-2 line-clamp-2 min-h-[2rem]">{land.title}</h3>
+                    <p className="text-lg font-extrabold text-[#E8740C]">{land.price.toLocaleString()}<span className="text-[10px] ml-1">万円</span></p>
+                    <p className="text-[10px] text-gray-500 mt-1">{land.tsubo}坪 / 坪単価{land.pricePerTsubo}万円</p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* ===== 7. ニュース ===== */}
+      {/* ===== 10. 会員特典 ===== */}
       <section className="py-16 md:py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <p className="text-xs font-semibold tracking-widest text-[#E8740C] uppercase mb-2">
-            News
-          </p>
-          <h2 className="text-2xl font-bold text-[#3D2200] mb-8">
-            ぺいほーむニュース
-          </h2>
-          <div className="divide-y divide-gray-100">
-            {newsItems.map((item) => (
-              <Link
-                key={item.id}
-                href="/news"
-                className="flex flex-wrap items-center gap-3 py-4 hover:bg-gray-50 transition-colors px-2 rounded"
-              >
-                <span className="text-xs text-gray-400 w-24">{item.date}</span>
-                <span className="text-xs font-semibold text-[#E8740C] bg-[#E8740C]/10 px-2 py-0.5 rounded">
-                  {item.tag}
-                </span>
-                <span className="text-sm text-gray-800 flex-1">
-                  {item.title}
-                </span>
-              </Link>
-            ))}
-          </div>
-          <div className="text-center mt-8">
-            <Link
-              href="/news"
-              className="inline-block border-2 border-[#E8740C] text-[#E8740C] font-bold px-8 py-3 rounded-full text-sm hover:bg-[#E8740C] hover:text-white transition"
-            >
-              ニュース一覧
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== 8. お役立ち記事 ===== */}
-      <section className="py-16 md:py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <p className="text-xs font-semibold tracking-widest text-[#E8740C] uppercase mb-2">
-            Articles
-          </p>
-          <h2 className="text-2xl font-bold text-[#3D2200] mb-8">
-            お役立ち記事
-          </h2>
-          <MobileMarquee desktopGridClass="grid md:grid-cols-3 gap-6">
-            {articles.map((article) => (
-              <Card
-                key={article.id}
-                href="/articles"
-                tag={article.tag}
-                meta={article.date}
-                title={article.title}
-                placeholder="Article Image"
-              />
-            ))}
-          </MobileMarquee>
-          <div className="text-center mt-8">
-            <Link
-              href="/articles"
-              className="inline-block border-2 border-[#E8740C] text-[#E8740C] font-bold px-8 py-3 rounded-full text-sm hover:bg-[#E8740C] hover:text-white transition"
-            >
-              記事一覧を見る
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== 9. ポータルバナー (AI chat CTA) ===== */}
-      <section className="py-12 bg-white">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="bg-gradient-to-r from-[#E8740C] to-[#F5A623] rounded-2xl p-8 md:p-12 flex items-center gap-6 text-white relative overflow-hidden">
-            <div className="flex-1">
-              <p className="text-sm md:text-base leading-relaxed">
-                AIチャット相談で、あなたにぴったりの住宅会社が見つかります。ぺいほーむ取材済みの会社を中心にご紹介。
-              </p>
-            </div>
-            <Image
-              src="/images/pei_confused.png"
-              alt="ペイさん"
-              width={100}
-              height={100}
-              className="w-20 md:w-24 h-auto flex-shrink-0 hidden md:block"
-            />
+          <div className="text-center mb-10">
+            <p className="text-xs font-semibold tracking-widest text-[#E8740C] uppercase mb-2">MEMBER BENEFITS</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-[#3D2200] mb-3">無料会員登録でできること</h2>
+            <p className="text-sm text-gray-500 max-w-2xl mx-auto">
+              ぺいほーむは完全無料の住宅ポータル。
+              会員登録で家づくりに役立つ機能がフルに使えるようになります。
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {memberBenefits.map((b, i) => (
+              <div key={i} className="bg-white border border-gray-100 rounded-2xl p-6 hover:border-[#E8740C]/30 hover:shadow-md transition">
+                <div className="w-10 h-10 bg-[#FFF8F0] text-[#E8740C] rounded-full flex items-center justify-center font-extrabold mb-4">
+                  {i + 1}
+                </div>
+                <h3 className="text-base font-bold text-[#3D2200] mb-2 leading-tight">{b.title}</h3>
+                <p className="text-xs text-gray-600 leading-relaxed">{b.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-10 text-center">
+            <Link
+              href="/signup"
+              className="inline-block bg-[#E8740C] hover:bg-[#D4660A] text-white font-bold px-10 py-4 rounded-full text-base transition shadow-[0_4px_12px_rgba(232,116,12,0.3)]"
+            >
+              無料会員登録する →
+            </Link>
+            <p className="text-xs text-gray-400 mt-3">
+              すでに会員の方は{' '}
+              <Link href="/login" className="text-[#E8740C] hover:underline font-bold">
+                ログイン
+              </Link>
+            </p>
           </div>
         </div>
       </section>
 
-      {/* ===== お客様の声 ===== */}
+      {/* ===== 11. お客様の声 ===== */}
       <section className="py-16 md:py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
-          <p className="text-xs font-semibold tracking-widest text-[#E8740C] uppercase mb-2 text-center">Voice</p>
+          <p className="text-xs font-semibold tracking-widest text-[#E8740C] uppercase mb-2 text-center">VOICE</p>
           <h2 className="text-2xl font-bold text-[#3D2200] mb-10 text-center">お客様の声</h2>
-          {/* PC: グリッド表示 */}
           <div className="hidden md:grid md:grid-cols-3 gap-6">
-            {reviews.map((review, i) => <ReviewCard key={i} review={review} />)}
+            {reviews.slice(0, 3).map((review, i) => <ReviewCard key={i} review={review} />)}
           </div>
-          {/* モバイル: 無限スライダー */}
           <div className="md:hidden">
             <MobileMarquee>
               {reviews.map((review, i) => (
@@ -705,45 +544,55 @@ export default function HomePage() {
               ))}
             </MobileMarquee>
           </div>
-          <div className="text-center mt-8">
-            <Link href="/voice" className="inline-block border-2 border-[#E8740C] text-[#E8740C] font-semibold px-8 py-3 rounded-full hover:bg-[#E8740C] hover:text-white transition text-sm">
-              お客様の声をもっと見る →
+        </div>
+      </section>
+
+      {/* ===== 12. AI診断への最終CTA ===== */}
+      <section className="bg-gradient-to-br from-[#E8740C] via-[#F5A623] to-[#E8740C] text-white py-16 md:py-20">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <p className="text-xs font-bold tracking-widest opacity-80 mb-3">START NOW</p>
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold mb-4 leading-tight">
+            まずはAI家づくり診断から
+          </h2>
+          <p className="text-sm md:text-base opacity-95 leading-relaxed mb-8 max-w-2xl mx-auto">
+            10問・約2分の診断で、あなたの家づくりタイプを判定し、相性の良い工務店3社をご提案します。
+            <br className="hidden md:block" />
+            会員登録でデジタルカタログ（施工事例集＋間取り図集）を無料プレゼント中。
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              href="/diagnosis"
+              className="inline-block bg-white text-[#E8740C] font-bold px-10 py-4 rounded-full text-base hover:bg-gray-100 transition shadow-xl"
+            >
+              AI家づくり診断をはじめる →
+            </Link>
+            <Link
+              href="/signup"
+              className="inline-block border-2 border-white/40 text-white font-bold px-10 py-4 rounded-full text-base hover:bg-white/10 transition"
+            >
+              会員登録する
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ===== 10. CTA バナー (housing company CTA) ===== */}
-      <section className="bg-gradient-to-r from-[#3D2200] to-[#E8740C] text-white py-16 relative overflow-hidden">
+      {/* ===== 13. 企業様向け（控えめ） ===== */}
+      <section className="bg-[#3D2200] text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
-              <p className="text-xs font-semibold tracking-widest uppercase opacity-80 mb-2">
-                For Housing Companies
+              <p className="text-xs font-semibold tracking-widest uppercase opacity-70 mb-2">FOR HOUSING COMPANIES</p>
+              <h2 className="text-xl md:text-2xl font-bold mb-2">住宅会社・工務店の集客を、ぺいほーむで。</h2>
+              <p className="text-xs opacity-80 leading-relaxed">
+                ルームツアー撮影 / ポータル掲載 / 見学会送客をパッケージで提供します。
               </p>
-              <h2 className="text-2xl md:text-3xl font-bold mb-3">
-                住宅会社の集客を、動画とWEBで変える。
-              </h2>
-              <p className="text-sm opacity-90 leading-relaxed mb-6">
-                ルームツアー撮影・SNS運用・WEB制作をパッケージでご提供。
-                <br />
-                まずはお気軽にご相談ください。
-              </p>
-              <a
-                href="/biz"
-                className="inline-block bg-white text-[#E8740C] font-bold px-8 py-3 rounded-full text-sm hover:bg-gray-100 transition"
-              >
-                サービス詳細を見る
-              </a>
             </div>
-            <Image
-              src="/images/pei_surprise.png"
-              alt="ペイさん"
-              width={120}
-              height={120}
-              className="w-20 md:w-28 h-auto flex-shrink-0 hidden md:block"
-              aria-hidden="true"
-            />
+            <Link
+              href="/biz"
+              className="bg-white text-[#3D2200] font-bold px-8 py-3 rounded-full text-sm hover:bg-gray-100 transition flex-shrink-0"
+            >
+              掲載のご相談 →
+            </Link>
           </div>
         </div>
       </section>
