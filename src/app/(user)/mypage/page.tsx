@@ -245,12 +245,20 @@ export default function MyPage() {
               statHighlight={compareCount > 0}
             />
             <MyPageCard
-              title="相談履歴"
-              description="AIチャットの会話履歴"
-              href="/"
-              linkLabel="チャットする"
-              stat="Phase 2"
-              disabled
+              title="匿名質問履歴"
+              description="工務店に送った匿名質問と回答を確認"
+              href="/mypage/questions"
+              linkLabel="質問履歴を見る"
+              stat="SMART MATCH"
+              statHighlight
+            />
+            <MyPageCard
+              title="ご相談・フィードバック"
+              description="ぺいほーむ運営に直接ご相談"
+              href="/mypage/feedback"
+              linkLabel="相談する"
+              stat="いつでも"
+              statHighlight
             />
             <MyPageCard
               title="予約履歴"

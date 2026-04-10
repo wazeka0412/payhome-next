@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { store } from '@/lib/store'
 import { createServerClient } from '@/lib/supabase'
 import { localInsert } from '@/lib/local-store'
+import { sendLeadNotification } from '@/lib/email'
+import type { ContactPreferences } from '@/lib/contact-preferences'
+import type { ViewingMode } from '@/lib/event-viewing-mode'
 
 const FORM_META_DELIMITER = '\n---FORM_META---\n'
 
@@ -79,9 +82,52 @@ export async function POST(req: NextRequest) {
       anonymousId,
     }
 
+    // Smart Match payload for email body (not stored in DB columns)
+    const contactPrefsForEmail = (data.contact_preferences &&
+      typeof data.contact_preferences === 'object'
+        ? (data.contact_preferences as ContactPreferences)
+        : null)
+    const viewingModeForEmail = (typeof data.viewing_mode === 'string'
+      ? (data.viewing_mode as ViewingMode)
+      : null)
+    const eventTitleForEmail = typeof data.event === 'string' ? data.event : undefined
+    const eventDateForEmail = typeof data.eventDate === 'string' ? data.eventDate : undefined
+
     try {
       const lead = await store.addLead(leadPayload)
       console.log('=== NEW LEAD ===', lead.id)
+      // Fire-and-forget: send notification email with SMART MATCH block
+      if (builderName) {
+        try {
+          const builder = await store.getBuilders().then((list) =>
+            list.find((b) => b.name === builderName)
+          )
+          if (builder?.email) {
+            await sendLeadNotification(
+              {
+                leadId: lead.id,
+                type: lead.type,
+                name: lead.name,
+                email: lead.email,
+                phone: lead.phone,
+                area: lead.area,
+                budget: lead.budget,
+                layout: lead.layout,
+                message: lead.message,
+                sourceChannel: lead.sourceChannel,
+                contactPreferences: contactPrefsForEmail,
+                viewingMode: viewingModeForEmail,
+                eventTitle: eventTitleForEmail,
+                eventDate: eventDateForEmail,
+              },
+              builder.email,
+              builderName
+            )
+          }
+        } catch (notifyErr) {
+          console.warn('[contact] notification failed (non-fatal):', (notifyErr as Error).message)
+        }
+      }
       return NextResponse.json({ success: true, leadId: lead.id, mode: 'supabase' })
     } catch (err) {
       console.warn('[contact] Supabase unreachable, using local fallback:', (err as Error).message)
