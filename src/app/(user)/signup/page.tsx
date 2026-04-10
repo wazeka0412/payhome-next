@@ -9,7 +9,7 @@ import { getOrCreateAnonymousId } from '@/lib/anonymous-id'
 function SignupForm() {
   const router = useRouter()
   const params = useSearchParams()
-  const redirectTo = params.get('redirect') || '/mypage'
+  const redirectTo = params.get('redirect') || '/welcome'
 
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')

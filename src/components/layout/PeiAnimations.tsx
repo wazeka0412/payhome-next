@@ -292,13 +292,13 @@ export default function PeiAnimations() {
         return {
           image: '/images/pei_wink.png',
           title: '工務店選びに迷っていますか？',
-          desc: '無料相談で1,000円分PayPay進呈！あなたに合った工務店を2〜3社厳選してご紹介します。',
-          cta1: { label: '工務店を紹介してもらう（PayPay進呈）', href: '/consultation', color: '#E8740C' },
-          cta2: { label: '資料だけ請求する', href: '/catalog', color: '#D4660A' },
+          desc: 'AI家づくり診断（10問・約2分）で、あなたに合った工務店3社を提案します。',
+          cta1: { label: 'AI家づくり診断をはじめる', href: '/diagnosis', color: '#E8740C' },
+          cta2: { label: '見学会を予約する', href: '/event', color: '#D4660A' },
           timer: campaignTimer,
         }
       }
-      if (p === '/consultation' || p === '/catalog' || p === '/event') {
+      if (p === '/consultation' || p === '/diagnosis' || p === '/event' || p === '/signup' || p === '/login' || p === '/welcome') {
         return null
       }
       if (p.startsWith('/interview') || p.startsWith('/news/') || p.startsWith('/articles/') || p.startsWith('/voice')) {

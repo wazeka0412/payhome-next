@@ -74,6 +74,20 @@ export default function DiagnosisPage() {
       const data: DiagnosisResult = await res.json()
       setResult(data)
       setStep(TOTAL_QUESTIONS + 2) // result
+
+      // 会員登録後の /welcome 画面で再表示できるよう localStorage にキャッシュ
+      try {
+        localStorage.setItem(
+          'payhome_diagnosis_result',
+          JSON.stringify({
+            user_type: data.user_type,
+            recommended_builders: data.recommended_builders,
+            cached_at: Date.now(),
+          })
+        )
+      } catch {
+        /* ignore quota errors */
+      }
     } catch (err) {
       setError((err as Error).message || '通信エラーが発生しました')
       setStep(TOTAL_QUESTIONS) // back to last question
@@ -322,20 +336,32 @@ export default function DiagnosisPage() {
                   </div>
                 </div>
                 <p className="text-gray-700 text-sm mb-4 bg-gray-50 rounded-lg p-3">
-                  💡 {builder.reason}
+                  {builder.reason}
                 </p>
-                <div className="flex gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   <Link
-                    href={`/event`}
-                    className="flex-1 bg-[#E8740C] hover:bg-[#D06800] text-white text-center text-sm font-semibold py-2.5 rounded-lg transition"
+                    href={`/builders/${builder.id}`}
+                    className="bg-[#E8740C] hover:bg-[#D06800] text-white text-center text-xs font-semibold py-2.5 rounded-lg transition"
                   >
-                    見学会を予約する
+                    工務店ページ
                   </Link>
                   <Link
-                    href={`/builders`}
-                    className="flex-1 border border-gray-300 hover:border-[#E8740C] text-gray-700 hover:text-[#E8740C] text-center text-sm font-semibold py-2.5 rounded-lg transition"
+                    href={`/event?builder=${encodeURIComponent(builder.name)}`}
+                    className="border border-[#E8740C] text-[#E8740C] hover:bg-[#FFF8F0] text-center text-xs font-semibold py-2.5 rounded-lg transition"
                   >
-                    詳しく見る
+                    見学会予約
+                  </Link>
+                  <Link
+                    href={`/sale-homes?builder=${builder.id}`}
+                    className="border border-gray-300 hover:border-[#E8740C] text-gray-700 hover:text-[#E8740C] text-center text-xs font-semibold py-2.5 rounded-lg transition"
+                  >
+                    分譲を見る
+                  </Link>
+                  <Link
+                    href={`/lands?builder=${builder.id}`}
+                    className="border border-gray-300 hover:border-[#E8740C] text-gray-700 hover:text-[#E8740C] text-center text-xs font-semibold py-2.5 rounded-lg transition"
+                  >
+                    土地を見る
                   </Link>
                 </div>
               </div>

@@ -4,6 +4,8 @@ import PageHeader from '@/components/ui/PageHeader';
 import { builders, getBuilderById, PRICE_BAND_LABELS } from '@/lib/builders-data';
 import { events, formatPeriod, EVENT_TYPE_STYLES } from '@/lib/events-data';
 import { videos } from '@/lib/videos-data';
+import { getSaleHomesByBuilderId, SALE_HOME_STATUS_LABELS } from '@/lib/sale-homes-data';
+import { getLandsByBuilderId, LAND_STATUS_LABELS } from '@/lib/lands-data';
 
 export function generateStaticParams() {
   return builders.map((b) => ({ id: b.id }));
@@ -33,6 +35,10 @@ export default async function BuilderDetailPage({
   const relatedBuilders = builders
     .filter((b) => b.id !== builder.id && b.area === builder.area)
     .slice(0, 3);
+
+  // この工務店が販売中の建売・土地
+  const saleHomes = getSaleHomesByBuilderId(builder.id);
+  const lands = getLandsByBuilderId(builder.id);
 
   return (
     <>
@@ -187,6 +193,107 @@ export default async function BuilderDetailPage({
                     </div>
                   </Link>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── 販売中の分譲戸建 ── */}
+          {saleHomes.length > 0 && (
+            <div>
+              <SectionTitle>{builder.name}が販売中の分譲戸建（{saleHomes.length}件）</SectionTitle>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {saleHomes.map((home) => {
+                  const status = SALE_HOME_STATUS_LABELS[home.status];
+                  return (
+                    <Link
+                      key={home.id}
+                      href={`/sale-homes/${home.id}`}
+                      className="block bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-md hover:border-[#E8740C]/30 transition"
+                    >
+                      <div className="relative aspect-[4/3] bg-gradient-to-br from-[#FFF8F0] via-[#FFF3E6] to-[#FFECD4] flex items-center justify-center">
+                        <div className="text-center text-[#E8740C]/40">
+                          <svg className="w-14 h-14 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                          </svg>
+                        </div>
+                        <span className={`absolute top-3 left-3 text-[10px] font-bold px-2 py-0.5 rounded-full ${status.color}`}>
+                          {status.label}
+                        </span>
+                      </div>
+                      <div className="p-4">
+                        <h3 className="text-sm font-bold text-[#3D2200] line-clamp-2 mb-2 min-h-[2rem]">
+                          {home.title}
+                        </h3>
+                        <p className="text-xl font-extrabold text-[#E8740C] mb-2">
+                          {home.price.toLocaleString()}
+                          <span className="text-xs ml-1">万円</span>
+                        </p>
+                        <p className="text-[10px] text-gray-500">
+                          {home.layout} / {home.tsubo}坪 / {home.city}
+                        </p>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+              <div className="mt-4 text-right">
+                <Link
+                  href={`/sale-homes?builder=${builder.id}`}
+                  className="inline-block text-xs text-[#E8740C] font-bold hover:underline"
+                >
+                  すべての分譲戸建を見る →
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {/* ── 販売中の土地情報 ── */}
+          {lands.length > 0 && (
+            <div>
+              <SectionTitle>{builder.name}が取扱中の土地情報（{lands.length}件）</SectionTitle>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {lands.map((land) => {
+                  const status = LAND_STATUS_LABELS[land.status];
+                  return (
+                    <Link
+                      key={land.id}
+                      href={`/lands/${land.id}`}
+                      className="block bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-md hover:border-[#E8740C]/30 transition"
+                    >
+                      <div className="relative aspect-[4/3] bg-gradient-to-br from-emerald-50 via-emerald-100 to-emerald-200 flex items-center justify-center">
+                        <div className="text-center text-emerald-700/40">
+                          <svg className="w-14 h-14 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M5 8l6-6 6 6M5 8v12a1 1 0 001 1h12a1 1 0 001-1V8M5 8h14" />
+                          </svg>
+                          <p className="text-xs font-semibold mt-1">{land.tsubo}坪</p>
+                        </div>
+                        <span className={`absolute top-3 left-3 text-[10px] font-bold px-2 py-0.5 rounded-full ${status.color}`}>
+                          {status.label}
+                        </span>
+                      </div>
+                      <div className="p-4">
+                        <h3 className="text-sm font-bold text-[#3D2200] line-clamp-2 mb-2 min-h-[2rem]">
+                          {land.title}
+                        </h3>
+                        <p className="text-xl font-extrabold text-[#E8740C] mb-2">
+                          {land.price.toLocaleString()}
+                          <span className="text-xs ml-1">万円</span>
+                        </p>
+                        <p className="text-[10px] text-gray-500">
+                          {land.tsubo}坪 / 坪単価{land.pricePerTsubo}万円 / {land.city}
+                        </p>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+              <div className="mt-4 text-right">
+                <Link
+                  href={`/lands?builder=${builder.id}`}
+                  className="inline-block text-xs text-[#E8740C] font-bold hover:underline"
+                >
+                  すべての土地情報を見る →
+                </Link>
               </div>
             </div>
           )}

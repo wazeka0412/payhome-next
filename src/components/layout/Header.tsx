@@ -19,6 +19,8 @@ const NAV_CONTENT = [
       { href: '/videos', label: '動画コンテンツ', desc: '平屋ルームツアー' },
       { href: '/features', label: '特集', desc: 'エリア・サイズ・工務店' },
       { href: '/builders', label: '工務店一覧', desc: '提携工務店を検索' },
+      { href: '/sale-homes', label: '建売情報', desc: '販売中の分譲戸建' },
+      { href: '/lands', label: '土地情報', desc: '工務店取扱の土地' },
       { href: '/event', label: '見学会・イベント', desc: '実物を体感' },
     ],
   },

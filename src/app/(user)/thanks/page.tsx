@@ -75,17 +75,57 @@ export default function ThanksPage() {
             {/* Actions */}
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
-                href="/"
+                href="/diagnosis"
                 className="inline-flex items-center justify-center bg-[#E8740C] text-white font-bold px-8 py-3 rounded-full text-sm hover:bg-[#D4660A] transition"
               >
-                トップページへ戻る
+                AI家づくり診断を受ける
               </Link>
               <Link
-                href="/videos"
+                href="/builders"
                 className="inline-flex items-center justify-center bg-white border-2 border-[#E8740C] text-[#E8740C] font-bold px-8 py-3 rounded-full text-sm hover:bg-[#FFF8F0] transition"
               >
-                動画を見る
+                工務店一覧
               </Link>
+            </div>
+
+            {/* NEXT STEP */}
+            <div className="mt-8 pt-6 border-t border-gray-100 text-left">
+              <p className="text-xs font-bold text-[#E8740C] tracking-wider mb-3 text-center">
+                NEXT STEP
+              </p>
+              <p className="text-xs text-gray-500 text-center mb-4">
+                お返事をお待ちいただく間に、こちらもチェック
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <Link
+                  href="/sale-homes"
+                  className="block bg-[#FFF8F0] hover:bg-[#FFF3E6] rounded-lg p-3 transition text-left"
+                >
+                  <p className="text-xs font-bold text-[#3D2200] mb-0.5">建売を見る</p>
+                  <p className="text-[10px] text-gray-500">販売中の分譲戸建</p>
+                </Link>
+                <Link
+                  href="/lands"
+                  className="block bg-[#FFF8F0] hover:bg-[#FFF3E6] rounded-lg p-3 transition text-left"
+                >
+                  <p className="text-xs font-bold text-[#3D2200] mb-0.5">土地を見る</p>
+                  <p className="text-[10px] text-gray-500">提携工務店の土地</p>
+                </Link>
+                <Link
+                  href="/event"
+                  className="block bg-[#FFF8F0] hover:bg-[#FFF3E6] rounded-lg p-3 transition text-left"
+                >
+                  <p className="text-xs font-bold text-[#3D2200] mb-0.5">見学会を予約</p>
+                  <p className="text-[10px] text-gray-500">実物を体感</p>
+                </Link>
+                <Link
+                  href="/features"
+                  className="block bg-[#FFF8F0] hover:bg-[#FFF3E6] rounded-lg p-3 transition text-left"
+                >
+                  <p className="text-xs font-bold text-[#3D2200] mb-0.5">特集を見る</p>
+                  <p className="text-[10px] text-gray-500">エリア・サイズ別</p>
+                </Link>
+              </div>
             </div>
 
             {/* Footer character */}

@@ -9,40 +9,39 @@ import {
   YOUTUBE_SUBSCRIBERS,
 } from '@/lib/constants';
 
-// Column order matches static HTML: コンテンツ, 運営情報, サービス, 企業様へ
+/**
+ * v4.0 MVP フッター
+ * REQUIREMENTS.md §5.0 に従い、月刊 / ウェビナー / ニュース / 取材 /
+ * お役立ち記事 / エリアから探す はナビから除外。
+ * 資料請求は廃止し、AI診断 / 建売 / 土地 を主導線に置き換え。
+ */
 const FOOTER_COLUMNS = [
   {
-    heading: 'コンテンツ',
+    heading: 'さがす',
     links: [
       { href: '/videos', label: '動画コンテンツ' },
-      { href: '/interview', label: '取材・レポート' },
-      { href: '/magazine', label: '月刊ぺいほーむ' },
-      { href: '/news', label: 'ニュース' },
-      { href: '/articles', label: 'お役立ち記事' },
-      { href: '/webinar', label: 'ウェビナー' },
-      { href: '/area', label: 'エリアから探す' },
-    ],
-  },
-  {
-    heading: '運営情報',
-    links: [
-      { href: '/about', label: 'ぺいほーむとは' },
-      { href: '/company', label: '運営会社' },
+      { href: '/features', label: '特集' },
+      { href: '/builders', label: '工務店一覧' },
+      { href: '/sale-homes', label: '建売情報' },
+      { href: '/lands', label: '土地情報' },
+      { href: '/event', label: '見学会・イベント' },
     ],
   },
   {
     heading: 'サービス',
     links: [
+      { href: '/diagnosis', label: 'AI家づくり診断' },
       { href: '/consultation', label: '無料住宅相談' },
-      { href: '/catalog', label: '資料請求' },
-      { href: '/event', label: '見学会・イベント' },
-      { href: '/builders', label: '工務店一覧' },
       { href: '/simulator', label: 'ローンシミュレーター' },
+      { href: '/signup', label: '会員登録' },
+      { href: '/login', label: 'ログイン' },
     ],
   },
   {
-    heading: '企業様へ',
+    heading: 'ぺいほーむについて',
     links: [
+      { href: '/about', label: 'ぺいほーむとは' },
+      { href: '/company', label: '運営会社' },
       { href: '/biz', label: '広告掲載をお考えの企業様' },
     ],
   },

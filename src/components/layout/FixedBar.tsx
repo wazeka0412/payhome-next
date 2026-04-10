@@ -58,10 +58,10 @@ export default function FixedBar() {
             LINE相談
           </a>
           <Link
-            href="/catalog"
+            href="/diagnosis"
             className="bg-[#3D2200] text-white text-sm font-bold px-4 py-2 rounded-full hover:bg-[#2a1700] transition-colors"
           >
-            資料請求
+            AI診断
           </Link>
           <Link
             href="/event"
@@ -90,10 +90,10 @@ export default function FixedBar() {
           LINE
         </a>
         <Link
-          href="/catalog"
+          href="/diagnosis"
           className="flex-1 bg-[#3D2200] text-white text-xs font-bold py-2.5 rounded-full text-center hover:bg-[#2a1700] transition-colors"
         >
-          資料請求
+          AI診断
         </Link>
         <Link
           href="/event"
