@@ -21,6 +21,11 @@ export interface PropertyData {
   insulation: string
   uaValue: string
   earthquake: string
+  /**
+   * v4.0: この物件が実物のモデルハウス（見学可能な家）かどうか。
+   * true の場合、動画詳細ページに「この家の見学会を予約する」セクションが表示される。
+   */
+  isModelHouse?: boolean
   builder: {
     name: string
     location: string
@@ -65,6 +70,7 @@ export const properties: PropertyData[] = [
     insulation: '等級5',
     uaValue: '0.56',
     earthquake: '等級3',
+    isModelHouse: true,
     builder: {
       name: 'ハウスサポート',
       location: '鹿児島県鹿児島市中央町10-2',

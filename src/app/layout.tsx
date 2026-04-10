@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Montserrat, Noto_Sans_JP } from 'next/font/google';
 import './globals.css';
+import Providers from '@/components/Providers';
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -50,7 +51,9 @@ export default function RootLayout({
       lang="ja"
       className={`${montserrat.variable} ${notoSansJP.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

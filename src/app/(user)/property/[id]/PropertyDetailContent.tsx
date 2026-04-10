@@ -244,6 +244,48 @@ export default function PropertyDetailContent({ id }: { id: string }) {
             </div>
           </div>
 
+          {/* ── F-27 (v4.0): この家の見学会予約セクション（モデルハウスのみ） ── */}
+          {property.isModelHouse && (
+            <div className="mb-8">
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#E8740C] via-[#F5A623] to-[#E8740C] text-white p-8 md:p-10 shadow-xl">
+                <div className="absolute top-3 right-3 bg-white/20 backdrop-blur-sm text-xs font-bold px-3 py-1 rounded-full">
+                  🏠 実物見学可能
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold mb-3">
+                  この家の見学会を予約する
+                </h2>
+                <p className="text-sm md:text-base opacity-95 mb-6 leading-relaxed">
+                  動画で見たこの家を、実際に歩いて体感できます。
+                  {property.builder.name}の担当者が直接ご案内するので、動画では伝わらない広さ・光の入り方・空気感までご確認いただけます。
+                </p>
+                <div className="flex flex-wrap gap-3 items-center">
+                  {builderEvents.length > 0 ? (
+                    <Link
+                      href={`/event/${builderEvents[0].id}`}
+                      className="bg-white text-[#E8740C] font-bold px-8 py-4 rounded-full text-base shadow-lg hover:bg-gray-100 transition inline-flex items-center gap-2"
+                    >
+                      <span>見学会を予約する</span>
+                      <span>→</span>
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/event"
+                      className="bg-white text-[#E8740C] font-bold px-8 py-4 rounded-full text-base shadow-lg hover:bg-gray-100 transition"
+                    >
+                      見学会の日程を見る →
+                    </Link>
+                  )}
+                  <Link
+                    href="/signup?redirect=/diagnosis"
+                    className="border-2 border-white/60 text-white font-semibold px-6 py-3 rounded-full text-sm hover:bg-white/20 transition"
+                  >
+                    AI診断で自分に合う工務店を探す
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Builder Events */}
           <div className="mb-8">
             <h2 className="text-lg font-bold text-[#3D2200] mb-4">
@@ -320,28 +362,28 @@ export default function PropertyDetailContent({ id }: { id: string }) {
             )}
           </div>
 
-          {/* CTA */}
+          {/* CTA — v4.0: 見学会予約 + AI診断 + 会員登録 を主軸に */}
           <div className="bg-gradient-to-r from-[#E8740C] to-[#F5A623] rounded-2xl p-8 text-center text-white mb-8">
             <h3 className="text-lg font-bold mb-2">この家が気になったら</h3>
-            <p className="text-sm opacity-90 mb-5">動画で紹介した工務店への相談・資料請求・見学会予約ができます</p>
+            <p className="text-sm opacity-90 mb-5">見学会の予約・AI診断で自分に合う工務店を見つけましょう</p>
             <div className="flex flex-wrap gap-3 justify-center items-center">
               <Link
-                href="/consultation"
+                href="/event"
                 className="bg-white text-[#E8740C] font-bold px-8 py-4 rounded-full text-base shadow-lg hover:bg-gray-100 transition"
               >
-                無料で相談する
-              </Link>
-              <Link
-                href="/catalog"
-                className="border-2 border-white/60 text-white font-semibold px-6 py-3 rounded-full text-sm hover:bg-white/20 transition"
-              >
-                資料を請求する
-              </Link>
-              <Link
-                href="/event"
-                className="border-2 border-white/60 text-white font-semibold px-6 py-3 rounded-full text-sm hover:bg-white/20 transition"
-              >
                 見学会を予約する
+              </Link>
+              <Link
+                href="/diagnosis"
+                className="border-2 border-white/60 text-white font-semibold px-6 py-3 rounded-full text-sm hover:bg-white/20 transition"
+              >
+                AI家づくり診断
+              </Link>
+              <Link
+                href="/consultation"
+                className="border-2 border-white/60 text-white font-semibold px-6 py-3 rounded-full text-sm hover:bg-white/20 transition"
+              >
+                無料で相談する
               </Link>
             </div>
             <p className="mt-4 text-xs opacity-80">

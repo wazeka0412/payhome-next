@@ -21,18 +21,27 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Phase 1: /dashboard/builder/* と /dashboard/user/* は admin のみアクセス可能
-  // ローンチ時はユーザー・工務店にはログインを求めず、リードはメール通知で届ける
-  // Phase 2 でロール別アクセス制御に切り替え:
-  //   builder/* → builder or admin
-  //   user/*    → any authenticated user
-  if (pathname.startsWith('/dashboard/builder') || pathname.startsWith('/dashboard/user')) {
+  // v4.0: /dashboard/builder/* は builder / admin ロール
+  if (pathname.startsWith('/dashboard/builder')) {
     const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
     if (!token) {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
+      return NextResponse.redirect(new URL('/login?redirect=' + encodeURIComponent(pathname), request.url))
     }
-    if (token.role !== 'admin') {
+    if (token.role !== 'builder' && token.role !== 'admin') {
       return NextResponse.redirect(new URL('/', request.url))
+    }
+    return NextResponse.next()
+  }
+
+  // v4.0: /dashboard/user/*, /mypage, /diagnosis/result は認証済みユーザー全員
+  if (
+    pathname.startsWith('/dashboard/user') ||
+    pathname === '/mypage' ||
+    pathname.startsWith('/mypage/')
+  ) {
+    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
+    if (!token) {
+      return NextResponse.redirect(new URL('/login?redirect=' + encodeURIComponent(pathname), request.url))
     }
     return NextResponse.next()
   }
@@ -41,5 +50,12 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/appadmin/:path*', '/dashboard/builder/:path*', '/dashboard/user/:path*'],
+  matcher: [
+    '/admin/:path*',
+    '/appadmin/:path*',
+    '/dashboard/builder/:path*',
+    '/dashboard/user/:path*',
+    '/mypage',
+    '/mypage/:path*',
+  ],
 }
