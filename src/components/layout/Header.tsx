@@ -6,24 +6,30 @@ import { useState, useRef, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import MobileMenu from './MobileMenu';
 
+/**
+ * v4.0 MVP ナビゲーション（7画面 + α に限定）
+ *
+ * REQUIREMENTS.md 5.0 に従い、月刊誌 / ウェビナー / ニュース / 取材 /
+ * お役立ち記事 はナビから除外（ページは残すが導線を切る）。
+ *
+ * MVP画面：
+ *   1. TOP (/)
+ *   2. 動画コンテンツ一覧 (/videos)
+ *   3. 動画コンテンツ詳細 (/videos/[id])
+ *   4. 特集 (/features, /features/[id])
+ *   5. 工務店一覧 (/builders)
+ *   6. 工務店個別 (/builders/[id])
+ *   7. AIチャットウィジェット（全画面に埋込）
+ *   + 会員登録/ログイン、AI診断、マイページ、簡易企業管理
+ */
 const NAV_CONTENT = [
   {
-    label: 'コンテンツ',
+    label: 'さがす',
     items: [
-      { href: '/videos', label: '動画コンテンツ' },
-      { href: '/interview', label: '取材・レポート' },
-      { href: '/magazine', label: '月刊ぺいほーむ' },
-      { href: '/news', label: 'ニュース' },
-      { href: '/articles', label: 'お役立ち記事' },
-      { href: '/webinar', label: 'ウェビナー' },
-      { href: '/area', label: 'エリアから探す' },
-    ],
-  },
-  {
-    label: '運営情報',
-    items: [
-      { href: '/about', label: 'ぺいほーむとは' },
-      { href: '/company', label: '運営会社' },
+      { href: '/videos', label: '🎬 動画コンテンツ' },
+      { href: '/features', label: '✨ 特集' },
+      { href: '/builders', label: '🏗 工務店一覧' },
+      { href: '/event', label: '📅 見学会・イベント' },
     ],
   },
   {
@@ -31,9 +37,14 @@ const NAV_CONTENT = [
     items: [
       { href: '/diagnosis', label: '🤖 AI家づくり診断' },
       { href: '/consultation', label: '無料住宅相談' },
-      { href: '/event', label: '見学会・イベント予約' },
-      { href: '/builders', label: '工務店一覧' },
       { href: '/simulator', label: 'ローンシミュレーター' },
+    ],
+  },
+  {
+    label: 'ぺいほーむについて',
+    items: [
+      { href: '/about', label: 'ぺいほーむとは' },
+      { href: '/company', label: '運営会社' },
     ],
   },
 ];
