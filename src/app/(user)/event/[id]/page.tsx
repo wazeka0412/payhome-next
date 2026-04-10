@@ -20,6 +20,7 @@ import {
   CONSIDERATION_PHASE_LABELS,
   type ContactPreferences,
 } from '@/lib/contact-preferences';
+import { VIEWING_MODE_INFO, type ViewingMode } from '@/lib/event-viewing-mode';
 
 /* ─── Calendar helpers ─── */
 function getDaysInMonth(year: number, month: number) {
@@ -62,8 +63,11 @@ export default function EventDetailPage() {
   const formRef = useRef<HTMLFormElement>(null);
   const reservationRef = useRef<HTMLDivElement>(null);
 
-  /* Anti-Pressure: fetch user's contact preferences */
+  /* Smart Match: fetch user's contact preferences */
   const [contactPrefs, setContactPrefs] = useState<ContactPreferences | null>(null);
+  /* Phase 1.5: viewing mode selection */
+  const [viewingMode, setViewingMode] = useState<ViewingMode>('consult');
+
   useEffect(() => {
     if (!mounted) return;
     const anonymousId = getOrCreateAnonymousId();
@@ -135,8 +139,10 @@ export default function EventDetailPage() {
           eventDate: selectedDate,
           builderName: event.builder,
           anonymous_id: anonymousId,
-          // Anti-Pressure Pack: auto-attach user's contact preferences
+          // Smart Match: auto-attach user's contact preferences
           contact_preferences: contactPrefs || undefined,
+          // Phase 1.5: viewing mode selection
+          viewing_mode: viewingMode,
         }),
       });
     } catch {
@@ -349,7 +355,44 @@ export default function EventDetailPage() {
               ご希望の日程を選択し、必要事項をご入力ください。
             </p>
 
-            {/* ─── Anti-Pressure Banner ─── */}
+            {/* ─── 見学会モード選択 ─── */}
+            <div className="mb-6">
+              <label className="block text-sm font-bold text-[#3D2200] mb-2">
+                見学当日の目的 <span className="text-red-500 text-xs">必須</span>
+              </label>
+              <p className="text-[11px] text-gray-500 mb-3">
+                目的を選んでいただくと、工務店様が事前に最適な準備をしてお迎えできます
+              </p>
+              <div className="grid sm:grid-cols-3 gap-2">
+                {(['experience', 'consult', 'contract'] as ViewingMode[]).map((mode) => {
+                  const info = VIEWING_MODE_INFO[mode];
+                  const selected = viewingMode === mode;
+                  return (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => setViewingMode(mode)}
+                      className={`p-4 rounded-xl border-2 text-left transition ${
+                        selected
+                          ? 'border-[#E8740C] bg-[#FFF8F0]'
+                          : 'border-gray-100 bg-white hover:border-gray-200'
+                      }`}
+                    >
+                      <p
+                        className={`text-xs font-bold mb-1 ${
+                          selected ? 'text-[#E8740C]' : 'text-gray-500'
+                        }`}
+                      >
+                        {info.label}
+                      </p>
+                      <p className="text-[10px] text-gray-500 leading-relaxed">{info.description}</p>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* ─── Smart Match Banner ─── */}
             <div className="bg-[#FFF8F0] border border-[#E8740C]/30 rounded-xl p-4 mb-6">
               <div className="flex items-start gap-3">
                 <svg
@@ -362,34 +405,37 @@ export default function EventDetailPage() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                   />
                 </svg>
                 <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-bold tracking-widest text-[#E8740C] mb-1">
+                    SMART MATCH｜お客様と工務店の相性設計
+                  </p>
                   <p className="text-xs font-bold text-[#3D2200] mb-1">
-                    ぺいほーむは「しつこい営業」を禁止しています
+                    お互いのペースで、ベストな家づくりを
                   </p>
                   {contactPrefs ? (
                     <>
                       <p className="text-[11px] text-gray-600 leading-relaxed mb-2">
-                        ご設定いただいた以下の連絡条件を工務店に自動送信します。工務店は規約上これを遵守する義務があります。
+                        ご設定いただいた以下の「連絡の相性」を工務店様にお伝えします。工務店様は事前にあなたのご希望を把握し、最適なご提案をご用意いただけます。
                       </p>
                       <div className="bg-white rounded-lg p-3 border border-[#E8740C]/20">
                         <ul className="text-[11px] text-gray-700 space-y-1">
                           <li>
-                            <span className="text-[#E8740C] font-bold">フェーズ:</span>{' '}
+                            <span className="text-[#E8740C] font-bold">検討フェーズ:</span>{' '}
                             {CONSIDERATION_PHASE_LABELS[contactPrefs.consideration_phase].label}
                           </li>
                           <li>
-                            <span className="text-[#E8740C] font-bold">連絡頻度:</span>{' '}
+                            <span className="text-[#E8740C] font-bold">ご希望の連絡頻度:</span>{' '}
                             {CONTACT_FREQUENCY_LABELS[contactPrefs.frequency]}
                           </li>
                           <li>
-                            <span className="text-[#E8740C] font-bold">連絡手段:</span>{' '}
+                            <span className="text-[#E8740C] font-bold">ご希望の連絡手段:</span>{' '}
                             {contactPrefs.channels.map((c) => CONTACT_CHANNEL_LABELS[c]).join(' / ')}
                           </li>
                           <li>
-                            <span className="text-[#E8740C] font-bold">連絡時間帯:</span>{' '}
+                            <span className="text-[#E8740C] font-bold">ご都合の良い時間帯:</span>{' '}
                             {contactPrefs.timeslots
                               .map((t) => CONTACT_TIMESLOT_LABELS[t])
                               .join(' / ')}
@@ -404,20 +450,19 @@ export default function EventDetailPage() {
                         href="/mypage/contact-preferences"
                         className="inline-block text-[11px] text-[#E8740C] font-bold hover:underline mt-2"
                       >
-                        連絡条件を変更する →
+                        相性設定を変更する →
                       </Link>
                     </>
                   ) : (
                     <>
                       <p className="text-[11px] text-gray-600 leading-relaxed mb-2">
-                        会員登録で「連絡条件設定」を使うと、工務店からの連絡頻度・時間帯・手段を
-                        あらかじめ指定できます。工務店は規約上これを遵守する義務を負います。
+                        会員登録で「連絡の相性設定」を使うと、ご希望の連絡方法・ペースを工務店様に事前にお伝えできます。双方にとって心地よいコミュニケーションを実現する仕組みです。
                       </p>
                       <Link
                         href="/signup?redirect=/mypage/contact-preferences"
                         className="inline-block text-[11px] text-[#E8740C] font-bold hover:underline"
                       >
-                        連絡条件を設定する（無料会員登録）→
+                        連絡の相性を設定する（無料会員登録）→
                       </Link>
                     </>
                   )}

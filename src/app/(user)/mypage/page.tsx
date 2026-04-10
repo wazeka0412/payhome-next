@@ -140,30 +140,38 @@ export default function MyPage() {
             </div>
           </div>
 
-          {/* Anti-Pressure プロモ：連絡条件設定 */}
+          {/* Smart Match プロモ：連絡の相性設定 */}
           <div className="bg-white border-2 border-[#E8740C]/40 rounded-2xl p-5 md:p-6 mb-4 shadow-sm">
             <div className="flex items-start gap-4">
               <div className="hidden sm:flex w-12 h-12 bg-[#FFF8F0] rounded-full flex-shrink-0 items-center justify-center">
                 <svg className="w-6 h-6 text-[#E8740C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[10px] font-bold tracking-widest text-[#E8740C] mb-1">
-                  ANTI-PRESSURE POLICY
+                  SMART MATCH｜連絡の相性設計
                 </p>
                 <h2 className="text-base md:text-lg font-bold text-[#3D2200] mb-1 leading-tight">
-                  しつこい営業から自分を守る
+                  お互いのペースで、ベストな家づくりを
                 </h2>
                 <p className="text-xs text-gray-600 mb-3 leading-relaxed">
-                  連絡頻度・時間帯・手段を設定すると、工務店は規約としてそれを守ります。
+                  ご希望の連絡手段・時間帯を事前にお伝えすることで、工務店様はより最適なご提案を準備できます。お互いの時間を大切にする仕組みです。
                 </p>
-                <Link
-                  href="/mypage/contact-preferences"
-                  className="inline-flex items-center gap-2 bg-[#E8740C] hover:bg-[#D4660A] text-white text-xs font-bold px-5 py-2 rounded-full transition"
-                >
-                  連絡条件を設定する →
-                </Link>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Link
+                    href="/mypage/contact-preferences"
+                    className="inline-flex items-center gap-2 bg-[#E8740C] hover:bg-[#D4660A] text-white text-xs font-bold px-5 py-2 rounded-full transition"
+                  >
+                    連絡の相性を設定する →
+                  </Link>
+                  <Link
+                    href="/mypage/feedback"
+                    className="inline-flex items-center gap-1.5 text-xs text-[#E8740C] font-bold hover:underline"
+                  >
+                    ぺいほーむ運営にご相談 →
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

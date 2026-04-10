@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
 import type { DbLead } from '@/lib/supabase'
 import type { ContactPreferences } from '@/lib/contact-preferences'
+import type { ViewingMode } from '@/lib/event-viewing-mode'
 
 const FORM_META_DELIMITER = '\n---FORM_META---\n'
 
@@ -24,6 +25,8 @@ function formatLead(db: DbLead) {
     meta.contact_preferences && typeof meta.contact_preferences === 'object'
       ? (meta.contact_preferences as ContactPreferences)
       : null
+  const viewingMode =
+    typeof meta.viewing_mode === 'string' ? (meta.viewing_mode as ViewingMode) : null
   return {
     id: db.id,
     type: db.type,
@@ -50,8 +53,9 @@ function formatLead(db: DbLead) {
     eventDate: (meta.eventDate as string) ?? '',
     eventTitle: (meta.eventTitle as string) ?? '',
     participants: (meta.participants as string) ?? '',
-    // Anti-Pressure Pack: contact preferences from the user
+    // Smart Match: contact preferences and viewing mode from the user
     contactPreferences,
+    viewingMode,
   }
 }
 

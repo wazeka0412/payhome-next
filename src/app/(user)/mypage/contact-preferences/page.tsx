@@ -21,9 +21,11 @@ import {
 } from '@/lib/contact-preferences';
 
 /**
- * 連絡条件設定ページ
- * Anti-Pressure Pack 第一弾。
- * ユーザーが工務店からの連絡をどう受け取りたいかを明示的に設定する。
+ * 連絡の相性設定ページ（SMART MATCH）
+ *
+ * 会員様と工務店が最適なタイミング・手段でつながれるよう、
+ * 会員様がご希望の連絡条件を設定する。工務店側は事前にこれを受け取り、
+ * より質の高いご提案につなげる。
  */
 export default function ContactPreferencesPage() {
   const { status } = useSession();
@@ -113,17 +115,18 @@ export default function ContactPreferencesPage() {
     return (
       <>
         <PageHeader
-          title="連絡条件設定"
+          title="連絡の相性設定"
           breadcrumbs={[
             { label: 'ホーム', href: '/' },
             { label: 'マイページ', href: '/mypage' },
-            { label: '連絡条件設定' },
+            { label: '連絡の相性設定' },
           ]}
         />
         <div className="max-w-md mx-auto px-4 py-16 text-center">
           <h2 className="text-lg font-bold text-[#3D2200] mb-3">会員限定機能です</h2>
           <p className="text-sm text-gray-500 mb-6">
-            会員登録すると、工務店からの連絡条件を設定して、しつこい営業を防ぐことができます。
+            会員登録すると、工務店との連絡方法・ペースを事前に設定して、
+            お互いに心地よいコミュニケーションで家づくりを進められます。
           </p>
           <div className="flex flex-col gap-3">
             <Link
@@ -147,13 +150,13 @@ export default function ContactPreferencesPage() {
   return (
     <>
       <PageHeader
-        title="連絡条件設定"
+        title="連絡の相性設定"
         breadcrumbs={[
           { label: 'ホーム', href: '/' },
           { label: 'マイページ', href: '/mypage' },
-          { label: '連絡条件設定' },
+          { label: '連絡の相性設定' },
         ]}
-        subtitle="工務店からの連絡をあなたのペースでコントロール"
+        subtitle="お互いのペースで、ベストな家づくりを"
       />
 
       <section className="py-10 md:py-14">
@@ -161,15 +164,16 @@ export default function ContactPreferencesPage() {
           {/* 説明バナー */}
           <div className="bg-gradient-to-br from-[#FFF8F0] to-white border border-[#E8740C]/20 rounded-2xl p-6 mb-8">
             <p className="text-xs font-bold text-[#E8740C] tracking-widest mb-2">
-              ANTI-PRESSURE POLICY
+              SMART MATCH｜お客様と工務店の相性設計
             </p>
             <h2 className="text-base md:text-lg font-bold text-[#3D2200] mb-2">
-              ぺいほーむは「しつこい営業」を禁止しています
+              お互いのペースで、ベストな家づくりを
             </h2>
             <p className="text-xs text-gray-600 leading-relaxed">
-              ここで設定した条件は、見学会予約・問い合わせ時に工務店に自動で共有されます。
-              提携工務店は規約上、この条件を遵守する義務を負っており、違反があった場合は
-              プラットフォームからの退出を含む対応を取ります。
+              ここで設定した内容は、見学会予約・問い合わせ時に工務店様と共有されます。
+              工務店様は事前にあなたのご希望を把握することで、最適なタイミング・手段で
+              より質の高いご提案をご用意いただけます。お互いの時間を大切にする、
+              新しい家づくりコミュニケーションです。
             </p>
           </div>
 

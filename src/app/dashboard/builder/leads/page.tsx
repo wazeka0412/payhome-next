@@ -9,6 +9,7 @@ import {
   CONSIDERATION_PHASE_LABELS,
   type ContactPreferences,
 } from '@/lib/contact-preferences'
+import { VIEWING_MODE_INFO, type ViewingMode } from '@/lib/event-viewing-mode'
 
 const TABS = ['すべて', '新規', '対応中', '紹介済', '成約', '失注'] as const
 
@@ -26,6 +27,7 @@ type Lead = {
   type?: string
   summary?: string
   contactPreferences?: ContactPreferences | null
+  viewingMode?: ViewingMode | null
 }
 
 function scoreBadge(score: number) {
@@ -211,8 +213,8 @@ export default function LeadsPage() {
                     </div>
                   </div>
 
-                  {/* ─── Anti-Pressure: user's contact preferences ─── */}
-                  {lead.contactPreferences && (
+                  {/* ─── Smart Match: user's preferences and mode ─── */}
+                  {(lead.contactPreferences || lead.viewingMode) && (
                     <div className="border-2 border-[#E8740C] bg-[#FFF8F0] rounded-xl p-4">
                       <div className="flex items-start gap-3 mb-3">
                         <div className="w-8 h-8 bg-[#E8740C] rounded-full flex-shrink-0 flex items-center justify-center">
@@ -221,70 +223,100 @@ export default function LeadsPage() {
                               strokeLinecap="round"
                               strokeLinejoin="round"
                               strokeWidth={2}
-                              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                             />
                           </svg>
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-[10px] font-bold tracking-widest text-[#E8740C] mb-0.5">
-                            ANTI-PRESSURE POLICY｜遵守義務
+                            SMART MATCH｜お客様の希望
                           </p>
                           <p className="text-sm font-bold text-[#3D2200]">
-                            お客様が設定した連絡条件
+                            お客様との相性の良いコミュニケーション設計
                           </p>
                           <p className="text-[11px] text-gray-600 leading-relaxed mt-1">
-                            以下はぺいほーむの提携条件として遵守義務があります。違反があった場合はプラットフォームから退出いただきます。
+                            お客様が事前にお知らせくださった情報です。最適なタイミング・手段でご対応いただくことで、より質の高い商談をご提供いただけます。
                           </p>
                         </div>
                       </div>
 
-                      <div className="bg-white rounded-lg p-3">
-                        <dl className="space-y-2 text-xs">
-                          <div className="flex gap-3">
-                            <dt className="font-bold text-[#E8740C] w-24 flex-shrink-0">検討フェーズ</dt>
-                            <dd className="text-gray-800 font-medium">
-                              {CONSIDERATION_PHASE_LABELS[lead.contactPreferences.consideration_phase].label}
-                              <span className="text-gray-500 ml-2">
-                                ({CONSIDERATION_PHASE_LABELS[lead.contactPreferences.consideration_phase].description})
-                              </span>
-                            </dd>
-                          </div>
-                          <div className="flex gap-3">
-                            <dt className="font-bold text-[#E8740C] w-24 flex-shrink-0">連絡頻度</dt>
-                            <dd className="text-gray-800 font-medium">
-                              {CONTACT_FREQUENCY_LABELS[lead.contactPreferences.frequency]}
-                            </dd>
-                          </div>
-                          <div className="flex gap-3">
-                            <dt className="font-bold text-[#E8740C] w-24 flex-shrink-0">連絡手段</dt>
-                            <dd className="text-gray-800 font-medium">
-                              {lead.contactPreferences.channels
-                                .map((c) => CONTACT_CHANNEL_LABELS[c])
-                                .join(' / ')}
-                            </dd>
-                          </div>
-                          <div className="flex gap-3">
-                            <dt className="font-bold text-[#E8740C] w-24 flex-shrink-0">時間帯</dt>
-                            <dd className="text-gray-800 font-medium">
-                              {lead.contactPreferences.timeslots
-                                .map((t) => CONTACT_TIMESLOT_LABELS[t])
-                                .join(' / ')}
-                            </dd>
-                          </div>
-                          <div className="flex gap-3">
-                            <dt className="font-bold text-[#E8740C] w-24 flex-shrink-0">連絡目的</dt>
-                            <dd className="text-gray-800 font-medium">
-                              {CONTACT_PURPOSE_LABELS[lead.contactPreferences.purpose]}
-                            </dd>
-                          </div>
-                          {lead.contactPreferences.memo && (
-                            <div className="flex gap-3 pt-2 border-t border-gray-100">
-                              <dt className="font-bold text-[#E8740C] w-24 flex-shrink-0">お客様メモ</dt>
-                              <dd className="text-gray-800 italic">「{lead.contactPreferences.memo}」</dd>
+                      {/* 見学会モード */}
+                      {lead.viewingMode && (
+                        <div className="bg-white rounded-lg p-3 mb-3 border border-[#E8740C]/20">
+                          <div className="flex items-start gap-3">
+                            <div
+                              className="text-2xl flex-shrink-0"
+                              aria-hidden="true"
+                            >
+                              {VIEWING_MODE_INFO[lead.viewingMode].icon}
                             </div>
-                          )}
-                        </dl>
-                      </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[10px] font-bold text-gray-500 mb-0.5">見学会当日の目的</p>
+                              <p className="text-sm font-bold text-[#3D2200]">
+                                {VIEWING_MODE_INFO[lead.viewingMode].label}
+                              </p>
+                              <p className="text-[11px] text-gray-600 mt-1">
+                                {VIEWING_MODE_INFO[lead.viewingMode].description}
+                              </p>
+                              <p className="text-[11px] text-[#E8740C] mt-2 font-medium">
+                                おすすめ対応：{VIEWING_MODE_INFO[lead.viewingMode].builderNote}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 連絡の相性 */}
+                      {lead.contactPreferences && (
+                        <div className="bg-white rounded-lg p-3">
+                          <p className="text-[10px] font-bold text-gray-500 mb-2">連絡の相性設定</p>
+                          <dl className="space-y-2 text-xs">
+                            <div className="flex gap-3">
+                              <dt className="font-bold text-[#E8740C] w-24 flex-shrink-0">検討フェーズ</dt>
+                              <dd className="text-gray-800 font-medium">
+                                {CONSIDERATION_PHASE_LABELS[lead.contactPreferences.consideration_phase].label}
+                                <span className="text-gray-500 ml-2">
+                                  ({CONSIDERATION_PHASE_LABELS[lead.contactPreferences.consideration_phase].description})
+                                </span>
+                              </dd>
+                            </div>
+                            <div className="flex gap-3">
+                              <dt className="font-bold text-[#E8740C] w-24 flex-shrink-0">ご希望の頻度</dt>
+                              <dd className="text-gray-800 font-medium">
+                                {CONTACT_FREQUENCY_LABELS[lead.contactPreferences.frequency]}
+                              </dd>
+                            </div>
+                            <div className="flex gap-3">
+                              <dt className="font-bold text-[#E8740C] w-24 flex-shrink-0">ご希望の手段</dt>
+                              <dd className="text-gray-800 font-medium">
+                                {lead.contactPreferences.channels
+                                  .map((c) => CONTACT_CHANNEL_LABELS[c])
+                                  .join(' / ')}
+                              </dd>
+                            </div>
+                            <div className="flex gap-3">
+                              <dt className="font-bold text-[#E8740C] w-24 flex-shrink-0">ご都合の良い時間</dt>
+                              <dd className="text-gray-800 font-medium">
+                                {lead.contactPreferences.timeslots
+                                  .map((t) => CONTACT_TIMESLOT_LABELS[t])
+                                  .join(' / ')}
+                              </dd>
+                            </div>
+                            <div className="flex gap-3">
+                              <dt className="font-bold text-[#E8740C] w-24 flex-shrink-0">連絡目的</dt>
+                              <dd className="text-gray-800 font-medium">
+                                {CONTACT_PURPOSE_LABELS[lead.contactPreferences.purpose]}
+                              </dd>
+                            </div>
+                            {lead.contactPreferences.memo && (
+                              <div className="flex gap-3 pt-2 border-t border-gray-100">
+                                <dt className="font-bold text-[#E8740C] w-24 flex-shrink-0">お客様メモ</dt>
+                                <dd className="text-gray-800 italic">「{lead.contactPreferences.memo}」</dd>
+                              </div>
+                            )}
+                          </dl>
+                        </div>
+                      )}
                     </div>
                   )}
 

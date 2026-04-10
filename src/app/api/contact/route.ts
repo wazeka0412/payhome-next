@@ -21,10 +21,14 @@ export async function POST(req: NextRequest) {
     if (data.event) meta.eventTitle = data.event
     if (data.participants) meta.participants = String(data.participants)
 
-    // Anti-Pressure Pack: persist the user's contact preferences
-    // to the lead record so the builder sees and must respect them.
+    // Smart Match: persist the user's contact preferences
+    // to the lead record so the builder can prepare the right approach.
     if (data.contact_preferences && typeof data.contact_preferences === 'object') {
       meta.contact_preferences = data.contact_preferences
+    }
+    // Phase 1.5: persist the viewing mode (体感/相談/契約検討)
+    if (typeof data.viewing_mode === 'string') {
+      meta.viewing_mode = data.viewing_mode
     }
 
     // Store user message + metadata JSON in message field

@@ -1,11 +1,13 @@
 /**
- * 連絡条件設定（Anti-Pressure Pack 第一弾）
+ * 連絡の相性設定（SMART MATCH）
  *
- * ユーザーが「ぺいほーむ経由での連絡はどう受け取りたいか」を明示的に
- * 設定できる仕組み。工務店は見学会予約・問い合わせ時にこれを受け取り、
- * 契約上の遵守義務を負う。
+ * 会員様と工務店の双方が最適なタイミング・手段でつながれるよう、
+ * 会員様がご希望の連絡条件を事前にお伝えする仕組み。
  *
- * 関連: docs/01_事業戦略・計画/営業圧力ゼロ戦略.md
+ * 工務店様にとっては「お客様のご希望を事前に把握でき、より質の高い
+ * ご提案が可能になる」機能として位置づけられる。
+ *
+ * 関連: docs/01_事業戦略・計画/スマートマッチ戦略.md
  */
 
 // ─── 連絡頻度 ───
@@ -113,27 +115,38 @@ export const DEFAULT_CONTACT_PREFERENCES: ContactPreferences = {
 };
 
 /**
- * 工務店向けに整形した「ユーザー名刺」形式のサマリー
- * 見学会予約通知メールや工務店ダッシュボードで表示する
+ * 工務店向けに整形した「お客様カード」形式のサマリー
+ * 見学会予約通知メール・工務店ダッシュボード・商談前資料で表示する。
+ *
+ * 目的：お客様のご希望を事前に把握し、より質の高いご提案・
+ *      コミュニケーション設計につなげていただくこと。
  */
 export function formatPreferencesForBuilder(p: ContactPreferences): string {
   const lines: string[] = [];
-  lines.push('━━━ 会員様の連絡条件 ━━━');
+  lines.push('━━━ お客様の連絡ご希望（SMART MATCH） ━━━');
+  lines.push('');
   lines.push(
-    `検討フェーズ: ${CONSIDERATION_PHASE_LABELS[p.consideration_phase].label}`
-  );
-  lines.push(`連絡頻度: ${CONTACT_FREQUENCY_LABELS[p.frequency]}`);
-  lines.push(
-    `連絡手段: ${p.channels.map((c) => CONTACT_CHANNEL_LABELS[c]).join(' / ')}`
+    `● 検討フェーズ: ${CONSIDERATION_PHASE_LABELS[p.consideration_phase].label}`
   );
   lines.push(
-    `連絡時間帯: ${p.timeslots.map((t) => CONTACT_TIMESLOT_LABELS[t]).join(' / ')}`
+    `  → ${CONSIDERATION_PHASE_LABELS[p.consideration_phase].description}`
   );
-  lines.push(`連絡目的: ${CONTACT_PURPOSE_LABELS[p.purpose]}`);
-  if (p.memo) lines.push(`メモ: ${p.memo}`);
-  lines.push('━━━━━━━━━━━━━━━━━');
+  lines.push(`● ご希望の連絡頻度: ${CONTACT_FREQUENCY_LABELS[p.frequency]}`);
   lines.push(
-    '※ ぺいほーむ提携条件として、上記の連絡条件をお守りください。違反があった場合、プラットフォーム規約に基づき対応させていただきます。'
+    `● ご希望の連絡手段: ${p.channels.map((c) => CONTACT_CHANNEL_LABELS[c]).join(' / ')}`
+  );
+  lines.push(
+    `● ご都合の良い時間帯: ${p.timeslots.map((t) => CONTACT_TIMESLOT_LABELS[t]).join(' / ')}`
+  );
+  lines.push(`● ご希望の連絡目的: ${CONTACT_PURPOSE_LABELS[p.purpose]}`);
+  if (p.memo) lines.push(`● お客様メモ: ${p.memo}`);
+  lines.push('');
+  lines.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  lines.push(
+    'このお客様は、上記のペース・手段でのご連絡を希望されています。'
+  );
+  lines.push(
+    'ご希望に沿ったコミュニケーションで、より良い商談体験の提供にご協力をお願いいたします。'
   );
   return lines.join('\n');
 }
