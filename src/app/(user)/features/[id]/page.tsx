@@ -64,15 +64,15 @@ export default async function FeatureDetailPage({
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               href="/diagnosis"
-              className="inline-flex items-center gap-2 bg-white text-[#3D2200] font-bold px-5 py-2.5 rounded-full text-sm hover:bg-white/95 transition"
+              className="inline-flex items-center gap-2 bg-white text-[#3D2200] font-bold px-6 py-3 rounded-full text-sm hover:bg-white/95 transition"
             >
-              🤖 AI家づくり診断で自分に合う家を探す
+              AI家づくり診断で自分に合う家を探す
             </Link>
             <Link
               href="/event"
-              className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/30 text-white font-bold px-5 py-2.5 rounded-full text-sm hover:bg-white/25 transition"
+              className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/30 text-white font-bold px-6 py-3 rounded-full text-sm hover:bg-white/25 transition"
             >
-              📅 見学会を予約する
+              見学会を予約する
             </Link>
           </div>
         </div>

@@ -1,8 +1,9 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import PageHeader from '@/components/ui/PageHeader';
-import { builders } from '@/lib/builders-data';
+import { builders, getBuilderById, PRICE_BAND_LABELS } from '@/lib/builders-data';
 import { events, formatPeriod, EVENT_TYPE_STYLES } from '@/lib/events-data';
+import { videos } from '@/lib/videos-data';
 
 export function generateStaticParams() {
   return builders.map((b) => ({ id: b.id }));
@@ -14,7 +15,7 @@ export default async function BuilderDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const builder = builders.find((b) => b.id === id);
+  const builder = getBuilderById(id);
 
   if (!builder) {
     notFound();
@@ -22,6 +23,16 @@ export default async function BuilderDetailPage({
 
   // この工務店が開催する見学会・イベント
   const builderEvents = events.filter((e) => e.builder === builder.name);
+
+  // featured 動画（builders-data の featuredVideoIds から解決）
+  const featuredVideos = builder.featuredVideoIds
+    .map((vid) => videos.find((v) => v.id === vid))
+    .filter((v): v is NonNullable<typeof v> => Boolean(v));
+
+  // 関連工務店（同じエリアで他3社）
+  const relatedBuilders = builders
+    .filter((b) => b.id !== builder.id && b.area === builder.area)
+    .slice(0, 3);
 
   return (
     <>
@@ -32,83 +43,158 @@ export default async function BuilderDetailPage({
           { label: '工務店一覧', href: '/builders' },
           { label: builder.name },
         ]}
-        subtitle={`${builder.region}の${builder.specialties.join('・')}が得意な工務店`}
+        subtitle={builder.catchphrase}
       />
 
+      {/* ── Hero Gradient ── */}
+      <div className="bg-gradient-to-br from-[#FFF8F0] via-[#FFF3E6] to-[#FFECD4]">
+        <div className="max-w-5xl mx-auto px-4 py-10 md:py-14">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+            {/* Logo placeholder */}
+            <div className="w-24 h-24 md:w-28 md:h-28 bg-white rounded-2xl shadow-sm flex items-center justify-center flex-shrink-0">
+              <span className="text-[10px] text-gray-400 tracking-wider">LOGO</span>
+            </div>
+
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-2 flex-wrap">
+                <span className="text-[10px] font-bold text-white bg-[#E8740C] px-3 py-1 rounded-full tracking-wider">
+                  {PRICE_BAND_LABELS[builder.priceBand].description.toUpperCase()}
+                </span>
+                <span className="text-xs text-gray-500">
+                  創業 {builder.established}年 / {builder.area} {builder.region}
+                </span>
+              </div>
+              <h1 className="text-2xl md:text-4xl font-extrabold text-[#3D2200] mb-3 leading-tight">
+                {builder.name}
+              </h1>
+              <p className="text-sm md:text-base text-gray-700 leading-relaxed max-w-3xl">
+                {builder.description}
+              </p>
+            </div>
+          </div>
+
+          {/* KPI strip */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 bg-white/70 backdrop-blur-sm rounded-2xl p-5">
+            <Kpi label="年間施工棟数" value={`${builder.annualBuilds}棟`} />
+            <Kpi label="坪単価" value={`${builder.pricePerTsubo.min}〜${builder.pricePerTsubo.max}万円`} />
+            <Kpi label="耐震等級" value={builder.earthquakeGrade} />
+            <Kpi label="断熱性能" value={builder.insulationGrade.split('（')[0]} />
+          </div>
+        </div>
+      </div>
+
       <section className="py-12 md:py-16">
-        <div className="max-w-5xl mx-auto px-4">
-          {/* ── 会社概要カード ── */}
-          <div className="bg-white border border-gray-100 rounded-2xl p-6 md:p-8 mb-8 shadow-sm">
-            <div className="flex items-start gap-5 mb-6">
-              <div className="w-20 h-20 md:w-24 md:h-24 bg-[#FFF8F0] rounded-2xl flex items-center justify-center flex-shrink-0">
-                <span className="text-xs text-gray-400">Logo</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h1 className="text-2xl md:text-3xl font-extrabold text-[#3D2200] mb-2">
-                  {builder.name}
-                </h1>
-                <p className="text-sm text-gray-500 mb-3">
-                  {builder.area} / {builder.region}
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {builder.specialties.map((s) => (
-                    <span
-                      key={s}
-                      className="text-xs bg-[#E8740C]/10 text-[#E8740C] px-2.5 py-1 rounded-full font-semibold"
-                    >
-                      {s}
-                    </span>
-                  ))}
+        <div className="max-w-5xl mx-auto px-4 space-y-14">
+          {/* ── 強み3点 ── */}
+          <div>
+            <SectionTitle>この工務店の強み</SectionTitle>
+            <div className="grid md:grid-cols-3 gap-4">
+              {builder.strengths.map((s, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white border border-gray-100 rounded-2xl p-6 hover:shadow-md transition"
+                >
+                  <div className="w-10 h-10 bg-[#E8740C] text-white rounded-full flex items-center justify-center font-extrabold text-base mb-4">
+                    {idx + 1}
+                  </div>
+                  <h3 className="text-base font-bold text-[#3D2200] mb-2 leading-tight">
+                    {s.title}
+                  </h3>
+                  <p className="text-xs text-gray-600 leading-relaxed">{s.description}</p>
                 </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── 基本情報（表） ── */}
+          <div>
+            <SectionTitle>会社情報</SectionTitle>
+            <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
+              <table className="w-full text-sm">
+                <tbody>
+                  <InfoRow label="会社名" value={builder.name} />
+                  <InfoRow label="本社所在地" value={`${builder.area} ${builder.region}`} />
+                  <InfoRow label="創業" value={`${builder.established}年`} />
+                  <InfoRow label="年間施工棟数" value={`約${builder.annualBuilds}棟`} />
+                  <InfoRow
+                    label="対応エリア"
+                    value={builder.serviceCities.join(' / ')}
+                  />
+                  <InfoRow
+                    label="坪単価目安"
+                    value={`${builder.pricePerTsubo.min}〜${builder.pricePerTsubo.max}万円`}
+                  />
+                  <InfoRow
+                    label="価格帯"
+                    value={`${PRICE_BAND_LABELS[builder.priceBand].label}（${PRICE_BAND_LABELS[builder.priceBand].description}）`}
+                  />
+                  <InfoRow label="構造・工法" value={builder.construction} />
+                  <InfoRow label="断熱性能" value={builder.insulationGrade} />
+                  <InfoRow label="耐震等級" value={builder.earthquakeGrade} />
+                  <InfoRow label="保証・アフター" value={builder.warranty} />
+                  <InfoRow
+                    label="向いている方"
+                    value={builder.suitableFor.join(' / ')}
+                  />
+                  <InfoRow label="電話番号" value={builder.phone} />
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* ── 特徴タグ ── */}
+          <div>
+            <SectionTitle>得意分野</SectionTitle>
+            <div className="flex flex-wrap gap-2">
+              {builder.specialties.map((s) => (
+                <span
+                  key={s}
+                  className="bg-[#FFF8F0] text-[#E8740C] border border-[#E8740C]/30 px-4 py-2 rounded-full text-sm font-bold"
+                >
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* ── 代表的な動画 ── */}
+          {featuredVideos.length > 0 && (
+            <div>
+              <SectionTitle>代表的なルームツアー動画</SectionTitle>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {featuredVideos.slice(0, 6).map((v) => (
+                  <Link
+                    key={v.id}
+                    href={`/videos/${v.id}`}
+                    className="block bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-md transition"
+                  >
+                    <div className="relative aspect-video bg-gray-200">
+                      <img
+                        src={`https://img.youtube.com/vi/${v.youtubeId}/mqdefault.jpg`}
+                        alt={v.title}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                      <div className="absolute top-2 left-2 bg-black/70 text-white text-xs font-bold px-2 py-0.5 rounded">
+                        ▶ {v.views}
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-xs font-bold text-[#3D2200] line-clamp-2 mb-2 min-h-[2rem]">
+                        {v.title}
+                      </h3>
+                      <p className="text-[10px] text-gray-500">{v.tsubo > 0 ? `${v.tsubo}坪` : '—'}</p>
+                    </div>
+                  </Link>
+                ))}
               </div>
             </div>
+          )}
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 border-t border-gray-100">
-              <Stat label="年間施工棟数" value={`約${builder.annualBuilds}棟`} />
-              <Stat label="対応エリア" value={builder.area} />
-              <Stat label="拠点" value={builder.region} />
-              <Stat label="得意分野" value={builder.specialties[0] || '—'} />
-            </div>
-          </div>
-
-          {/* ── 見学会予約 CTAセクション（メインCV） ── */}
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#E8740C] via-[#F5A623] to-[#E8740C] text-white p-8 md:p-10 shadow-xl mb-10">
-            <div className="absolute top-3 right-3 bg-white/20 backdrop-blur-sm text-xs font-bold px-3 py-1 rounded-full">
-              🏠 実物を見学できます
-            </div>
-            <h2 className="text-2xl md:text-3xl font-bold mb-3">
-              {builder.name}の家を見学する
-            </h2>
-            <p className="text-sm md:text-base text-white/95 mb-6 leading-relaxed">
-              動画では伝わらない広さ・光の入り方・素材の質感を、実際に体感できます。
-              {builderEvents.length > 0
-                ? `現在 ${builderEvents.length} 件の見学会を受付中です。`
-                : '随時、見学会を開催しています。お気軽にご予約ください。'}
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link
-                href={`/event?builder=${encodeURIComponent(builder.name)}`}
-                className="inline-flex items-center justify-center gap-2 bg-white text-[#E8740C] font-bold px-8 py-3.5 rounded-full text-sm hover:bg-white/95 transition shadow-lg"
-              >
-                📅 見学会の日程を見る
-              </Link>
-              <Link
-                href="/diagnosis"
-                className="inline-flex items-center justify-center gap-2 bg-white/15 backdrop-blur-sm border border-white/30 text-white font-bold px-8 py-3.5 rounded-full text-sm hover:bg-white/25 transition"
-              >
-                🤖 AI家づくり診断で相性チェック
-              </Link>
-            </div>
-          </div>
-
-          {/* ── 開催中の見学会一覧 ── */}
+          {/* ── 開催予定の見学会 ── */}
           {builderEvents.length > 0 && (
-            <section className="mb-10">
-              <h2 className="text-xl md:text-2xl font-bold text-[#3D2200] mb-4 flex items-center gap-2">
-                <span className="w-1 h-6 bg-[#E8740C] rounded-full" />
-                開催予定の見学会
-              </h2>
+            <div>
+              <SectionTitle>開催予定の見学会</SectionTitle>
               <div className="grid md:grid-cols-2 gap-4">
                 {builderEvents.map((event) => {
                   const style = EVENT_TYPE_STYLES[event.type];
@@ -119,7 +205,7 @@ export default async function BuilderDetailPage({
                       className="block bg-white border border-gray-100 rounded-xl p-5 hover:shadow-md hover:border-[#E8740C]/30 transition"
                     >
                       <span
-                        className={`inline-block text-[0.65rem] font-bold px-2.5 py-0.5 rounded-full mb-2 ${style.bg} ${style.text}`}
+                        className={`inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full mb-2 ${style.bg} ${style.text}`}
                       >
                         {event.typeLabel}
                       </span>
@@ -127,51 +213,109 @@ export default async function BuilderDetailPage({
                         {event.title}
                       </h3>
                       <div className="text-xs text-gray-500 space-y-1">
-                        <p>📍 {event.location}</p>
-                        <p>📅 {formatPeriod(event.startDate, event.endDate)}</p>
-                        <p>👥 定員 {event.capacity}組</p>
+                        <p>{event.location}</p>
+                        <p>{formatPeriod(event.startDate, event.endDate)}</p>
+                        <p>定員 {event.capacity}組</p>
                       </div>
                     </Link>
                   );
                 })}
               </div>
-            </section>
+            </div>
           )}
 
-          {/* ── 会員登録 CTA（非ログインユーザ向け） ── */}
-          <div className="bg-[#FFF8F0] border border-[#E8740C]/20 rounded-2xl p-6 md:p-8">
-            <h3 className="text-lg md:text-xl font-bold text-[#3D2200] mb-3">
-              工務店選びでお悩みですか？
-            </h3>
-            <p className="text-sm text-gray-600 mb-5 leading-relaxed">
-              会員登録（無料）すると、AI家づくり診断の結果保存・間取り図のフル閲覧・お気に入り登録・工務店比較機能がご利用いただけます。
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link
-                href="/signup?redirect=/diagnosis"
-                className="inline-flex items-center justify-center bg-[#E8740C] hover:bg-[#D4660A] text-white font-bold px-6 py-3 rounded-full text-sm transition"
-              >
-                無料会員登録してAI診断を受ける →
-              </Link>
-              <Link
-                href="/builders"
-                className="inline-flex items-center justify-center border border-gray-300 text-gray-700 hover:border-[#E8740C] hover:text-[#E8740C] font-bold px-6 py-3 rounded-full text-sm transition"
-              >
-                他の工務店を見る
-              </Link>
+          {/* ── 見学会予約 大型CTA ── */}
+          <div className="relative overflow-hidden rounded-2xl bg-[#E8740C] text-white p-8 md:p-12 shadow-xl">
+            <div className="max-w-2xl">
+              <p className="text-xs font-bold tracking-wider mb-2 opacity-90">
+                NEXT STEP
+              </p>
+              <h2 className="text-2xl md:text-3xl font-bold mb-3 leading-tight">
+                {builder.name}の家を実際に見に行きませんか？
+              </h2>
+              <p className="text-sm md:text-base text-white/95 mb-6 leading-relaxed">
+                動画では伝わらない広さ・光の入り方・素材の質感を体感できます。
+                {builderEvents.length > 0
+                  ? `現在 ${builderEvents.length} 件の見学会を受付中です。`
+                  : '随時、見学会を開催しています。'}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link
+                  href={`/event?builder=${encodeURIComponent(builder.name)}`}
+                  className="inline-flex items-center justify-center bg-white text-[#E8740C] font-bold px-8 py-3.5 rounded-full text-sm hover:bg-gray-50 transition shadow-lg"
+                >
+                  見学会の日程を見る
+                </Link>
+                <Link
+                  href="/diagnosis"
+                  className="inline-flex items-center justify-center bg-white/15 backdrop-blur-sm border border-white/40 text-white font-bold px-8 py-3.5 rounded-full text-sm hover:bg-white/25 transition"
+                >
+                  AI診断で相性をチェック
+                </Link>
+              </div>
             </div>
           </div>
+
+          {/* ── 関連工務店 ── */}
+          {relatedBuilders.length > 0 && (
+            <div>
+              <SectionTitle>同じエリアの他の工務店</SectionTitle>
+              <div className="grid md:grid-cols-3 gap-4">
+                {relatedBuilders.map((b) => (
+                  <Link
+                    key={b.id}
+                    href={`/builders/${b.id}`}
+                    className="block bg-white border border-gray-100 rounded-xl p-5 hover:shadow-md hover:border-[#E8740C]/30 transition"
+                  >
+                    <h3 className="font-bold text-[#3D2200] mb-1">{b.name}</h3>
+                    <p className="text-xs text-gray-500 mb-3">{b.region}</p>
+                    <p className="text-xs text-gray-600 line-clamp-2 mb-3">{b.catchphrase}</p>
+                    <div className="flex flex-wrap gap-1">
+                      {b.specialties.slice(0, 3).map((s) => (
+                        <span
+                          key={s}
+                          className="text-[10px] bg-[#FFF8F0] text-[#E8740C] px-2 py-0.5 rounded font-semibold"
+                        >
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
     </>
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <div>
-      <div className="text-xs text-gray-500 mb-1">{label}</div>
-      <div className="text-sm md:text-base font-bold text-[#3D2200]">{value}</div>
+    <h2 className="text-xl md:text-2xl font-bold text-[#3D2200] mb-5 flex items-center gap-3">
+      <span className="w-1 h-6 bg-[#E8740C] rounded-full" />
+      {children}
+    </h2>
+  );
+}
+
+function Kpi({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="text-center md:text-left">
+      <div className="text-[10px] text-gray-500 mb-1 tracking-wide">{label}</div>
+      <div className="text-base md:text-lg font-extrabold text-[#3D2200]">{value}</div>
     </div>
+  );
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <tr className="border-b border-gray-100 last:border-b-0">
+      <th className="text-left font-bold text-[#3D2200] bg-[#FFF8F0] px-5 py-3 w-32 md:w-40 align-top text-xs md:text-sm">
+        {label}
+      </th>
+      <td className="px-5 py-3 text-gray-700 text-xs md:text-sm">{value}</td>
+    </tr>
   );
 }

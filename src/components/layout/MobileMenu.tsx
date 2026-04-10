@@ -44,12 +44,11 @@ export default function MobileMenu({ isOpen, onClose, navContent }: MobileMenuPr
         {/* v4.0: 会員/ゲスト切り替え + AI診断primaryCTA */}
         <Link
           href="/diagnosis"
-          className="flex items-center justify-between w-full mb-4 px-5 py-3.5 rounded-xl font-bold text-sm text-white shadow-md transition-all"
-          style={{ background: 'linear-gradient(135deg, #E8740C 0%, #F5A623 100%)' }}
+          className="flex items-center justify-between w-full mb-4 px-5 py-3.5 rounded-xl font-bold text-sm text-white bg-[#E8740C] hover:bg-[#D4660A] shadow-[0_2px_8px_rgba(232,116,12,0.25)] transition-colors"
           onClick={onClose}
         >
-          <span>🤖 AI家づくり診断をはじめる</span>
-          <span>→</span>
+          <span>AI家づくり診断をはじめる</span>
+          <span className="text-lg">→</span>
         </Link>
 
         {session?.user ? (
@@ -156,11 +155,10 @@ export default function MobileMenu({ isOpen, onClose, navContent }: MobileMenuPr
       <div className="px-5 pb-6">
         <Link
           href="/diagnosis"
-          className="block text-center text-white font-bold py-3.5 rounded-full shadow-md transition-colors"
-          style={{ background: 'linear-gradient(135deg, #E8740C 0%, #F5A623 100%)' }}
+          className="block text-center text-white font-bold py-3.5 rounded-full shadow-[0_4px_12px_rgba(232,116,12,0.3)] bg-[#E8740C] hover:bg-[#D4660A] transition-colors"
           onClick={onClose}
         >
-          🤖 AI家づくり診断をはじめる
+          AI家づくり診断をはじめる
         </Link>
       </div>
     </div>
