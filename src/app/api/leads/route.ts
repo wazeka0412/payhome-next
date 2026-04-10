@@ -1,10 +1,11 @@
 import { NextRequest } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
 import type { DbLead } from '@/lib/supabase'
+import type { ContactPreferences } from '@/lib/contact-preferences'
 
 const FORM_META_DELIMITER = '\n---FORM_META---\n'
 
-function parseMessageAndMeta(raw: string | undefined): { message: string; meta: Record<string, string> } {
+function parseMessageAndMeta(raw: string | undefined): { message: string; meta: Record<string, unknown> } {
   if (!raw) return { message: '', meta: {} }
   const idx = raw.indexOf(FORM_META_DELIMITER)
   if (idx === -1) return { message: raw, meta: {} }
@@ -19,6 +20,10 @@ function parseMessageAndMeta(raw: string | undefined): { message: string; meta: 
 
 function formatLead(db: DbLead) {
   const { message, meta } = parseMessageAndMeta(db.message)
+  const contactPreferences =
+    meta.contact_preferences && typeof meta.contact_preferences === 'object'
+      ? (meta.contact_preferences as ContactPreferences)
+      : null
   return {
     id: db.id,
     type: db.type,
@@ -39,12 +44,14 @@ function formatLead(db: DbLead) {
     memo: db.memo ?? '',
     createdAt: db.created_at,
     // Form-specific metadata
-    buildArea: meta.buildArea ?? '',
-    postal: meta.postal ?? '',
-    address: meta.address ?? '',
-    eventDate: meta.eventDate ?? '',
-    eventTitle: meta.eventTitle ?? '',
-    participants: meta.participants ?? '',
+    buildArea: (meta.buildArea as string) ?? '',
+    postal: (meta.postal as string) ?? '',
+    address: (meta.address as string) ?? '',
+    eventDate: (meta.eventDate as string) ?? '',
+    eventTitle: (meta.eventTitle as string) ?? '',
+    participants: (meta.participants as string) ?? '',
+    // Anti-Pressure Pack: contact preferences from the user
+    contactPreferences,
   }
 }
 

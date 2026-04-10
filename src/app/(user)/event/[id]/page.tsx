@@ -11,6 +11,15 @@ import {
   EVENT_TYPE_STYLES,
 } from '@/lib/events-data';
 import { useEvents } from '@/lib/content-store';
+import { getOrCreateAnonymousId } from '@/lib/anonymous-id';
+import {
+  CONTACT_FREQUENCY_LABELS,
+  CONTACT_CHANNEL_LABELS,
+  CONTACT_TIMESLOT_LABELS,
+  CONTACT_PURPOSE_LABELS,
+  CONSIDERATION_PHASE_LABELS,
+  type ContactPreferences,
+} from '@/lib/contact-preferences';
 
 /* ─── Calendar helpers ─── */
 function getDaysInMonth(year: number, month: number) {
@@ -52,6 +61,19 @@ export default function EventDetailPage() {
   const [submitting, setSubmitting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const reservationRef = useRef<HTMLDivElement>(null);
+
+  /* Anti-Pressure: fetch user's contact preferences */
+  const [contactPrefs, setContactPrefs] = useState<ContactPreferences | null>(null);
+  useEffect(() => {
+    if (!mounted) return;
+    const anonymousId = getOrCreateAnonymousId();
+    fetch(`/api/me/contact-preferences?anonymous_id=${anonymousId}`)
+      .then((r) => r.json())
+      .then((res) => {
+        if (res?.preferences) setContactPrefs(res.preferences);
+      })
+      .catch(() => {});
+  }, [mounted]);
 
   const isDateSelectable = useCallback(
     (dateStr: string) => {
@@ -97,6 +119,7 @@ export default function EventDetailPage() {
     setSubmitting(true);
 
     const fd = new FormData(e.currentTarget);
+    const anonymousId = getOrCreateAnonymousId();
     try {
       await fetch('/api/contact', {
         method: 'POST',
@@ -111,6 +134,9 @@ export default function EventDetailPage() {
           event: event.title,
           eventDate: selectedDate,
           builderName: event.builder,
+          anonymous_id: anonymousId,
+          // Anti-Pressure Pack: auto-attach user's contact preferences
+          contact_preferences: contactPrefs || undefined,
         }),
       });
     } catch {
@@ -322,6 +348,82 @@ export default function EventDetailPage() {
             <p className="text-sm text-gray-500 mb-6">
               ご希望の日程を選択し、必要事項をご入力ください。
             </p>
+
+            {/* ─── Anti-Pressure Banner ─── */}
+            <div className="bg-[#FFF8F0] border border-[#E8740C]/30 rounded-xl p-4 mb-6">
+              <div className="flex items-start gap-3">
+                <svg
+                  className="w-5 h-5 text-[#E8740C] mt-0.5 flex-shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                  />
+                </svg>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold text-[#3D2200] mb-1">
+                    ぺいほーむは「しつこい営業」を禁止しています
+                  </p>
+                  {contactPrefs ? (
+                    <>
+                      <p className="text-[11px] text-gray-600 leading-relaxed mb-2">
+                        ご設定いただいた以下の連絡条件を工務店に自動送信します。工務店は規約上これを遵守する義務があります。
+                      </p>
+                      <div className="bg-white rounded-lg p-3 border border-[#E8740C]/20">
+                        <ul className="text-[11px] text-gray-700 space-y-1">
+                          <li>
+                            <span className="text-[#E8740C] font-bold">フェーズ:</span>{' '}
+                            {CONSIDERATION_PHASE_LABELS[contactPrefs.consideration_phase].label}
+                          </li>
+                          <li>
+                            <span className="text-[#E8740C] font-bold">連絡頻度:</span>{' '}
+                            {CONTACT_FREQUENCY_LABELS[contactPrefs.frequency]}
+                          </li>
+                          <li>
+                            <span className="text-[#E8740C] font-bold">連絡手段:</span>{' '}
+                            {contactPrefs.channels.map((c) => CONTACT_CHANNEL_LABELS[c]).join(' / ')}
+                          </li>
+                          <li>
+                            <span className="text-[#E8740C] font-bold">連絡時間帯:</span>{' '}
+                            {contactPrefs.timeslots
+                              .map((t) => CONTACT_TIMESLOT_LABELS[t])
+                              .join(' / ')}
+                          </li>
+                          <li>
+                            <span className="text-[#E8740C] font-bold">連絡目的:</span>{' '}
+                            {CONTACT_PURPOSE_LABELS[contactPrefs.purpose]}
+                          </li>
+                        </ul>
+                      </div>
+                      <Link
+                        href="/mypage/contact-preferences"
+                        className="inline-block text-[11px] text-[#E8740C] font-bold hover:underline mt-2"
+                      >
+                        連絡条件を変更する →
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-[11px] text-gray-600 leading-relaxed mb-2">
+                        会員登録で「連絡条件設定」を使うと、工務店からの連絡頻度・時間帯・手段を
+                        あらかじめ指定できます。工務店は規約上これを遵守する義務を負います。
+                      </p>
+                      <Link
+                        href="/signup?redirect=/mypage/contact-preferences"
+                        className="inline-block text-[11px] text-[#E8740C] font-bold hover:underline"
+                      >
+                        連絡条件を設定する（無料会員登録）→
+                      </Link>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
 
             {/* Calendar date picker */}
             <div className="mb-6">

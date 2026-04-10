@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { store } from '@/lib/store'
 import { createServerClient } from '@/lib/supabase'
+import { localInsert } from '@/lib/local-store'
 
 const FORM_META_DELIMITER = '\n---FORM_META---\n'
 
@@ -12,13 +13,19 @@ export async function POST(req: NextRequest) {
     const selectedCompanies = data.selectedCompanies || data.selected || undefined
 
     // Collect form-specific metadata that doesn't have dedicated DB columns
-    const meta: Record<string, string> = {}
+    const meta: Record<string, unknown> = {}
     if (data.build_area) meta.buildArea = data.build_area
     if (data.postal) meta.postal = data.postal
     if (data.address) meta.address = data.address
     if (data.eventDate) meta.eventDate = data.eventDate
     if (data.event) meta.eventTitle = data.event
     if (data.participants) meta.participants = String(data.participants)
+
+    // Anti-Pressure Pack: persist the user's contact preferences
+    // to the lead record so the builder sees and must respect them.
+    if (data.contact_preferences && typeof data.contact_preferences === 'object') {
+      meta.contact_preferences = data.contact_preferences
+    }
 
     // Store user message + metadata JSON in message field
     const userMessage = data.message || ''
@@ -48,7 +55,7 @@ export async function POST(req: NextRequest) {
     // --- 流入チャネルの判定 ---
     const sourceChannel = data.source_channel || data.utm_source || inferChannel(req.headers.get('referer'))
 
-    const lead = await store.addLead({
+    const leadPayload = {
       type: data.type || '無料相談',
       name: data.name || data.company || '',
       email: data.email || '',
@@ -66,9 +73,38 @@ export async function POST(req: NextRequest) {
       sourceContentId: data.source_content_id,
       recentViews,
       anonymousId,
-    })
-    console.log('=== NEW LEAD ===', lead.id)
-    return NextResponse.json({ success: true, leadId: lead.id })
+    }
+
+    try {
+      const lead = await store.addLead(leadPayload)
+      console.log('=== NEW LEAD ===', lead.id)
+      return NextResponse.json({ success: true, leadId: lead.id, mode: 'supabase' })
+    } catch (err) {
+      console.warn('[contact] Supabase unreachable, using local fallback:', (err as Error).message)
+      const localLead = await localInsert('leads', {
+        type: leadPayload.type,
+        name: leadPayload.name,
+        email: leadPayload.email,
+        phone: leadPayload.phone,
+        company: leadPayload.company,
+        area: leadPayload.area,
+        budget: leadPayload.budget,
+        layout: leadPayload.layout,
+        message: leadPayload.message,
+        video: leadPayload.video,
+        builder_name: leadPayload.builderName,
+        selected_services: leadPayload.selectedServices,
+        selected_companies: leadPayload.selectedCompanies,
+        source_channel: leadPayload.sourceChannel,
+        source_content_id: leadPayload.sourceContentId,
+        recent_views: leadPayload.recentViews,
+        anonymous_id: leadPayload.anonymousId,
+        status: '新規',
+        score: 50,
+      })
+      console.log('=== NEW LOCAL LEAD ===', localLead.id)
+      return NextResponse.json({ success: true, leadId: localLead.id, mode: 'local' })
+    }
   } catch (error) {
     console.error('Contact API error:', error)
     return NextResponse.json({ error: 'Failed' }, { status: 500 })
