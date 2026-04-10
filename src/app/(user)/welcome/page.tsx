@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import PageHeader from '@/components/ui/PageHeader';
+import { getOrCreateAnonymousId } from '@/lib/anonymous-id';
 
 /**
  * 会員登録完了後のウェルカム画面
@@ -36,12 +37,27 @@ export default function WelcomePage() {
   const [diagnosis, setDiagnosis] = useState<DiagnosisCache | null>(null);
 
   useEffect(() => {
+    // ① まず localStorage から即座に表示
     try {
       const raw = localStorage.getItem('payhome_diagnosis_result');
       if (raw) setDiagnosis(JSON.parse(raw) as DiagnosisCache);
     } catch {
       /* ignore */
     }
+    // ② 同時に API からサーバ側保存の最新を取得（会員ログイン後の信頼できるデータ）
+    const anonymousId = getOrCreateAnonymousId();
+    fetch(`/api/ai/diagnosis/me?anonymous_id=${anonymousId}`)
+      .then((r) => r.json())
+      .then((res) => {
+        if (res?.found && res.session) {
+          setDiagnosis({
+            user_type: res.session.user_type,
+            recommended_builders: res.session.recommended_builders || [],
+            cached_at: Date.now(),
+          });
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // 未ログインなら /signup へ誘導

@@ -1,23 +1,66 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import PageHeader from '@/components/ui/PageHeader';
+import { getOrCreateAnonymousId } from '@/lib/anonymous-id';
+import { getCompareCount } from '@/lib/comparison-store';
 
 /**
  * マイページ（v4.0 MVP）
- * REQUIREMENTS.md 5.0 および 6.2 に準拠。
+ * REQUIREMENTS.md 5.0 / 6.2 準拠。
  *
- * 表示項目:
+ * 表示項目（実データ接続済み）：
  *  - プロフィール概要
- *  - お気に入り（Phase 1）
- *  - 閲覧履歴（Phase 1）
- *  - 診断結果（Phase 1、F-25 と接続）
- *  - 比較リスト（Phase 2 プレースホルダ）
- *  - 相談履歴（Phase 2 プレースホルダ）
+ *  - お気に入り件数（API live）
+ *  - AI診断結果（API live + user_type 表示）
+ *  - 比較リスト件数（localStorage live）
  */
+
+interface FavoriteRow {
+  id: string;
+  content_type: string;
+  content_id: string;
+}
+interface DiagnosisSession {
+  id: string;
+  user_type: string;
+  recommended_builders: Array<{ name?: string; builder_id?: string }>;
+}
+
 export default function MyPage() {
   const { data: session, status } = useSession();
+  const [favorites, setFavorites] = useState<FavoriteRow[]>([]);
+  const [diagnosis, setDiagnosis] = useState<DiagnosisSession | null>(null);
+  const [compareCount, setCompareCount] = useState(0);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    if (status !== 'authenticated') {
+      setDataLoading(false);
+      return;
+    }
+    const anonymousId = getOrCreateAnonymousId();
+    Promise.allSettled([
+      fetch(`/api/favorites?anonymous_id=${anonymousId}`).then((r) => r.json()),
+      fetch(`/api/ai/diagnosis/me?anonymous_id=${anonymousId}`).then((r) => r.json()),
+    ])
+      .then(([favRes, diagRes]) => {
+        if (favRes.status === 'fulfilled' && Array.isArray(favRes.value)) {
+          setFavorites(favRes.value.filter((f: FavoriteRow) => f.content_id));
+        }
+        if (diagRes.status === 'fulfilled' && diagRes.value?.found && diagRes.value.session) {
+          setDiagnosis(diagRes.value.session);
+        }
+      })
+      .finally(() => setDataLoading(false));
+
+    setCompareCount(getCompareCount());
+    const handler = () => setCompareCount(getCompareCount());
+    window.addEventListener('payhome:compare-changed', handler);
+    return () => window.removeEventListener('payhome:compare-changed', handler);
+  }, [status]);
 
   if (status === 'loading') {
     return (
@@ -56,6 +99,13 @@ export default function MyPage() {
 
   const user = session.user as { name?: string | null; email?: string | null };
 
+  // 集計
+  const favCount = favorites.length;
+  const propertyFavCount = favorites.filter((f) => f.content_type === 'property').length;
+  const builderFavCount = favorites.filter((f) => f.content_type === 'builder').length;
+  const saleHomeFavCount = favorites.filter((f) => f.content_type === 'sale_home').length;
+  const landFavCount = favorites.filter((f) => f.content_type === 'land').length;
+
   return (
     <>
       <PageHeader
@@ -84,7 +134,7 @@ export default function MyPage() {
                   href="/diagnosis"
                   className="inline-block bg-[#E8740C] text-white text-xs font-bold px-4 py-2 rounded-full hover:bg-[#D4660A] transition"
                 >
-                  🤖 AI家づくり診断を受ける
+                  AI家づくり診断を受ける
                 </Link>
               </div>
             </div>
@@ -93,40 +143,46 @@ export default function MyPage() {
           {/* 機能カード */}
           <div className="grid md:grid-cols-2 gap-4 mb-6">
             <MyPageCard
-              icon="❤️"
               title="お気に入り"
-              description="気になる物件・工務店を保存しましょう"
-              href="/builders"
-              linkLabel="工務店を探す"
-              stat="0 件"
+              description={
+                favCount > 0
+                  ? `物件${propertyFavCount} / 工務店${builderFavCount} / 建売${saleHomeFavCount} / 土地${landFavCount}`
+                  : '気になる物件・工務店を無制限に保存できます'
+              }
+              href="/mypage/favorites"
+              linkLabel={favCount > 0 ? '一覧を見る' : '工務店を探す'}
+              stat={dataLoading ? '...' : `${favCount} 件`}
+              statHighlight={favCount > 0}
             />
             <MyPageCard
-              icon="🕐"
               title="閲覧履歴"
               description="最近見た物件・記事の履歴"
               href="/videos"
               linkLabel="動画を見る"
-              stat="0 件"
-            />
-            <MyPageCard
-              icon="🤖"
-              title="AI診断結果"
-              description="家づくりタイプと推薦工務店"
-              href="/diagnosis"
-              linkLabel="診断を受ける"
-              stat="未実施"
-            />
-            <MyPageCard
-              icon="⚖️"
-              title="比較リスト"
-              description="2〜3社を並べて比較"
-              href="/builders"
-              linkLabel="工務店一覧へ"
-              stat="Phase 2"
+              stat={`Phase 2`}
               disabled
             />
             <MyPageCard
-              icon="💬"
+              title="AI診断結果"
+              description={
+                diagnosis
+                  ? `タイプ: ${diagnosis.user_type} / 推薦${diagnosis.recommended_builders?.length || 0}社`
+                  : '家づくりタイプと推薦工務店を診断します'
+              }
+              href={diagnosis ? '/welcome' : '/diagnosis'}
+              linkLabel={diagnosis ? '結果を見る' : '診断を受ける'}
+              stat={dataLoading ? '...' : diagnosis ? '診断済み' : '未実施'}
+              statHighlight={!!diagnosis}
+            />
+            <MyPageCard
+              title="比較リスト"
+              description="2〜3社を並べて比較（最大3社）"
+              href="/builders/compare"
+              linkLabel={compareCount > 0 ? '比較を見る' : '工務店を選ぶ'}
+              stat={`${compareCount} / 3 社`}
+              statHighlight={compareCount > 0}
+            />
+            <MyPageCard
               title="相談履歴"
               description="AIチャットの会話履歴"
               href="/"
@@ -135,28 +191,30 @@ export default function MyPage() {
               disabled
             />
             <MyPageCard
-              icon="📅"
               title="予約履歴"
               description="見学会予約の一覧"
               href="/event"
               linkLabel="見学会を予約"
-              stat="0 件"
+              stat="Phase 2"
+              disabled
             />
           </div>
 
           {/* 次のステップCTA */}
           <div className="bg-gradient-to-br from-[#FFF8F0] to-white border border-[#E8740C]/20 rounded-2xl p-6 md:p-8 text-center">
             <h3 className="text-lg md:text-xl font-bold text-[#3D2200] mb-2">
-              次のステップはAI家づくり診断です
+              {diagnosis ? '次のステップは見学会の予約です' : '次のステップはAI家づくり診断です'}
             </h3>
             <p className="text-sm text-gray-600 mb-5">
-              10問に答えるだけで、あなたに合う工務店3社をご紹介します（約2分）
+              {diagnosis
+                ? '推薦された工務店の家を実際に見に行きませんか？'
+                : '10問に答えるだけで、あなたに合う工務店3社をご紹介します（約2分）'}
             </p>
             <Link
-              href="/diagnosis"
+              href={diagnosis ? '/event' : '/diagnosis'}
               className="inline-flex items-center gap-2 bg-[#E8740C] hover:bg-[#D4660A] text-white font-bold px-8 py-3 rounded-full text-sm transition shadow-md"
             >
-              🤖 診断をはじめる →
+              {diagnosis ? '見学会の日程を見る →' : '診断をはじめる →'}
             </Link>
           </div>
         </div>
@@ -166,20 +224,20 @@ export default function MyPage() {
 }
 
 function MyPageCard({
-  icon,
   title,
   description,
   href,
   linkLabel,
   stat,
+  statHighlight,
   disabled,
 }: {
-  icon: string;
   title: string;
   description: string;
   href: string;
   linkLabel: string;
   stat: string;
+  statHighlight?: boolean;
   disabled?: boolean;
 }) {
   return (
@@ -189,13 +247,20 @@ function MyPageCard({
       }`}
     >
       <div className="flex items-start justify-between mb-3">
-        <div className="text-3xl">{icon}</div>
-        <span className={`text-xs font-bold ${disabled ? 'text-gray-400' : 'text-[#E8740C]'}`}>
+        <h3 className="text-base font-bold text-[#3D2200]">{title}</h3>
+        <span
+          className={`text-xs font-bold ${
+            disabled
+              ? 'text-gray-400'
+              : statHighlight
+                ? 'text-[#E8740C]'
+                : 'text-gray-400'
+          }`}
+        >
           {stat}
         </span>
       </div>
-      <h3 className="text-base font-bold text-[#3D2200] mb-1">{title}</h3>
-      <p className="text-xs text-gray-500 mb-3 leading-relaxed">{description}</p>
+      <p className="text-xs text-gray-500 mb-3 leading-relaxed min-h-[2.5rem]">{description}</p>
       {disabled ? (
         <span className="text-xs text-gray-400 font-medium">準備中</span>
       ) : (

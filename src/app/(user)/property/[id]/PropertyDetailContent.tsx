@@ -11,6 +11,7 @@ import { EVENT_TYPE_STYLES, formatPeriod } from '@/lib/events-data';
 import { notFound } from 'next/navigation';
 import { useTrackEvent } from '@/lib/use-track-event';
 import FavoriteButton from '@/components/ui/FavoriteButton';
+import FloorPlanViewer from '@/components/property/FloorPlanViewer';
 
 export default function PropertyDetailContent({ id }: { id: string }) {
   const properties = useProperties();
@@ -113,13 +114,12 @@ export default function PropertyDetailContent({ id }: { id: string }) {
             equipment={equipment}
           />
 
-          {/* Floor Plan Placeholder */}
-          <div className="mb-8">
-            <h2 className="text-lg font-bold text-[#3D2200] mb-4">間取り図</h2>
-            <div className="bg-gray-100 rounded-xl h-48 flex items-center justify-center text-gray-400 text-sm">
-              間取り図（準備中）
-            </div>
-          </div>
+          {/* 間取り図ビューア（v4.0 会員限定機能） */}
+          <FloorPlanViewer
+            propertyId={id}
+            layout={property.layout}
+            area={property.area}
+          />
 
           {/* Photos Slideshow */}
           <div className="mb-8">

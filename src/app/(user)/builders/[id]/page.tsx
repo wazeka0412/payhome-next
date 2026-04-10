@@ -6,6 +6,7 @@ import { events, formatPeriod, EVENT_TYPE_STYLES } from '@/lib/events-data';
 import { videos } from '@/lib/videos-data';
 import { getSaleHomesByBuilderId, SALE_HOME_STATUS_LABELS } from '@/lib/sale-homes-data';
 import { getLandsByBuilderId, LAND_STATUS_LABELS } from '@/lib/lands-data';
+import CompareToggleButton from '@/components/builders/CompareToggleButton';
 
 export function generateStaticParams() {
   return builders.map((b) => ({ id: b.id }));
@@ -85,6 +86,11 @@ export default async function BuilderDetailPage({
             <Kpi label="坪単価" value={`${builder.pricePerTsubo.min}〜${builder.pricePerTsubo.max}万円`} />
             <Kpi label="耐震等級" value={builder.earthquakeGrade} />
             <Kpi label="断熱性能" value={builder.insulationGrade.split('（')[0]} />
+          </div>
+
+          {/* 比較リスト追加 */}
+          <div className="mt-5">
+            <CompareToggleButton builderId={builder.id} />
           </div>
         </div>
       </div>

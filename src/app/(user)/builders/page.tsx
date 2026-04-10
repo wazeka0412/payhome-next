@@ -11,6 +11,7 @@ import {
   getAllPrefectures,
   type PriceBand,
 } from '@/lib/builders-data';
+import CompareToggleButton from '@/components/builders/CompareToggleButton';
 
 const PREFECTURES = ['すべて', ...getAllPrefectures().map((p) => p.replace('県', ''))];
 const CITIES = getAllCities();
@@ -360,7 +361,7 @@ export default function BuildersPage() {
                       </div>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 mb-2">
                       <Link
                         href={`/builders/${builder.id}`}
                         className="flex-1 text-center bg-[#E8740C] text-white text-xs font-bold py-2.5 rounded-full hover:bg-[#D4660A] transition"
@@ -374,11 +375,25 @@ export default function BuildersPage() {
                         見学会予約
                       </Link>
                     </div>
+                    <CompareToggleButton builderId={builder.id} />
                   </div>
                 </div>
               ))}
             </div>
           )}
+
+          {/* 比較ページへのフッターナビ */}
+          <div className="mt-10 text-center">
+            <Link
+              href="/builders/compare"
+              className="inline-flex items-center gap-2 text-sm text-[#E8740C] font-bold hover:underline"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+              比較リストを見る（最大3社まで）
+            </Link>
+          </div>
         </div>
       </section>
     </>
