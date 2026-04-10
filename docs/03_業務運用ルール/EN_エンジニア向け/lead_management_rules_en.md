@@ -1,5 +1,12 @@
 # Lead Management Rules
-> Version 1.0 | 2026-03-22 | wazeka Inc.
+> Version 2.0 | 2026-04-02 | wazeka Inc.
+>
+> **v2.0 changes (pivot from catalog-request-centric model):**
+> - Catalog request score reduced from +15 to +5 (lowest priority)
+> - Open house reservation score raised from +15 to +30 (primary revenue driver)
+> - New: AI diagnosis completed = +15
+> - New: Member signup = +10
+> - New: Deal closed = +50 (tracking only; triggers 3% commission)
 
 ---
 
@@ -9,24 +16,27 @@
 
 Each lead is assigned a numeric score ranging from 0 to 100. The initial score for all new leads is 50 points. The score dynamically adjusts based on user behavior and engagement patterns.
 
-### 1.2 Scoring Addition Rules
+### 1.2 Scoring Addition Rules (v2.0 — v4.0 strategy aligned)
 
-The following behaviors add points to a lead's score:
+The following behaviors add points to a lead's score. **Note: In v4.0, catalog requests are de-prioritized because builder hearings confirmed they produce low-quality leads.**
 
 | # | Behavior | Points | Notes |
 |---|----------|--------|-------|
-| 1 | Consultation form submission | +20 | Primary conversion action |
-| 2 | Catalog request | +15 | High purchase intent |
-| 3 | Event reservation | +15 | Strong engagement signal |
-| 4 | Chat session completed (5+ messages) | +10 | Meaningful conversation |
-| 5 | Favorites added (3+ properties) | +5 | Browsing with intent |
-| 6 | Comparison list created | +5 | Active evaluation phase |
-| 7 | Property detail page viewed (3+ unique) | +3 | Research behavior |
-| 8 | Blog article read (3+ articles) | +2 | Educational engagement |
-| 9 | Return visit within 7 days | +3 | Sustained interest |
-| 10 | Email link clicked | +5 | Responsive to outreach |
-| 11 | Phone number provided | +10 | High contact willingness |
+| 1 | **Deal closed (contract signed)** | **+50** | Tracking only; triggers 3% commission |
+| 2 | **Open house reservation** | **+30** | **Primary revenue driver (5万円 per booking)** |
+| 3 | Consultation form submission | +20 | High-intent direct contact |
+| 4 | AI home-building diagnosis completed | +15 | **NEW v2.0: member funnel entry** |
+| 5 | Member signup (email / OAuth / magic link) | +10 | **NEW v2.0: unlocks personalization** |
+| 6 | Chat session completed (5+ messages) | +10 | Meaningful conversation |
+| 7 | Phone number provided | +10 | High contact willingness |
+| 8 | Favorites added (3+ properties) | +5 | Browsing with intent |
+| 9 | Comparison list created | +5 | Active evaluation phase |
+| 10 | Catalog request (deprecated in v4.0) | **+5** | **DOWNGRADED from +15. Low quality lead. Kept only for backward compatibility.** |
+| 11 | Email link clicked | +5 | Responsive to outreach |
 | 12 | LINE friend added | +5 | Channel engagement |
+| 13 | Property detail page viewed (3+ unique) | +3 | Research behavior |
+| 14 | Return visit within 7 days | +3 | Sustained interest |
+| 15 | Blog article read (3+ articles) | +2 | Educational engagement |
 
 ### 1.3 Score Decay Rules
 

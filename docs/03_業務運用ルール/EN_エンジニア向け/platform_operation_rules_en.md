@@ -27,6 +27,34 @@ The following table defines the four platform roles and their access scope.
 | builder | Builder staff | + Builder dashboard, own leads | Partner builder employees |
 | admin | Administrator | All features (CMS, admin panel, all leads) | wazeka staff |
 
+### 1.1a Permission Matrix by Content Type (v2.0 NEW)
+
+> **v4.0 strategy:** Member signup unlocks premium content. This matrix defines exactly what each role can access.
+
+| Content / Feature | anonymous | user (member) | builder | admin |
+|-------------------|:---:|:---:|:---:|:---:|
+| TOP page | ✅ | ✅ | ✅ | ✅ |
+| Video content list | ✅ | ✅ | ✅ | ✅ |
+| Video detail (basic info) | ✅ | ✅ | ✅ | ✅ |
+| **Floor plan (full resolution)** | ❌ (blurred) | ✅ | ✅ | ✅ |
+| Builder list / detail (basic) | ✅ | ✅ | ✅ | ✅ |
+| **Builder detail (ranking / match score)** | ❌ | ✅ | ✅ | ✅ |
+| AI chat | ✅ | ✅ | ✅ | ✅ |
+| **AI home-building diagnosis (10 questions)** | ✅ (1-time, no save) | ✅ (saved, rerunnable) | ✅ | ✅ |
+| **AI builder recommendation (3 builders)** | ❌ | ✅ | ✅ | ✅ |
+| **AI floor-plan recommendation** | ❌ | ✅ | ✅ | ✅ |
+| Favorites | ✅ (LocalStorage, max 5) | ✅ (unlimited, synced) | ✅ | ✅ |
+| **Comparison feature (up to 3 builders)** | ❌ | ✅ | ✅ | ✅ |
+| Browsing history | — | ✅ | — | ✅ |
+| Open house reservation form | ✅ | ✅ | ✅ | ✅ |
+| **Case library (Phase 1.5)** | ❌ | ✅ | ✅ | ✅ |
+| **Community Q&A (Phase 1.5)** | ❌ (read-only snippets) | ✅ (full + posting) | ✅ | ✅ |
+| **My Page** | ❌ | ✅ | — | ✅ |
+| Simple builder admin panel (`/dashboard/builder`) | ❌ | ❌ | ✅ | ✅ |
+| CMS admin panel (`/appadmin`) | ❌ | ❌ | ❌ | ✅ |
+
+**Implementation note:** Anonymous visitors see blurred content with a "会員登録で見る" CTA overlay. The blur is implemented via CSS filter on the image + a styled CTA card above.
+
 ### 1.2 Role Assignment Rules
 
 | Action | Assigned Role | Method |

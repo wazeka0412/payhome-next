@@ -1,5 +1,10 @@
 # Form Specification
-> Version 1.0 | 2026-03-22 | wazeka Inc.
+> Version 2.0 | 2026-04-02 | wazeka Inc.
+>
+> **v2.0 changes:**
+> - Catalog request form **demoted to auxiliary** (Chapter 3). No new UI investment; removed from primary navigation.
+> - New Chapter 7: **Member Signup Form** — the primary entry point in v4.0 strategy.
+> - Open house reservation (Chapter 4) elevated to the **primary conversion form** (5万円 revenue per booking).
 
 ---
 
@@ -94,7 +99,10 @@
 
 ---
 
-## Chapter 3: Catalog Request Form
+## Chapter 3: Catalog Request Form (DEPRECATED in v4.0 — auxiliary only)
+
+> **⚠ DEPRECATED:** Builder interviews confirmed catalog requests produce low-quality leads. As of v4.0, this form is retained only for backward compatibility. **Do not feature it in navigation, CTAs, or chat widget CTAs.** Lead score is downgraded to +5. No revenue is collected on catalog requests; use open house reservation as the primary CV.
+
 
 ### 3.1 Field Specifications
 
@@ -198,3 +206,50 @@ In Phase 2, CS agents will have the ability to manually convert any chat session
 | Field pre-population | System suggests field values extracted from the chat conversation via AI |
 | CS review | CS agent can review and edit extracted fields before creating the lead |
 | Attribution tracking | Lead is tagged with source='chat_manual' and linked to the chat session ID |
+
+---
+
+## Chapter 7: Member Signup Form (NEW in v2.0 — Primary Entry Point)
+
+> **v4.0 priority:** Member signup is the primary way users unlock value on the platform (full-res floor plans, AI diagnosis results, favorites/comparison, case library, community). It is the most important form in the MVP.
+
+### 7.1 Field Specifications
+
+| Field | Type | Required | Validation |
+|-------|------|:---:|------------|
+| email | email | ✅ | RFC 5322 |
+| auth_method | enum | ✅ | `email_magic_link` / `google_oauth` / `apple_oauth` |
+| full_name | text | Optional | 1-50 chars (can be filled post-signup) |
+| marketing_consent | boolean | ✅ | Must be true for newsletter / follow-up emails |
+
+**No password field.** Magic link (email) or OAuth only — friction reduction is critical.
+
+### 7.2 Signup Flow
+
+| Step | Action |
+|------|--------|
+| 1 | User clicks "会員登録" CTA (from chat widget, blurred content, or diagnosis result page) |
+| 2 | Modal or `/signup` page shows 3 options: Email magic link / Google / Apple |
+| 3 | On submit, create entry in `users` table with `role='user'` |
+| 4 | For email: send magic link via Resend. For OAuth: NextAuth callback |
+| 5 | After confirmation, merge any existing `anonymous_id` data (user_events, favorites, chat_sessions) to the new `user_id` |
+| 6 | Redirect to `/mypage` with welcome toast: "登録完了！AI家づくり診断で自分に合う工務店を見つけましょう → [diagnosis link]" |
+
+### 7.3 Post-Signup Unlocks
+
+Upon successful signup, the following content becomes accessible to the user:
+
+| Feature | Before signup | After signup |
+|---------|:---:|:---:|
+| Floor plan resolution | Blurred (low-res thumbnail) | Full resolution + download |
+| AI home-building diagnosis | 1-time only, no save | Saved to profile, rerun anytime |
+| AI builder recommendation | Not available | 3-builder recommendation based on diagnosis + browsing |
+| Favorites | LocalStorage, max 5 items | Unlimited, synced across devices |
+| Comparison feature | Not available | Compare up to 3 builders |
+| Chat history | Session only | Persistent across devices |
+| Case library (Phase 1.5) | Not available | Full access |
+| Community (Phase 1.5) | Read-only snippets | Full access + posting |
+
+### 7.4 Member Score Boost
+
+Completing member signup adds **+10 points** to the lead score (see lead_management_rules_en.md v2.0).

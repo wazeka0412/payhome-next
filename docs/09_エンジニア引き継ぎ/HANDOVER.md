@@ -498,50 +498,89 @@ The platform's revenue model is performance-based. Every feature should be evalu
 | F-05 | Lead notification email (Resend) | Builder trust | ✅ Built, needs prod config |
 | F-06 | AI chat (production prompts) | Chat → lead conversion | ✅ Built, needs prompt tuning |
 
-**Tier 2 — Ship in May (1.5-3x revenue multiplier)**
-| ID | Feature | Revenue Impact | Est. Effort |
-|---|---|---|---|
-| F-07 | **Bulk catalog request (up to 3 builders)** | **+¥9.6M/yr** | 1 week |
-| F-08 | **Open house "seats remaining" + "this weekend" section** | **+¥19.2M/yr** | 1 week |
-| F-09 | **Builder comparison (2-3 side-by-side)** | Improves CV rate | 2 weeks |
-| F-10 | **Filter search (area × price × features)** | UX improvement for 50 builders | 1 week |
-| F-11 | **Favorites enhancement (event notifications)** | Return visit rate | 3 days |
+**⚠️ IMPORTANT — Strategy pivot (v4.0, 2026-04-02):**
+> Builder hearings confirmed catalog requests produce low-quality leads. The revenue model has shifted to **Member Signup × AI Diagnosis × Open House Booking**.
+> - **F-07 Bulk catalog request: CANCELLED.** Do not implement.
+> - Revenue now comes from: **(a) Open house booking = ¥50,000 / booking**, **(b) Deal closed = 3% of contract value**
+> - All CTAs should promote member signup / AI diagnosis / open house booking — NOT catalog requests.
 
-**Tier 3 — Ship June-July (conversion rate improvement)**
+**Tier 2 — Ship in May (v2.0 re-prioritized)**
 | ID | Feature | Revenue Impact | Est. Effort |
 |---|---|---|---|
-| F-12 | Consumer follow-up email series (9 emails) | +¥5M/yr (collection improvement) | 1 week |
+| F-07 | ~~Bulk catalog request~~ **CANCELLED** | N/A | N/A |
+| F-08 | Open house "seats remaining" + "this weekend" section | Primary conversion driver | 1 week |
+| F-09 | **Builder comparison (2-3 side-by-side) — member-only** | Improves CV rate | 2 weeks |
+| F-10 | Filter search (area × price × features) | UX improvement for 50 builders | 1 week |
+| F-11 | Favorites enhancement (unlimited for members) | Return visit rate | 3 days |
+| **F-24 NEW** | **Member signup flow** (email / OAuth / magic link) | Value unlock entry point | 1 week |
+| **F-25 NEW** | **AI home-building diagnosis** (10 questions) | MVP killer feature | 2 weeks |
+| **F-26 NEW** | **AI builder recommendation** (3 builders) | Diagnosis output | 2 weeks |
+| **F-27 NEW** | **Video detail → open house booking section** (when `is_model_house=true`) | Direct revenue CTA | 3 days |
+| **F-28 NEW** | **Builder detail CTA → open house booking** (replace catalog request CTA) | CTA realignment | 2 days |
+| **F-29 NEW** | **Member-only content blur + signup CTA** | Drives signup rate | 3 days |
+| **F-30 NEW** | **Simple builder admin panel** (3 pages: received leads / profile / open house management) | Builder retention | 1 week |
+
+**Tier 3 — Ship June-July (Phase 1.5)**
+| ID | Feature | Revenue Impact | Est. Effort |
+|---|---|---|---|
+| F-12 | Consumer follow-up email series (member signup funnel) | Signup rate improvement | 1 week |
 | F-13 | "Built with this builder" testimonial section | Contract rate improvement | 1 week |
 | F-14 | AI chat → builder recommendation | Chat → open house CV | 2 weeks |
 | F-15 | Open house calendar view | Discovery rate improvement | 1 week |
 | F-16 | LINE notification for builders | Response speed improvement | 1 week |
+| **F-31 NEW** | **AI pre-meeting hearing summary** (for builders) | 3% commission justification | 2 weeks |
+| **F-32 NEW** | **Dynamic AI lead scoring** (replaces static scoring) | Lead quality visibility | 1 week |
+| **F-33 NEW** | **Hiraya case library MVP** (member-only) | Signup incentive | 2 weeks |
+| **F-34 NEW** | **Community Q&A MVP** (member-only) | Engagement + nurturing | 2 weeks |
 
-**Tier 4 — August onwards (scale phase)**
+**Tier 4 — August onwards (Phase 2)**
 | ID | Feature | Est. Effort |
 |---|---|---|
 | F-17 | GA4 custom events | 1 week |
 | F-18 | User dashboard (live data) | 2 weeks |
-| F-19 | Builder dashboard (production) | 3 weeks |
+| F-19 | Builder dashboard (full features) | 3 weeks |
 | F-20 | CMS structured data forms | 2 weeks |
 | F-21 | AI intent extraction / conversation summary | 3 weeks |
-| F-22 | User profile registration | 2 weeks |
-| F-23 | Lead auto-scoring | 2 weeks |
+| F-22 | User profile registration (extended) | 2 weeks |
+| F-23 | Revival of magazine / webinar / news / column pages | 2 weeks |
 
-### Key Implementation Note: F-07 (Bulk Catalog Request)
-This is the highest-ROI feature. Implementation:
-1. Add multi-select checkboxes to builder list/comparison page
-2. Store selected builder IDs in state (max 3)
-3. Show floating "Request catalogs from X builders" CTA
-4. On submit, create one lead per selected builder via POST /api/leads
-5. Send notification email to each selected builder
-6. Redirect to thank-you page showing all requested builders
+### Key Implementation Note: F-24 (Member Signup)
+Member signup is the primary value-unlock entry point. Implementation:
+1. Add `/signup` and `/login` pages with 3 options: email magic link / Google OAuth / Apple OAuth
+2. Use NextAuth with magic-link email provider (no password needed)
+3. On successful signup, merge existing `anonymous_id` data into the new `user_id` (events, favorites, chat sessions)
+4. Show welcome toast: "会員登録完了！AI家づくり診断で自分に合う工務店を見つけましょう → /diagnosis"
+5. Store role='user' in users table by default
 
-### Key Implementation Note: F-08 (Seats Remaining)
-1. Add `capacity` and `reserved_count` fields to events data
-2. Display "残り{capacity - reserved_count}組" badge on event cards
-3. Add "今週末の見学会" section to homepage (filter events by this weekend's dates)
-4. When reserved_count >= capacity, show "満席" and disable reservation button
+### Key Implementation Note: F-25 (AI Home-Building Diagnosis)
+10-question diagnostic flow that saves results to user_profiles for AI recommendation:
+1. Create `user_profiles` table with fields: family_structure, age_range, budget_range, preferred_area, design_orientation, lifestyle_priorities, planning_timing, has_land
+2. Build `/diagnosis` page with 10 questions (1 question per page for mobile-friendly UX)
+3. POST `/api/ai/diagnosis` persists results to user_profiles
+4. Non-members can complete the diagnosis once but cannot save results (prompt signup at end)
+5. Members see results saved to mypage and can rerun anytime
+
+### Key Implementation Note: F-26 (AI Builder Recommendation)
+Uses diagnosis results + browsing history + builder structured data to recommend 3 builders:
+1. Generate embeddings for builders (OpenAI text-embedding-3-small) based on: description, design_taste, features, suitable_for, price_range
+2. POST `/api/ai/recommend/builders` takes user_id → builds query embedding from user_profiles + recent user_events → cosine similarity search against builder embeddings → returns top 3 with reasons
+3. Display in mypage, diagnosis result page, and builder list (highlighted "あなたにおすすめ" badge)
+4. Log recommendations to `builder_recommendations` table for Phase 2 learning
+
+### Key Implementation Note: F-27 (Video Detail Open House Section)
+1. Add `is_model_house BOOLEAN DEFAULT false` to `properties` table
+2. In `src/app/(user)/videos/[id]/page.tsx` (or equivalent), check the property's `is_model_house` flag
+3. When `true`, render a prominent "この家の見学会を予約する" section with the linked open house event
+4. When `false`, show "類似の見学会を見る" linking to filtered events
+
+### Key Implementation Note: F-30 (Simple Builder Admin Panel)
+MVP version with only 3 pages:
+1. `/dashboard/builder` — Received leads list (from this builder's leads only)
+2. `/dashboard/builder/profile` — Edit own builder profile (name, description, design_taste, etc.)
+3. `/dashboard/builder/events` — Manage own open house events (create, edit, see reservations)
+
+All three pages are gated by middleware role check: `role === 'builder' || role === 'admin'`.
 
 ---
 
-*This handover document was created on 2026-03-22. For questions about design intent, refer to the business strategy and requirements documents. The codebase is the source of truth for implementation details.*
+*This handover document was created on 2026-03-22 and significantly updated on 2026-04-02 for the v4.0 strategy pivot. For questions about design intent, refer to the business strategy and requirements documents. The codebase is the source of truth for implementation details.*

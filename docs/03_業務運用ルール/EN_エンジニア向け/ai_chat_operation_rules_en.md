@@ -1,5 +1,7 @@
 # AI Chat Operation Rules
-> Version 1.0 | 2026-03-22 | wazeka Inc.
+> Version 2.0 | 2026-04-02 | wazeka Inc.
+>
+> **v2.0 changes:** CTAs shifted from catalog-request to member-signup + AI diagnosis + open-house booking. Catalog requests are no longer a revenue driver as of v4.0 strategy pivot.
 
 ---
 
@@ -79,7 +81,7 @@ Every AI response must adhere to the following rules:
 | 4 | Partner builders only | Only recommend or mention builders that are registered partners on Payhome |
 | 5 | No superlatives | Avoid words like "best", "cheapest", "number one", "guaranteed" to prevent misleading claims |
 | 6 | Polite formal tone | Use desu/masu form consistently; maintain professional but approachable tone |
-| 7 | Actionable advice | Each response should guide the user toward a next step (view property, request catalog, book consultation) |
+| 7 | Actionable advice | Each response should guide the user toward a next step: **(a) member signup to unlock floor plans / case library**, **(b) AI home-building diagnosis**, or **(c) open house visit booking**. **Do NOT prioritize catalog requests — catalog requests are no longer a revenue driver in v4.0.** |
 
 ### 3.2 Prohibited Topics
 
@@ -115,15 +117,19 @@ Automatic conversion from chat session to lead occurs when BOTH conditions are m
 | Message count | 10 or more user messages in the session |
 | Intent keyword detected | Message contains: consultation, quote, estimate, budget, visit, appointment, builder recommendation, land, property, floor plan, mortgage, loan |
 
-### 4.2 CTA Injection Schedule
+### 4.2 CTA Injection Schedule (v2.0 updated)
+
+**Core principle (v4.0):** Guide users through **Member Signup → AI Diagnosis → Open House Booking** funnel. Catalog requests are no longer featured as a primary CTA.
 
 Call-to-action messages are injected at specific points in the conversation:
 
-| Trigger | CTA Content | Format |
+| Trigger | CTA Content (v2.0) | Format |
 |---|---|---|
-| 5th user message | Form link CTA | "Would you like personalized recommendations? Fill out our quick consultation form: [link]" |
-| 10th user message | Phone/LINE CTA | "For immediate assistance, call us at [phone] or add us on LINE: [LINE ID]" |
-| Session limit warning (45th msg) | Urgency CTA | "This session is nearing its limit. To continue the conversation, please contact us via [form/phone/LINE]." |
+| 3rd user message | Member signup CTA | "会員登録すると、間取り図のフル解像度・AI家づくり診断結果の保存・お気に入り機能が使えます。1分で登録できます → [signup link]" |
+| 5th user message | AI diagnosis CTA | "もっと具体的に合う工務店を知りたい場合は、AI家づくり診断（10問）はいかがですか？ → [diagnosis link]" |
+| 8th user message | Open house booking CTA | "この工務店が気になるなら、見学会の予約がおすすめです。実物を見て判断できます → [booking link]" |
+| 10th user message | Direct contact CTA | "すぐに話したい場合は電話かLINEでご連絡ください → [phone] / [LINE ID]" |
+| Session limit warning (45th msg) | Urgency CTA | "This session is nearing its limit. To continue the conversation, please sign up or book an open house visit." |
 
 ### 4.3 Manual Conversion (Phase 2)
 
