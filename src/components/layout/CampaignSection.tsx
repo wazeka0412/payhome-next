@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 
 /**
  * ぺいほーむ住宅ポータルサイト開設記念キャンペーン（v4.0）
@@ -53,11 +52,29 @@ export default function CampaignSection() {
                 AI家づくり診断と会員登録で全員にお渡しします。
               </p>
 
-              {/* ステップ */}
+              {/* ステップ（クリック可能） */}
               <div className="space-y-3 mb-6">
-                <Step num={1} title="AI家づくり診断（約2分）" desc="10問の質問に答えるだけ" />
-                <Step num={2} title="無料会員登録" desc="メール / Google で登録" />
-                <Step num={3} title="デジタルカタログ受領" desc="マイページからすぐにダウンロード" />
+                <StepLink
+                  num={1}
+                  href="/diagnosis"
+                  title="AI家づくり診断（約2分）"
+                  desc="10問の質問に答えるだけ"
+                  cta="診断をはじめる →"
+                />
+                <StepLink
+                  num={2}
+                  href="/signup?redirect=/mypage/catalog"
+                  title="無料会員登録"
+                  desc="メール / Google で登録"
+                  cta="登録する →"
+                />
+                <StepLink
+                  num={3}
+                  href="/mypage/catalog"
+                  title="デジタルカタログを受け取る"
+                  desc="マイページの「デジタルカタログ」からすぐ閲覧"
+                  cta="受け取り画面へ →"
+                />
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3">
@@ -65,13 +82,7 @@ export default function CampaignSection() {
                   href="/diagnosis"
                   className="flex-1 text-center bg-[#E8740C] hover:bg-[#D4660A] text-white font-bold px-6 py-3.5 rounded-full text-sm transition shadow-[0_4px_12px_rgba(232,116,12,0.3)]"
                 >
-                  AI診断をはじめる
-                </Link>
-                <Link
-                  href="/signup"
-                  className="flex-1 text-center border-2 border-[#E8740C] text-[#E8740C] hover:bg-[#FFF8F0] font-bold px-6 py-3.5 rounded-full text-sm transition"
-                >
-                  先に会員登録する
+                  ① AI診断からはじめる
                 </Link>
               </div>
             </div>
@@ -154,16 +165,36 @@ export default function CampaignSection() {
   )
 }
 
-function Step({ num, title, desc }: { num: number; title: string; desc: string }) {
+function StepLink({
+  num,
+  href,
+  title,
+  desc,
+  cta,
+}: {
+  num: number
+  href: string
+  title: string
+  desc: string
+  cta: string
+}) {
   return (
-    <div className="flex items-center gap-3">
+    <Link
+      href={href}
+      className="group flex items-center gap-3 -mx-2 px-2 py-1.5 rounded-lg hover:bg-[#FFF8F0] transition"
+    >
       <div className="w-8 h-8 bg-[#FFF8F0] border-2 border-[#E8740C] text-[#E8740C] rounded-full flex items-center justify-center text-sm font-extrabold flex-shrink-0">
         {num}
       </div>
-      <div>
-        <p className="text-sm font-bold text-[#3D2200]">{title}</p>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-bold text-[#3D2200] group-hover:text-[#E8740C] transition">
+          {title}
+        </p>
         <p className="text-[11px] text-gray-500">{desc}</p>
       </div>
-    </div>
+      <span className="text-[10px] font-bold text-[#E8740C] opacity-0 group-hover:opacity-100 transition shrink-0 hidden sm:inline">
+        {cta}
+      </span>
+    </Link>
   )
 }

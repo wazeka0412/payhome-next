@@ -292,18 +292,48 @@ export default function DiagnosisPage() {
             </p>
           </div>
 
-          {/* Signup CTA for non-members */}
-          {!isLoggedIn && (
-            <div className="bg-[#E8740C] text-white rounded-2xl p-6 mb-8 shadow-lg">
-              <h3 className="text-lg font-bold mb-2">この結果を保存しませんか？</h3>
+          {/* Signup CTA + デジタルカタログプレゼント告知 */}
+          {!isLoggedIn ? (
+            <div className="bg-gradient-to-br from-[#3D2200] via-[#8B4513] to-[#3D2200] text-white rounded-2xl p-6 md:p-7 mb-8 shadow-xl">
+              <p className="text-[10px] font-bold tracking-widest text-yellow-300 mb-2">
+                ぺいほーむ住宅ポータルサイト開設記念
+              </p>
+              <h3 className="text-lg md:text-xl font-extrabold mb-2 leading-tight">
+                会員登録でデジタルカタログ進呈
+              </h3>
+              <p className="text-sm mb-2 opacity-95">
+                診断結果の保存に加え、<span className="font-bold text-yellow-300">施工事例集 30邸</span>と
+                <span className="font-bold text-yellow-300">平屋間取り図集 30プラン</span>のデジタルカタログを今すぐお渡しします。
+              </p>
+              <ul className="text-xs opacity-90 mb-5 space-y-1">
+                <li>✓ 間取り図をフル解像度で閲覧</li>
+                <li>✓ お気に入り無制限</li>
+                <li>✓ 工務店比較機能（最大3社）</li>
+                <li>✓ デジタルカタログ無料DL</li>
+              </ul>
+              <Link
+                href="/signup?redirect=/mypage/catalog"
+                className="inline-block bg-white text-[#E8740C] font-bold px-6 py-3 rounded-full text-sm hover:bg-gray-100 transition shadow-md"
+              >
+                会員登録してカタログを受け取る →
+              </Link>
+            </div>
+          ) : (
+            <div className="bg-gradient-to-br from-[#E8740C] via-[#F5A623] to-[#E8740C] text-white rounded-2xl p-6 md:p-7 mb-8 shadow-xl">
+              <p className="text-[10px] font-bold tracking-widest text-yellow-200 mb-2">
+                受け取り条件をクリア
+              </p>
+              <h3 className="text-lg md:text-xl font-extrabold mb-2 leading-tight">
+                デジタルカタログを受け取れます
+              </h3>
               <p className="text-sm mb-4 opacity-95">
-                会員登録（無料）すると、診断結果の保存、間取り図のフル閲覧、お気に入り機能が使えるようになります。
+                施工事例集 30邸 + 平屋間取り図集 30プラン がマイページからご覧いただけます。
               </p>
               <Link
-                href="/signup?redirect=/mypage"
-                className="inline-block bg-white text-[#E8740C] font-bold px-6 py-2.5 rounded-lg hover:bg-gray-100 transition"
+                href="/mypage/catalog"
+                className="inline-block bg-white text-[#E8740C] font-bold px-6 py-3 rounded-full text-sm hover:bg-gray-100 transition shadow-md"
               >
-                会員登録して結果を保存する →
+                カタログ受け取り画面へ →
               </Link>
             </div>
           )}

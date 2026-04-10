@@ -113,6 +113,36 @@ export default function WelcomePage() {
 
       <section className="py-12 md:py-16">
         <div className="max-w-5xl mx-auto px-4 space-y-12">
+          {/* ── デジタルカタログ受け取りプロモ ── */}
+          <div className={`relative overflow-hidden rounded-3xl text-white p-8 md:p-10 shadow-xl ${
+            diagnosis ? 'bg-gradient-to-br from-[#3D2200] via-[#8B4513] to-[#3D2200]' : 'bg-gradient-to-br from-[#E8740C] via-[#F5A623] to-[#E8740C]'
+          }`}>
+            <p className="text-[10px] font-bold tracking-widest text-yellow-300 mb-2">
+              OPENING CAMPAIGN
+            </p>
+            <h2 className="text-2xl md:text-3xl font-extrabold mb-3 leading-tight">
+              {diagnosis
+                ? 'デジタルカタログを受け取れます'
+                : 'AI診断完了でデジタルカタログ進呈'}
+            </h2>
+            <p className="text-sm md:text-base text-white/95 leading-relaxed mb-6 max-w-2xl">
+              ぺいほーむ住宅ポータルサイト開設記念キャンペーン。
+              <br />
+              <span className="font-bold">施工事例集 30邸</span>と
+              <span className="font-bold">平屋間取り図集 30プラン</span>のデジタルカタログを
+              {diagnosis ? '今すぐマイページから' : 'AI家づくり診断完了後にマイページから'}
+              ご覧いただけます。
+            </p>
+            <Link
+              href={diagnosis ? '/mypage/catalog' : '/diagnosis'}
+              className="inline-flex items-center gap-2 bg-white text-[#E8740C] font-bold px-8 py-3.5 rounded-full text-sm hover:bg-gray-50 transition shadow-lg"
+            >
+              {diagnosis
+                ? 'カタログ受け取り画面へ →'
+                : 'AI診断をはじめる（カタログ進呈）→'}
+            </Link>
+          </div>
+
           {/* ── 診断結果がある場合：推薦工務店3社 ── */}
           {diagnosis && diagnosis.recommended_builders?.length > 0 ? (
             <div>

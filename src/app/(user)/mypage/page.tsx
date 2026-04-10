@@ -140,6 +140,32 @@ export default function MyPage() {
             </div>
           </div>
 
+          {/* デジタルカタログ受け取り（最上部にプロモ） */}
+          <div className="bg-gradient-to-br from-[#3D2200] via-[#8B4513] to-[#3D2200] text-white rounded-2xl p-6 md:p-7 mb-6 shadow-xl">
+            <div className="flex items-start gap-4">
+              <div className="hidden sm:flex w-14 h-16 bg-gradient-to-br from-[#E8740C] to-[#F5A623] rounded-md flex-shrink-0 items-center justify-center text-white text-[8px] font-bold tracking-wider text-center leading-tight shadow-md">
+                CATA<br/>LOG
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-bold tracking-widest text-yellow-300 mb-1">
+                  ぺいほーむ住宅ポータルサイト開設記念
+                </p>
+                <h2 className="text-base md:text-lg font-extrabold mb-1 leading-tight">
+                  デジタルカタログを受け取る
+                </h2>
+                <p className="text-xs text-white/90 mb-3">
+                  施工事例集 30邸 + 平屋間取り図集 30プラン
+                </p>
+                <Link
+                  href="/mypage/catalog"
+                  className="inline-flex items-center gap-2 bg-[#E8740C] hover:bg-[#D4660A] text-white text-xs font-bold px-5 py-2.5 rounded-full transition shadow-md"
+                >
+                  {diagnosis ? '受け取り画面へ →' : 'AI診断 → 受け取り →'}
+                </Link>
+              </div>
+            </div>
+          </div>
+
           {/* 機能カード */}
           <div className="grid md:grid-cols-2 gap-4 mb-6">
             <MyPageCard
