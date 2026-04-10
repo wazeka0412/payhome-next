@@ -10,6 +10,7 @@ import { builders } from '@/lib/builders-data';
 import { saleHomes, SALE_HOME_STATUS_LABELS } from '@/lib/sale-homes-data';
 import { lands, LAND_STATUS_LABELS } from '@/lib/lands-data';
 import { features } from '@/lib/features-data';
+import { caseStudies } from '@/lib/case-studies-data';
 
 /* ── Data ─────────────────────────────────────────── */
 
@@ -130,6 +131,9 @@ export default function HomePage() {
   const topSaleHomes = saleHomes.filter((s) => s.status === 'available').slice(0, 4);
   const topLands = lands.filter((l) => l.status === 'available').slice(0, 3);
   const topFeatures = features.slice(0, 6);
+  const topCaseStudies = [...caseStudies]
+    .sort((a, b) => b.completedAt.localeCompare(a.completedAt))
+    .slice(0, 6);
 
   return (
     <>
@@ -341,8 +345,67 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== 6. 特集 ===== */}
+      {/* ===== 5.5 平屋事例ライブラリ ===== */}
       <section className="py-16 md:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <p className="text-xs font-semibold tracking-widest text-[#E8740C] uppercase mb-2">CASE STUDIES</p>
+              <h2 className="text-2xl font-bold text-[#3D2200]">平屋事例ライブラリ</h2>
+              <p className="text-sm text-gray-500 mt-2">ぺいほーむ取材済みの完成事例を間取り・費用・工務店・タグで検索</p>
+            </div>
+            <Link href="/case-studies" className="hidden md:block text-sm text-[#E8740C] font-bold hover:underline">
+              すべて見る →
+            </Link>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {topCaseStudies.map((cs) => (
+              <Link
+                key={cs.id}
+                href={`/case-studies/${cs.id}`}
+                className="block bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md hover:border-[#E8740C]/30 transition"
+              >
+                <div className="relative aspect-video bg-gray-200">
+                  <img
+                    src={`https://img.youtube.com/vi/${cs.youtubeId}/mqdefault.jpg`}
+                    alt={cs.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  <div className="absolute top-2 left-2 bg-[#E8740C] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    完成事例
+                  </div>
+                  <div className="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] font-bold px-2 py-0.5 rounded">
+                    {cs.completedAt}
+                  </div>
+                </div>
+                <div className="p-4">
+                  <p className="text-[10px] text-gray-500 mb-1">{cs.city} / {cs.familyStructure}</p>
+                  <h3 className="text-sm font-bold text-[#3D2200] mb-2 line-clamp-2 min-h-[2.5rem]">
+                    {cs.title}
+                  </h3>
+                  <div className="flex items-baseline gap-2 mb-2">
+                    <p className="text-lg font-extrabold text-[#E8740C]">
+                      {cs.totalPrice.toLocaleString()}
+                      <span className="text-[10px] ml-1">万円</span>
+                    </p>
+                    <span className="text-[9px] text-gray-400">総額</span>
+                  </div>
+                  <p className="text-[10px] text-gray-500">
+                    {cs.layout} / {cs.tsubo}坪
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+          <p className="text-[11px] text-gray-400 text-center mt-6">
+            ※ 非会員は新着5件まで閲覧可。6件目以降は無料会員登録でご覧いただけます
+          </p>
+        </div>
+      </section>
+
+      {/* ===== 6. 特集 ===== */}
+      <section className="py-16 md:py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-end justify-between mb-8">
             <div>

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import PageHeader from '@/components/ui/PageHeader';
 import { lands, getLandById, LAND_STATUS_LABELS, getLandsByBuilderId } from '@/lib/lands-data';
 import { getBuilderById } from '@/lib/builders-data';
+import FavoriteButton from '@/components/ui/FavoriteButton';
 
 export function generateStaticParams() {
   return lands.map((l) => ({ id: l.id }));
@@ -52,9 +53,13 @@ export default async function LandDetailPage({
           <h1 className="text-2xl md:text-4xl font-extrabold text-[#3D2200] mb-3 leading-tight">
             {land.title}
           </h1>
-          <p className="text-sm md:text-base text-gray-700 leading-relaxed mb-6 max-w-3xl">
+          <p className="text-sm md:text-base text-gray-700 leading-relaxed mb-4 max-w-3xl">
             {land.description}
           </p>
+
+          <div className="mb-6">
+            <FavoriteButton contentType="land" contentId={land.id} />
+          </div>
 
           {/* Price + KPI */}
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6">

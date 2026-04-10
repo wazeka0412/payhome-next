@@ -7,6 +7,7 @@ import { videos } from '@/lib/videos-data';
 import { getSaleHomesByBuilderId, SALE_HOME_STATUS_LABELS } from '@/lib/sale-homes-data';
 import { getLandsByBuilderId, LAND_STATUS_LABELS } from '@/lib/lands-data';
 import CompareToggleButton from '@/components/builders/CompareToggleButton';
+import FavoriteButton from '@/components/ui/FavoriteButton';
 
 export function generateStaticParams() {
   return builders.map((b) => ({ id: b.id }));
@@ -88,8 +89,9 @@ export default async function BuilderDetailPage({
             <Kpi label="断熱性能" value={builder.insulationGrade.split('（')[0]} />
           </div>
 
-          {/* 比較リスト追加 */}
-          <div className="mt-5">
+          {/* 比較リスト追加 + お気に入り */}
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <FavoriteButton contentType="builder" contentId={builder.id} />
             <CompareToggleButton builderId={builder.id} />
           </div>
         </div>

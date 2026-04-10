@@ -5,7 +5,7 @@ import { getOrCreateAnonymousId } from '@/lib/anonymous-id'
 import { useTrackEvent } from '@/lib/use-track-event'
 
 interface FavoriteButtonProps {
-  contentType: 'property' | 'builder' | 'article' | 'event'
+  contentType: 'property' | 'builder' | 'article' | 'event' | 'sale_home' | 'land' | 'case_study'
   contentId: string
   className?: string
 }

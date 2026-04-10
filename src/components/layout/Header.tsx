@@ -17,6 +17,7 @@ const NAV_CONTENT = [
     label: 'さがす',
     items: [
       { href: '/videos', label: '動画コンテンツ', desc: '平屋ルームツアー' },
+      { href: '/case-studies', label: '平屋事例ライブラリ', desc: '完成事例を検索' },
       { href: '/features', label: '特集', desc: 'エリア・サイズ・工務店' },
       { href: '/builders', label: '工務店一覧', desc: '提携工務店を検索' },
       { href: '/sale-homes', label: '建売情報', desc: '販売中の分譲戸建' },

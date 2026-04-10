@@ -20,6 +20,7 @@ const FOOTER_COLUMNS = [
     heading: 'さがす',
     links: [
       { href: '/videos', label: '動画コンテンツ' },
+      { href: '/case-studies', label: '平屋事例ライブラリ' },
       { href: '/features', label: '特集' },
       { href: '/builders', label: '工務店一覧' },
       { href: '/sale-homes', label: '建売情報' },

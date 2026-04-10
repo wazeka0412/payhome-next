@@ -9,20 +9,23 @@ import { properties } from '@/lib/properties';
 import { builders } from '@/lib/builders-data';
 import { saleHomes } from '@/lib/sale-homes-data';
 import { lands } from '@/lib/lands-data';
+import { caseStudies } from '@/lib/case-studies-data';
 
 interface FavoriteRow {
   id: string;
-  content_type: 'property' | 'builder' | 'sale_home' | 'land' | string;
+  content_type: 'property' | 'builder' | 'sale_home' | 'land' | 'case_study' | string;
   content_id: string;
   created_at?: string;
 }
 
-const TABS: Array<{ value: 'all' | 'property' | 'builder' | 'sale_home' | 'land'; label: string }> = [
+type TabValue = 'all' | 'property' | 'builder' | 'sale_home' | 'land' | 'case_study';
+const TABS: Array<{ value: TabValue; label: string }> = [
   { value: 'all', label: 'すべて' },
   { value: 'property', label: '物件・動画' },
   { value: 'builder', label: '工務店' },
   { value: 'sale_home', label: '建売' },
   { value: 'land', label: '土地' },
+  { value: 'case_study', label: '完成事例' },
 ];
 
 export default function FavoritesPage() {
@@ -94,6 +97,7 @@ export default function FavoritesPage() {
     builder: favorites.filter((f) => f.content_type === 'builder').length,
     sale_home: favorites.filter((f) => f.content_type === 'sale_home').length,
     land: favorites.filter((f) => f.content_type === 'land').length,
+    case_study: favorites.filter((f) => f.content_type === 'case_study').length,
   };
 
   const userName =
@@ -201,6 +205,13 @@ function FavoriteCard({ fav }: { fav: FavoriteRow }) {
     subtitle = `${l.tsubo}坪 / 坪単価${l.pricePerTsubo}万円`;
     href = `/lands/${l.id}`;
     badge = '土地';
+  } else if (fav.content_type === 'case_study') {
+    const c = caseStudies.find((x) => x.id === fav.content_id);
+    if (!c) return null;
+    title = c.title;
+    subtitle = `${c.layout} / ${c.tsubo}坪 / 総額${c.totalPrice.toLocaleString()}万円`;
+    href = `/case-studies/${c.id}`;
+    badge = '完成事例';
   } else {
     return null;
   }

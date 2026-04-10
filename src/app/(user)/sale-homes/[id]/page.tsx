@@ -8,6 +8,7 @@ import {
   getSaleHomesByBuilderId,
 } from '@/lib/sale-homes-data';
 import { getBuilderById } from '@/lib/builders-data';
+import FavoriteButton from '@/components/ui/FavoriteButton';
 
 export function generateStaticParams() {
   return saleHomes.map((s) => ({ id: s.id }));
@@ -59,9 +60,13 @@ export default async function SaleHomeDetailPage({
           <h1 className="text-2xl md:text-4xl font-extrabold text-[#3D2200] mb-3 leading-tight">
             {home.title}
           </h1>
-          <p className="text-sm md:text-base text-gray-700 leading-relaxed mb-6 max-w-3xl">
+          <p className="text-sm md:text-base text-gray-700 leading-relaxed mb-4 max-w-3xl">
             {home.description}
           </p>
+
+          <div className="mb-6">
+            <FavoriteButton contentType="sale_home" contentId={home.id} />
+          </div>
 
           {/* Price + KPI strip */}
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6">
