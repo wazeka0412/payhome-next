@@ -47,31 +47,12 @@ export default function BizLayout({ children }: { children: React.ReactNode }) {
               </div>
             </div>
 
-            {/* Service */}
+            {/* About — MVPは /biz TOP と /biz/contact のみ公開 */}
             <div>
-              <h4 className="text-white font-semibold mb-4 text-sm">サービス</h4>
+              <h4 className="text-white font-semibold mb-4 text-sm">ぺいほーむについて</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link href="/biz/service" className="hover:text-[#E8740C] transition">サービス概要</Link></li>
-                <li><Link href="/biz/ad" className="hover:text-[#E8740C] transition">広告・タイアップ</Link></li>
+                <li><Link href="/biz" className="hover:text-[#E8740C] transition">サービス TOP</Link></li>
                 <li><Link href="/biz/contact" className="hover:text-[#E8740C] transition">お問い合わせ</Link></li>
-                <li><Link href="/biz/partner" className="hover:text-[#E8740C] transition">提携パートナー募集</Link></li>
-              </ul>
-            </div>
-
-            {/* Info */}
-            <div>
-              <h4 className="text-white font-semibold mb-4 text-sm">情報</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/biz/news" className="hover:text-[#E8740C] transition">業界ニュース</Link></li>
-                <li><Link href="/biz/articles" className="hover:text-[#E8740C] transition">集客ノウハウ</Link></li>
-                <li><Link href="/biz/webinar" className="hover:text-[#E8740C] transition">セミナー</Link></li>
-              </ul>
-            </div>
-
-            {/* About */}
-            <div>
-              <h4 className="text-white font-semibold mb-4 text-sm">運営情報</h4>
-              <ul className="space-y-2 text-sm">
                 <li><Link href="/about" className="hover:text-[#E8740C] transition">ぺいほーむとは</Link></li>
                 <li><Link href="/company" className="hover:text-[#E8740C] transition">運営会社</Link></li>
                 <li><Link href="/" className="hover:text-[#E8740C] transition">ユーザー向けサイト</Link></li>

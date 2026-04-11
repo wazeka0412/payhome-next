@@ -7,9 +7,6 @@ import MobileMarquee from '@/components/ui/MobileMarquee';
 import CampaignSection from '@/components/layout/CampaignSection';
 import { videos } from '@/lib/videos-data';
 import { builders } from '@/lib/builders-data';
-import { saleHomes, SALE_HOME_STATUS_LABELS } from '@/lib/sale-homes-data';
-import { lands, LAND_STATUS_LABELS } from '@/lib/lands-data';
-import { features } from '@/lib/features-data';
 import { caseStudies } from '@/lib/case-studies-data';
 
 /* ── Data ─────────────────────────────────────────── */
@@ -128,9 +125,6 @@ export default function HomePage() {
   // データ抽出
   const latestVideos = videos.slice(0, 6);
   const topBuilders = [...builders].sort((a, b) => b.annualBuilds - a.annualBuilds).slice(0, 6);
-  const topSaleHomes = saleHomes.filter((s) => s.status === 'available').slice(0, 4);
-  const topLands = lands.filter((l) => l.status === 'available').slice(0, 3);
-  const topFeatures = features.slice(0, 6);
   const topCaseStudies = [...caseStudies]
     .sort((a, b) => b.completedAt.localeCompare(a.completedAt))
     .slice(0, 6);
@@ -404,32 +398,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== 6. 特集 ===== */}
-      <section className="py-16 md:py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <p className="text-xs font-semibold tracking-widest text-[#E8740C] uppercase mb-2">FEATURES</p>
-              <h2 className="text-2xl font-bold text-[#3D2200]">特集から探す</h2>
-              <p className="text-sm text-gray-500 mt-2">エリア・サイズ・工務店別にぺいほーむが厳選</p>
-            </div>
-            <Link href="/features" className="hidden md:block text-sm text-[#E8740C] font-bold hover:underline">すべて見る →</Link>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {topFeatures.map((feature) => (
-              <Link key={feature.id} href={`/features/${feature.id}`} className="group block rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition border border-gray-100">
-                <div className={`relative h-32 bg-gradient-to-br ${feature.heroColor} flex items-end p-5`}>
-                  <div className="text-white">
-                    <p className="text-xs opacity-80 mb-1">{feature.subtitle}</p>
-                    <h3 className="text-lg font-bold leading-tight">{feature.title}</h3>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ===== 7. 工務店一覧 PICKUP ===== */}
       <section className="py-16 md:py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
@@ -467,86 +435,6 @@ export default function HomePage() {
             <Link href="/builders" className="inline-block border-2 border-[#E8740C] text-[#E8740C] font-bold px-8 py-3 rounded-full text-sm hover:bg-[#E8740C] hover:text-white transition">
               工務店一覧を見る
             </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== 8. 販売中の建売 ===== */}
-      <section className="py-16 md:py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <p className="text-xs font-semibold tracking-widest text-[#E8740C] uppercase mb-2">SALE HOMES</p>
-              <h2 className="text-2xl font-bold text-[#3D2200]">販売中の分譲戸建</h2>
-              <p className="text-sm text-gray-500 mt-2">提携工務店の建売情報</p>
-            </div>
-            <Link href="/sale-homes" className="hidden md:block text-sm text-[#E8740C] font-bold hover:underline">すべて見る →</Link>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {topSaleHomes.map((home) => {
-              const status = SALE_HOME_STATUS_LABELS[home.status];
-              return (
-                <Link key={home.id} href={`/sale-homes/${home.id}`} className="block bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md hover:border-[#E8740C]/30 transition">
-                  <div className="relative aspect-[4/3] bg-gradient-to-br from-[#FFF8F0] via-[#FFF3E6] to-[#FFECD4] flex items-center justify-center">
-                    <div className="text-center text-[#E8740C]/40">
-                      <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                      </svg>
-                    </div>
-                    <span className={`absolute top-2 left-2 text-[9px] font-bold px-2 py-0.5 rounded-full ${status.color}`}>{status.label}</span>
-                  </div>
-                  <div className="p-4">
-                    <p className="text-[10px] text-gray-500">{home.city}</p>
-                    <h3 className="text-xs font-bold text-[#3D2200] mb-2 line-clamp-2 min-h-[2rem]">{home.title}</h3>
-                    <p className="text-lg font-extrabold text-[#E8740C]">{home.price.toLocaleString()}<span className="text-[10px] ml-1">万円</span></p>
-                    <p className="text-[10px] text-gray-500 mt-1">{home.layout} / {home.tsubo}坪</p>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-          <div className="text-center mt-8 md:hidden">
-            <Link href="/sale-homes" className="inline-block border-2 border-[#E8740C] text-[#E8740C] font-bold px-8 py-3 rounded-full text-sm hover:bg-[#E8740C] hover:text-white transition">
-              建売情報を見る
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== 9. 取扱中の土地 ===== */}
-      <section className="py-16 md:py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <p className="text-xs font-semibold tracking-widest text-[#E8740C] uppercase mb-2">LANDS</p>
-              <h2 className="text-2xl font-bold text-[#3D2200]">取扱中の土地情報</h2>
-              <p className="text-sm text-gray-500 mt-2">工務店プランと組み合わせ可能な提携土地</p>
-            </div>
-            <Link href="/lands" className="hidden md:block text-sm text-[#E8740C] font-bold hover:underline">すべて見る →</Link>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {topLands.map((land) => {
-              const status = LAND_STATUS_LABELS[land.status];
-              return (
-                <Link key={land.id} href={`/lands/${land.id}`} className="block bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md hover:border-[#E8740C]/30 transition">
-                  <div className="relative aspect-[4/3] bg-gradient-to-br from-emerald-50 via-emerald-100 to-emerald-200 flex items-center justify-center">
-                    <div className="text-center text-emerald-700/40">
-                      <svg className="w-14 h-14 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M5 8l6-6 6 6M5 8v12a1 1 0 001 1h12a1 1 0 001-1V8M5 8h14" />
-                      </svg>
-                      <p className="text-xs font-semibold mt-1">{land.tsubo}坪</p>
-                    </div>
-                    <span className={`absolute top-2 left-2 text-[9px] font-bold px-2 py-0.5 rounded-full ${status.color}`}>{status.label}</span>
-                  </div>
-                  <div className="p-4">
-                    <p className="text-[10px] text-gray-500">{land.city}</p>
-                    <h3 className="text-xs font-bold text-[#3D2200] mb-2 line-clamp-2 min-h-[2rem]">{land.title}</h3>
-                    <p className="text-lg font-extrabold text-[#E8740C]">{land.price.toLocaleString()}<span className="text-[10px] ml-1">万円</span></p>
-                    <p className="text-[10px] text-gray-500 mt-1">{land.tsubo}坪 / 坪単価{land.pricePerTsubo}万円</p>
-                  </div>
-                </Link>
-              );
-            })}
           </div>
         </div>
       </section>
