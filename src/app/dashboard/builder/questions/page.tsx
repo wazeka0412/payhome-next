@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getBuilderById } from '@/lib/builders-data'
+import { useCurrentBuilder } from '@/lib/use-current-builder'
 
 /**
  * 工務店ダッシュボード：匿名質問への回答ページ（Smart Match Phase 1.5）
@@ -36,10 +36,8 @@ const STATUS_LABELS: Record<Question['status'], { label: string; color: string }
   resolved: { label: '解決済み', color: 'bg-gray-100 text-gray-500' },
 }
 
-// MVP: demo builder hard-coded (same pattern as /dashboard/builder/leads)
-const DEMO_BUILDER_ID = 'b01'
-
 export default function BuilderQuestionsPage() {
+  const builder = useCurrentBuilder()
   const [questions, setQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)
   const [expandedId, setExpandedId] = useState<string | null>(null)
@@ -47,15 +45,14 @@ export default function BuilderQuestionsPage() {
   const [saving, setSaving] = useState<string | null>(null)
   const [tab, setTab] = useState<'all' | Question['status']>('pending')
 
-  const builder = getBuilderById(DEMO_BUILDER_ID)
-
   useEffect(() => {
-    fetch(`/api/builders/questions?builder_id=${DEMO_BUILDER_ID}`)
+    if (!builder.id) return
+    fetch(`/api/builders/questions?builder_id=${encodeURIComponent(builder.id)}`)
       .then((r) => r.json())
       .then((res) => setQuestions(res.questions || []))
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [])
+  }, [builder.id])
 
   const handleAnswer = async (questionId: string) => {
     const answer = answerInputs[questionId]?.trim()

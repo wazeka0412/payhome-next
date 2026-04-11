@@ -1,24 +1,48 @@
 import { NextRequest } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
+import { events as staticEvents } from '@/lib/events-data'
 
 export async function GET(request: NextRequest) {
   const builder = request.nextUrl.searchParams.get('builder')
-  const supabase = createServerClient()
 
-  let query = supabase.from('events').select('*').order('date', { ascending: true })
-
-  if (builder) {
-    query = query.eq('builder_name', builder)
+  // ── Supabase 優先 ──
+  try {
+    const supabase = createServerClient()
+    let query = supabase.from('events').select('*').order('date', { ascending: true })
+    if (builder) {
+      query = query.eq('builder_name', builder)
+    }
+    const { data, error } = await query
+    if (error) throw error
+    return Response.json(data || [])
+  } catch (err) {
+    console.warn('[events GET] Supabase unreachable, using local fallback:', (err as Error).message)
   }
 
-  const { data, error } = await query
-
-  if (error) {
-    console.error('Events GET error:', error)
-    return Response.json({ error: 'Failed to fetch events' }, { status: 500 })
+  // ── ローカルフォールバック：events-data.ts を Supabase 互換形式で返す ──
+  try {
+    const filtered = builder
+      ? staticEvents.filter((e) => e.builder === builder)
+      : staticEvents
+    const formatted = filtered.map((e) => ({
+      id: e.id,
+      builder_id: null,
+      builder_name: e.builder,
+      title: e.title,
+      date: e.startDate,
+      location: e.location,
+      type: e.typeLabel,
+      capacity: e.capacity,
+      reservations: 0,
+      is_active: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }))
+    return Response.json(formatted)
+  } catch (err) {
+    console.error('[events GET] local fallback failed:', err)
+    return Response.json([])
   }
-
-  return Response.json(data)
 }
 
 export async function POST(request: NextRequest) {

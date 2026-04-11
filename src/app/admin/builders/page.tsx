@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 
 type Builder = {
   id: string
@@ -33,7 +33,19 @@ export default function BuildersPage() {
   useEffect(() => {
     fetch('/api/builders')
       .then(r => r.json())
-      .then(data => setBuilders(data))
+      .then(data => {
+        const list = Array.isArray(data) ? data : []
+        setBuilders(list.map((b: Record<string, unknown>) => ({
+          id: String(b.id ?? ''),
+          name: String(b.name ?? ''),
+          area: String(b.area ?? ''),
+          plan: String(b.plan ?? 'フリー'),
+          leads: Number(b.leads ?? 0),
+          contracts: Number(b.contracts ?? 0),
+          billing: String(b.billing ?? '—'),
+          startDate: String(b.start_date ?? b.startDate ?? b.created_at ?? '—').slice(0, 10),
+        })))
+      })
       .catch(err => setError(err.message))
       .finally(() => setLoading(false))
   }, []);
@@ -123,9 +135,8 @@ export default function BuildersPage() {
             </thead>
             <tbody>
               {filtered.map((b) => (
-                <>
+                <Fragment key={b.id}>
                   <tr
-                    key={b.id}
                     onClick={() => setExpandedId(expandedId === b.id ? null : b.id)}
                     className="border-b border-gray-50 hover:bg-orange-50/50 cursor-pointer transition"
                   >
@@ -147,7 +158,7 @@ export default function BuildersPage() {
                     <td className="py-3 px-4 text-gray-500">{b.startDate}</td>
                   </tr>
                   {expandedId === b.id && (
-                    <tr key={`${b.id}-detail`} className="bg-orange-50/30">
+                    <tr className="bg-orange-50/30">
                       <td colSpan={8} className="px-8 py-4">
                         <div className="flex items-center justify-between">
                           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm flex-1">
@@ -200,7 +211,7 @@ export default function BuildersPage() {
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               ))}
             </tbody>
           </table>

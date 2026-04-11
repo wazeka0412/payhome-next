@@ -37,20 +37,28 @@ const plans = [
     detail: {
       description: '住宅会社に特化したホームページ・LP制作で、WEBからの反響数を最大化します。',
       services: ['レスポンシブ対応ホームページ制作', '施工事例・お客様の声ページ設計', 'SEO対策（内部構造・コンテンツ最適化）', 'コンバージョン導線設計（CTA最適化）', 'Googleアナリティクス・サーチコンソール設定'],
-      recommended: ['ホームページが古くスマホ対応できていない', '資料請求や来場予約をWEBで増やしたい', 'SEOで検索上位を狙いたい'],
-      result: 'リニューアル後 平均PV +180% / 資料請求 +2.8倍',
+      recommended: ['ホームページが古くスマホ対応できていない', '来場予約やお問い合わせをWEBで増やしたい', 'SEOで検索上位を狙いたい'],
+      result: 'リニューアル後 平均PV +180% / 来場予約 +2.8倍',
     },
   },
   {
     key: 'plan-portal',
-    title: 'ポータルサイト掲載',
-    desc: 'ぺいほーむが運営する住宅会社ポータルサイトに掲載。AIチャット相談機能を通じて見込み顧客をご紹介します。',
+    title: 'ポータルサイト掲載＋Smart Match 送客',
+    desc: 'AI家づくり診断と Smart Match 連絡希望プロファイルで、本気度の高いユーザーを自動選別して送客。しつこい営業ゼロを実現します。',
     icon: '/images/service_portal.png',
     detail: {
-      description: 'ぺいほーむが運営する住宅会社ポータルサイトに掲載。AIチャットで見込み顧客をご紹介します。',
-      services: ['会社紹介ページの作成・掲載', '施工事例・口コミの掲載', 'AIチャット相談経由のリード送客', 'エリア・特徴での検索最適化', '掲載順位の優先表示オプション'],
-      recommended: ['新しい集客チャネルを開拓したい', '他社ポータルの費用対効果に不満がある', '地元エリアでの認知度を上げたい'],
-      result: '月間サイト訪問者 12,000人 / 平均送客 月8件',
+      description: 'ぺいほーむポータルに掲載すると、AI家づくり診断 × Smart Match システムで、ユーザーの希望条件と相性の良い工務店だけに送客されます。ユーザーが事前に連絡時間・頻度・手段を設定しているため、営業ストレスゼロで商談に進めます。',
+      services: [
+        '工務店プロフィール詳細ページ（施工事例・動画・口コミ付き）',
+        'AI家づくり診断からの相性マッチング（上位3社に推薦）',
+        '見学会モード連携（体感 / 相談 / 契約検討）',
+        '匿名AI仲介質問機能（ユーザーから気軽に質問）',
+        '連絡希望プロファイル同期（希望時間・頻度・手段を事前把握）',
+        'エリア・特徴・間取りでの検索最適化',
+        '工務店ダッシュボードでリード即時確認・対応',
+      ],
+      recommended: ['&quot;しつこい営業&quot;を避けたい顧客層に届きたい', 'AI診断で本気度の高いリードだけ獲得したい', '地元エリアでの認知度を上げたい'],
+      result: '月間サイト訪問者 12,000人 / AI診断経由 成約率 35% / 平均送客 月8件',
     },
   },
 ];
@@ -70,11 +78,11 @@ const cases = [
   {
     key: 'case-b',
     company: 'Bハウス（福岡市）',
-    title: 'WEBリニューアルで資料請求数が2.8倍に',
-    excerpt: 'ホームページリニューアルとSEO対策を実施。施工事例ページの充実と動線改善により、月間資料請求数が大幅に向上しました。',
+    title: 'WEBリニューアルで来場予約数が2.8倍に',
+    excerpt: 'ホームページリニューアルとSEO対策を実施。施工事例ページの充実と動線改善により、月間の来場予約・無料相談数が大幅に向上しました。',
     detail: {
       service: 'WEB制作（フルリニューアル）+ SEO対策 + 月次改善',
-      results: ['月間PV：3,200 → 8,500（+166%）', '資料請求数：月12件 → 月34件（2.8倍）', '施工事例ページ直帰率：68% → 32%', 'モバイル表示速度：4.2秒 → 1.8秒'],
+      results: ['月間PV：3,200 → 8,500（+166%）', '来場予約数：月12件 → 月34件（2.8倍）', '施工事例ページ直帰率：68% → 32%', 'モバイル表示速度：4.2秒 → 1.8秒'],
       quote: '「以前のサイトはスマホで見づらく、お客様からも指摘がありました。リニューアル後は反響が目に見えて増え、営業担当も喜んでいます。」',
     },
   },
@@ -200,10 +208,10 @@ export default function ServicePage() {
               </thead>
               <tbody>
                 {[
-                  ['初期費用', '10〜30万円', '5〜20万円', '0円'],
+                  ['初期費用', '有償', '有償', '0円'],
                   ['動画コンテンツ', '❌', '❌', '✅ 4.28万人CH'],
-                  ['AIチャット推薦', '❌', '❌', '✅'],
-                  ['反響単価', '8,000〜15,000円', '5,000〜10,000円', '3,000〜5,000円'],
+                  ['AI診断レコメンド', '❌', '❌', '✅'],
+                  ['Smart Match 連携', '❌', '❌', '✅'],
                   ['月額プラン', '必須', '必須', '任意（無料プランあり）'],
                   ['専任担当', '△', '△', '✅（プレミアム）'],
                 ].map(([label, s, h, p], i) => (
@@ -220,7 +228,7 @@ export default function ServicePage() {
         </div>
       </section>
 
-      <section className="bg-gray-50 py-20"><div className="max-w-7xl mx-auto px-4"><div className="text-center mb-12"><p className="text-[#E8740C] font-semibold text-sm tracking-widest uppercase mb-2">Pricing</p><h2 className="text-2xl md:text-3xl font-extrabold">料金プラン</h2></div><div className="max-w-3xl mx-auto overflow-x-auto"><table className="w-full border-collapse text-center text-sm"><thead><tr className="bg-gray-900 text-white"><th className="p-4 text-left w-2/5">サービス</th><th className="p-4">料金</th></tr></thead><tbody><tr className="border-b border-gray-200"><th className="p-4 text-left bg-gray-50 font-semibold">記事掲載</th><td className="p-4"><span className="text-[#E8740C] font-extrabold text-xl font-mono">無料</span></td></tr><tr className="border-b border-gray-200"><th className="p-4 text-left bg-gray-50 font-semibold">ルームツアー動画（オプション）</th><td className="p-4"><span className="text-[#E8740C] font-extrabold text-xl font-mono">30万円〜</span>/本</td></tr></tbody></table><h3 className="text-center mt-10 mb-4 text-lg font-bold">反響課金</h3><table className="w-full border-collapse text-center text-sm"><thead><tr className="bg-gray-900 text-white"><th className="p-4 text-left w-2/5">反響の種類</th><th className="p-4">課金単価</th></tr></thead><tbody><tr className="border-b border-gray-200"><th className="p-4 text-left bg-gray-50 font-semibold">資料請求</th><td className="p-4"><span className="text-[#E8740C] font-extrabold text-xl font-mono">3,000円</span>/件</td></tr><tr className="border-b border-gray-200"><th className="p-4 text-left bg-gray-50 font-semibold">見学会予約</th><td className="p-4"><span className="text-[#E8740C] font-extrabold text-xl font-mono">5,000円</span>/件</td></tr><tr className="border-b border-gray-200"><th className="p-4 text-left bg-gray-50 font-semibold">成約報酬</th><td className="p-4"><span className="text-[#E8740C] font-extrabold text-xl font-mono">20万円</span>/件</td></tr></tbody></table></div><p className="text-center mt-8 text-xs text-gray-400">※ 記事掲載は無料。初期費用ゼロでスタートできます。<br />※ 反響課金型なので、成果が出た分だけお支払いいただくモデルです。</p></div></section>
+      <section className="bg-gray-50 py-20"><div className="max-w-7xl mx-auto px-4"><div className="text-center mb-12"><p className="text-[#E8740C] font-semibold text-sm tracking-widest uppercase mb-2">Pricing</p><h2 className="text-2xl md:text-3xl font-extrabold">料金プラン</h2></div><div className="max-w-3xl mx-auto overflow-x-auto"><table className="w-full border-collapse text-center text-sm"><thead><tr className="bg-gray-900 text-white"><th className="p-4 text-left w-2/5">サービス</th><th className="p-4">料金</th></tr></thead><tbody><tr className="border-b border-gray-200"><th className="p-4 text-left bg-gray-50 font-semibold">記事掲載・プロフィール掲載</th><td className="p-4"><span className="text-[#E8740C] font-extrabold text-xl font-mono">無料</span></td></tr><tr className="border-b border-gray-200"><th className="p-4 text-left bg-gray-50 font-semibold">ルームツアー動画（オプション）</th><td className="p-4"><span className="text-[#E8740C] font-extrabold text-xl font-mono">お問い合わせ</span></td></tr><tr className="border-b border-gray-200"><th className="p-4 text-left bg-gray-50 font-semibold">プレミアム掲載・送客プラン</th><td className="p-4"><span className="text-[#E8740C] font-extrabold text-xl font-mono">お問い合わせ</span></td></tr></tbody></table></div><p className="text-center mt-8 text-xs text-gray-400">※ 記事掲載・工務店プロフィール掲載は完全無料。初期費用ゼロでスタートできます。<br />※ オプションサービスや成果報酬の詳細は、貴社の課題やご予算に合わせて個別にご提案いたします。お気軽にお問い合わせください。</p></div></section>
 
       <section className="py-20"><div className="max-w-7xl mx-auto px-4"><div className="text-center mb-12"><p className="text-[#E8740C] font-semibold text-sm tracking-widest uppercase mb-2">FAQ</p><h2 className="text-2xl md:text-3xl font-extrabold">よくあるご質問</h2></div><div className="max-w-3xl mx-auto divide-y divide-gray-200">{faqs.map((faq) => (<details key={faq.q} className="group py-4"><summary className="flex items-center justify-between cursor-pointer font-semibold text-sm list-none">{faq.q}<span className="text-[#E8740C] text-lg font-bold group-open:hidden">+</span><span className="text-[#E8740C] text-lg font-bold hidden group-open:inline">-</span></summary><p className="mt-3 text-sm text-gray-500 leading-relaxed">{faq.a}</p></details>))}</div></div></section>
 

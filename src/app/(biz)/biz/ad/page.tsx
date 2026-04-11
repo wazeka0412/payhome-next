@@ -3,19 +3,20 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
+import { SITE_STATS } from '@/lib/site-config';
 
 const mediaStats = [
-  { number: '4.2万', label: 'YouTube登録者数' },
-  { number: '150万', label: '月間再生数' },
-  { number: '3.2万', label: '平均視聴回数/本' },
+  { number: SITE_STATS.youtubeSubscribers, label: 'YouTube登録者数' },
+  { number: SITE_STATS.monthlyViews, label: '月間再生数' },
+  { number: SITE_STATS.averageWatchTime, label: '平均視聴回数/本' },
   { number: '25-45歳', label: '主な視聴者層' },
 ];
 
 const tieupMenus = [
-  { key: 'tieup-video', title: 'タイアップ動画', desc: 'ぺいほーむのYouTubeチャンネルで御社の商品・サービスを紹介するタイアップ動画を制作・配信します。', icon: '/images/tieup_video.png', detail: { description: 'ぺいほーむのYouTubeチャンネル（4.2万登録者）で、御社の商品・サービスを紹介する動画を制作・配信します。', services: ['企画構成・台本作成', 'プロクルーによる撮影（半日〜1日）', '編集・テロップ・BGM・サムネイル制作', 'YouTube公開 + SNSでの告知投稿', '公開後1ヶ月間のレポート提出'], price: '50万円〜（税別）/ 1本あたり', result: '再生回数 3.2万回 / 視聴維持率 52%' } },
-  { key: 'tieup-article', title: 'タイアップ記事', desc: 'ぺいほーむのWEBメディアに御社の商品・サービスを紹介するスポンサード記事を掲載します。', icon: '/images/tieup_article.png', detail: { description: 'ぺいほーむのWEBメディアに、御社の商品・サービスを紹介するスポンサード記事を掲載します。', services: ['取材・ヒアリング（オンライン or 訪問）', '3,000〜5,000字の記事制作', '写真撮影 or 素材提供での構成', 'SEO最適化（検索流入を狙う設計）', 'SNSでの告知投稿（Instagram・X）'], price: '20万円〜（税別）/ 1記事あたり', result: '月間PV 8,000 / 平均滞在時間 3分12秒' } },
-  { key: 'tieup-magazine', title: '月刊ぺいほーむ掲載', desc: 'デジタルマガジン「月刊ぺいほーむ」に広告枠またはタイアップ特集として掲載いたします。', icon: '/images/tieup_magazine.png', detail: { description: 'デジタルマガジン「月刊ぺいほーむ」に広告枠またはタイアップ特集として掲載いたします。', services: ['純広告枠：1/2ページ or 1ページの広告掲載', 'タイアップ特集：2〜4ページの編集記事風コンテンツ', '表紙周り：表2・表3・表4の広告枠'], price: '純広告（1/2ページ）：5万円〜 / タイアップ特集：15万円〜 / 表紙周り：10万円〜', result: '毎月 3,500人以上がダウンロード' } },
-  { key: 'tieup-event', title: 'イベント・ウェビナー協賛', desc: 'ぺいほーむ主催のウェビナーやイベントへの協賛・共催が可能です。ターゲット層への直接訴求ができます。', icon: '/images/tieup_event.png', detail: { description: 'ぺいほーむ主催のウェビナーやイベントへの協賛・共催で、ターゲット層へ直接訴求できます。', services: ['冠スポンサー：イベント名に社名を冠し、登壇枠を提供', 'プレゼンスポンサー：10分間のプレゼン枠を提供', 'ブース協賛：会場イベント時の展示ブース提供', 'ロゴ掲載：告知バナー・動画内にロゴを掲出'], price: '冠スポンサー：30万円〜 / プレゼンスポンサー：15万円〜 / ロゴ掲載：5万円〜', result: 'ウェビナー平均参加者 100名 / アーカイブ視聴 500名' } },
+  { key: 'tieup-video', title: 'タイアップ動画', desc: 'ぺいほーむのYouTubeチャンネルで御社の商品・サービスを紹介するタイアップ動画を制作・配信します。', icon: '/images/tieup_video.png', detail: { description: 'ぺいほーむのYouTubeチャンネル（4.28万登録者）で、御社の商品・サービスを紹介する動画を制作・配信します。', services: ['企画構成・台本作成', 'プロクルーによる撮影（半日〜1日）', '編集・テロップ・BGM・サムネイル制作', 'YouTube公開 + SNSでの告知投稿', '公開後1ヶ月間のレポート提出'], price: 'お問い合わせください', result: '再生回数 3.2万回 / 視聴維持率 52%' } },
+  { key: 'tieup-article', title: 'タイアップ記事', desc: 'ぺいほーむのWEBメディアに御社の商品・サービスを紹介するスポンサード記事を掲載します。', icon: '/images/tieup_article.png', detail: { description: 'ぺいほーむのWEBメディアに、御社の商品・サービスを紹介するスポンサード記事を掲載します。', services: ['取材・ヒアリング（オンライン or 訪問）', '3,000〜5,000字の記事制作', '写真撮影 or 素材提供での構成', 'SEO最適化（検索流入を狙う設計）', 'SNSでの告知投稿（Instagram・X）'], price: 'お問い合わせください', result: '月間PV 8,000 / 平均滞在時間 3分12秒' } },
+  { key: 'tieup-magazine', title: '月刊ぺいほーむ掲載', desc: 'デジタルマガジン「月刊ぺいほーむ」に広告枠またはタイアップ特集として掲載いたします。', icon: '/images/tieup_magazine.png', detail: { description: 'デジタルマガジン「月刊ぺいほーむ」に広告枠またはタイアップ特集として掲載いたします。', services: ['純広告枠：1/2ページ or 1ページの広告掲載', 'タイアップ特集：2〜4ページの編集記事風コンテンツ', '表紙周り：表2・表3・表4の広告枠'], price: 'お問い合わせください', result: '毎月 3,500人以上がダウンロード' } },
+  { key: 'tieup-event', title: 'イベント・ウェビナー協賛', desc: 'ぺいほーむ主催のウェビナーやイベントへの協賛・共催が可能です。ターゲット層への直接訴求ができます。', icon: '/images/tieup_event.png', detail: { description: 'ぺいほーむ主催のウェビナーやイベントへの協賛・共催で、ターゲット層へ直接訴求できます。', services: ['冠スポンサー：イベント名に社名を冠し、登壇枠を提供', 'プレゼンスポンサー：10分間のプレゼン枠を提供', 'ブース協賛：会場イベント時の展示ブース提供', 'ロゴ掲載：告知バナー・動画内にロゴを掲出'], price: 'お問い合わせください', result: 'ウェビナー平均参加者 100名 / アーカイブ視聴 500名' } },
 ];
 
 const tieupCases = [

@@ -2,32 +2,34 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { SITE_STATS } from '@/lib/site-config';
 
 const statsData = [
-  { number: '15万回', label: '月間視聴回数' },
-  { number: '500件+', label: '相談実績' },
-  { number: '35%', label: '紹介成約率' },
+  { number: SITE_STATS.youtubeSubscribers, label: 'YouTube登録者数' },
+  { number: SITE_STATS.monthlyViews, label: '月間視聴回数' },
+  { number: SITE_STATS.partnerCount, label: '提携工務店' },
+  { number: SITE_STATS.prefectureCoverage, label: '対応エリア' },
 ];
 
 const planCards = [
   {
     name: '無料掲載プラン（スタンダード）',
     price: '0',
-    priceUnit: '円/月',
+    priceUnit: '円／月',
     featured: false,
     features: [
       { text: 'WEBメディア記事掲載', value: '無料', ok: true },
       { text: '工務店プロフィールページ', value: '無料', ok: true },
-      { text: '資料請求の受付', value: '無料（反響課金 3,000円/件）', ok: true },
-      { text: '見学会・イベント掲載', value: '無料（来場課金 5,000円/件）', ok: true },
-      { text: '無料相談からの紹介', value: '無料（成約報酬 20万円/件）', ok: true },
+      { text: '見学会・イベント掲載', value: '無料', ok: true },
+      { text: '無料相談・お問い合わせ受付', value: '無料', ok: true },
+      { text: 'AI診断レコメンド対象', value: '無料', ok: true },
       { text: '月刊ぺいほーむ掲載', value: '', ok: false },
     ],
   },
   {
     name: 'ルームツアー動画オプション',
-    price: '30万円〜',
-    priceUnit: '/本',
+    price: 'お問い合わせ',
+    priceUnit: '',
     featured: false,
     features: [
       { text: 'プロクルーによる撮影（半日〜1日）', value: '', ok: true },
@@ -40,8 +42,8 @@ const planCards = [
   },
   {
     name: 'プレミアムプラン',
-    price: '10万円',
-    priceUnit: '/月',
+    price: 'お問い合わせ',
+    priceUnit: '',
     featured: true,
     features: [
       { text: '無料掲載プランの全機能', value: '', ok: true },
@@ -58,14 +60,14 @@ const flowSteps = [
   { num: 1, title: 'お申し込み', desc: 'フォームからお申し込み。担当者より2営業日以内にご連絡します。' },
   { num: 2, title: '取材・撮影', desc: '貴社の強み・特徴をヒアリング。必要に応じてルームツアー撮影を実施します。' },
   { num: 3, title: '掲載開始', desc: 'プロフィールページと記事を公開。YouTube・SNSでも発信を開始します。' },
-  { num: 4, title: '反響獲得', desc: '資料請求・来場予約・相談など、反響をお届けします。' },
+  { num: 4, title: '反響獲得', desc: '見学会予約・お問い合わせ・無料相談など、反響をお届けします。' },
 ];
 
 const faqs = [
-  { q: '掲載料は本当に無料ですか？', a: 'はい、記事掲載・プロフィールページは完全無料です。費用が発生するのは反響課金（資料請求・来場・成約時）のみです。' },
+  { q: '掲載料は本当に無料ですか？', a: 'はい、記事掲載・プロフィールページは完全無料です。オプションサービスや成果報酬プランの詳細は、お問い合わせいただければ個別にご提案いたします。' },
   { q: 'どのエリアの工務店が対象ですか？', a: '九州全域を中心に、全国の工務店様にご参加いただけます。' },
   { q: 'ルームツアー動画は必須ですか？', a: 'いいえ、オプションです。記事掲載のみでも提携パートナーとしてお客様をご紹介します。' },
-  { q: '反響課金の支払いタイミングは？', a: '月末締め翌月末払いです。成約報酬は成約確認後にご請求します。' },
+  { q: '料金プランの詳細を知りたい', a: '貴社の課題・ご予算・ご希望のサービス内容に応じて、最適なプランを個別にご提案いたします。お気軽にお問い合わせください。' },
   { q: '解約はいつでもできますか？', a: 'はい、いつでも解約可能です。最低契約期間はありません。' },
 ];
 

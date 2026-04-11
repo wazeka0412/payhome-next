@@ -32,12 +32,12 @@ export default function DashboardPage() {
 
   useEffect(() => {
     Promise.all([
-      fetch('/api/stats').then(r => r.json()),
-      fetch('/api/leads').then(r => r.json()),
+      fetch('/api/stats').then(r => r.json()).catch(() => null),
+      fetch('/api/leads').then(r => r.json()).catch(() => []),
     ])
       .then(([statsData, leadsData]) => {
         setStats(statsData)
-        setLeads(leadsData.slice(0, 5))
+        setLeads(Array.isArray(leadsData) ? leadsData.slice(0, 5) : [])
       })
       .catch(err => setError(err.message))
       .finally(() => setLoading(false))

@@ -254,71 +254,87 @@ export default function PeiAnimations() {
     document.addEventListener('touchstart', markInteraction, { passive: true })
     document.addEventListener('click', markInteraction)
 
-    // ページ別のポップアップ内容を決定
+    // ページ別のポップアップ内容を決定（v4.0 開設記念キャンペーン）
     function getPopupContent() {
       const p = pathname
-      const campaignTimer = '🎉 4/30まで！無料相談で1,000円分PayPay進呈'
-      if (p.startsWith('/property/')) {
+      // 共通: 開設記念キャンペーン（カタログプレゼント）
+      const campaignTimer = 'OPENING CAMPAIGN｜AI診断＋会員登録でデジタルカタログ無料プレゼント'
+
+      if (p.startsWith('/property/') || p.startsWith('/videos/')) {
         return {
           image: '/images/pei_wink.png',
           title: 'この家、気になりますか？',
-          desc: '今なら無料相談で1,000円分のPayPayをプレゼント！動画で紹介した工務店に相談できます。',
-          cta1: { label: '無料相談する（PayPay進呈）', href: '/consultation', color: '#E8740C' },
-          cta2: { label: 'LINEで聞いてみる', href: 'https://line.me/R/ti/p/@253gzmoh', color: '#06C755' },
+          desc: 'AI家づくり診断と会員登録で、施工事例集30邸＋平屋間取り図集30プランのデジタルカタログを無料プレゼント中。',
+          cta1: { label: 'AI家づくり診断をはじめる', href: '/diagnosis', color: '#E8740C' },
+          cta2: { label: '無料会員登録する', href: '/signup', color: '#D4660A' },
           timer: campaignTimer,
         }
       }
-      if (p === '/videos' || p === '/area') {
+      if (p === '/videos' || p === '/area' || p === '/case-studies') {
         return {
           image: '/images/pei_smile.png',
-          title: 'お探しの家、見つかりましたか？',
-          desc: '無料相談で1,000円分、見学会予約で4,000円分のPayPayをプレゼント中！',
-          cta1: { label: '無料相談する（PayPay進呈）', href: '/consultation', color: '#E8740C' },
-          cta2: { label: '見学会を予約する（4,000円）', href: '/event', color: '#D4660A' },
+          title: 'お探しの家が見つかったら、次は…',
+          desc: '会員登録すると、間取り図フル解像度・お気に入り無制限・工務店3社のAIレコメンドが使えるようになります。デジタルカタログも無料プレゼント。',
+          cta1: { label: '無料会員登録する', href: '/signup', color: '#E8740C' },
+          cta2: { label: 'AI家づくり診断', href: '/diagnosis', color: '#D4660A' },
           timer: campaignTimer,
         }
       }
       if (p === '/simulator') {
         return {
           image: '/images/pei_think.png',
-          title: '資金計画、プロに相談しませんか？',
-          desc: '今なら無料相談で1,000円分PayPay進呈！ぺいほーむ経由の契約で10万円キャッシュバックも。',
-          cta1: { label: '資金計画を無料相談（PayPay進呈）', href: '/consultation', color: '#E8740C' },
-          cta2: { label: 'LINEで気軽に質問', href: 'https://line.me/R/ti/p/@253gzmoh', color: '#06C755' },
-          timer: '🎉 4/30まで！契約で総額105,000円プレゼント',
+          title: '予算が固まったら、次のステップへ',
+          desc: 'AI家づくり診断（10問・約2分）で、あなたの予算と希望に合う工務店3社をAIがご提案します。',
+          cta1: { label: 'AI家づくり診断をはじめる', href: '/diagnosis', color: '#E8740C' },
+          cta2: { label: '見学会の日程を見る', href: '/event', color: '#D4660A' },
+          timer: campaignTimer,
         }
       }
       if (p === '/builders' || p.startsWith('/builders/')) {
         return {
           image: '/images/pei_wink.png',
           title: '工務店選びに迷っていますか？',
-          desc: 'AI家づくり診断（10問・約2分）で、あなたに合った工務店3社を提案します。',
+          desc: 'AI家づくり診断（10問・約2分）で、あなたに合った工務店3社を提案します。会員登録でデジタルカタログも進呈中。',
           cta1: { label: 'AI家づくり診断をはじめる', href: '/diagnosis', color: '#E8740C' },
           cta2: { label: '見学会を予約する', href: '/event', color: '#D4660A' },
           timer: campaignTimer,
         }
       }
-      if (p === '/consultation' || p === '/diagnosis' || p === '/event' || p === '/signup' || p === '/login' || p === '/welcome') {
+      if (
+        p === '/consultation' ||
+        p === '/diagnosis' ||
+        p === '/event' ||
+        p === '/signup' ||
+        p === '/login' ||
+        p === '/welcome' ||
+        p.startsWith('/mypage')
+      ) {
         return null
       }
-      if (p.startsWith('/interview') || p.startsWith('/news/') || p.startsWith('/articles/') || p.startsWith('/voice')) {
+      if (
+        p.startsWith('/interview') ||
+        p.startsWith('/news/') ||
+        p.startsWith('/articles/') ||
+        p.startsWith('/voice') ||
+        p.startsWith('/features')
+      ) {
         return {
           image: '/images/pei_confused.png',
-          title: '春のキャンペーン実施中！',
-          desc: '無料相談で1,000円、見学会予約で4,000円分のPayPayをプレゼント。さらに契約で10万円！',
-          cta1: { label: '無料相談する（1,000円PayPay）', href: '/consultation', color: '#E8740C' },
-          cta2: { label: '見学会を予約（4,000円PayPay）', href: '/event', color: '#D4660A' },
-          timer: '🎉 4/30まで！総額105,000円プレゼント',
+          title: 'ぺいほーむ住宅ポータルサイト 開設記念',
+          desc: 'AI家づくり診断と会員登録で、施工事例集30邸＋平屋間取り図集30プランのデジタルカタログを無料プレゼント。',
+          cta1: { label: 'AI家づくり診断', href: '/diagnosis', color: '#E8740C' },
+          cta2: { label: '無料会員登録', href: '/signup', color: '#D4660A' },
+          timer: campaignTimer,
         }
       }
       // TOP・その他
       return {
         image: '/images/pei_confused.png',
-        title: '春のキャンペーン実施中！',
-        desc: '無料相談するだけで1,000円分のPayPayをプレゼント。見学会予約なら4,000円分！',
-        cta1: { label: '無料相談する（PayPay進呈）', href: '/consultation', color: '#E8740C' },
-        cta2: { label: 'LINEで気軽に相談', href: 'https://line.me/R/ti/p/@253gzmoh', color: '#06C755' },
-        timer: '🎉 4/30まで！総額105,000円プレゼント',
+        title: 'ぺいほーむ住宅ポータルサイト 開設記念',
+        desc: 'AI家づくり診断＋無料会員登録で、ぺいほーむ厳選 施工事例集30邸＋平屋間取り図集30プランのデジタルカタログを無料プレゼント中。',
+        cta1: { label: 'AI家づくり診断（約2分）', href: '/diagnosis', color: '#E8740C' },
+        cta2: { label: '無料会員登録', href: '/signup', color: '#D4660A' },
+        timer: campaignTimer,
       }
     }
 

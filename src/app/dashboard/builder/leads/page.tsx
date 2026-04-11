@@ -10,6 +10,7 @@ import {
   type ContactPreferences,
 } from '@/lib/contact-preferences'
 import { VIEWING_MODE_INFO, type ViewingMode } from '@/lib/event-viewing-mode'
+import { useCurrentBuilder } from '@/lib/use-current-builder'
 
 const TABS = ['すべて', '新規', '対応中', '紹介済', '成約', '失注'] as const
 
@@ -48,6 +49,7 @@ function statusColor(status: string) {
 }
 
 export default function LeadsPage() {
+  const builder = useCurrentBuilder()
   const [tab, setTab] = useState<string>('すべて')
   const [leads, setLeads] = useState<Lead[]>([])
   const [loading, setLoading] = useState(true)
@@ -58,12 +60,13 @@ export default function LeadsPage() {
   const [showMemoInput, setShowMemoInput] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/leads?builder=万代ホーム')
+    if (!builder.name) return
+    fetch(`/api/leads?builder=${encodeURIComponent(builder.name)}`)
       .then(r => r.json())
-      .then(data => setLeads(data))
+      .then(data => setLeads(Array.isArray(data) ? data : []))
       .catch(err => setError(err.message))
       .finally(() => setLoading(false))
-  }, [])
+  }, [builder.name])
 
   const handleStatusUpdate = async (leadId: string, newStatus: string) => {
     try {
