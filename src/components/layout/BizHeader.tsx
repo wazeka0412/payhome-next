@@ -4,23 +4,17 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
 
-const NAV_CONTENT = [
-  {
-    label: 'サービス',
-    items: [
-      { href: '/biz/service', label: 'サービス概要' },
-      { href: '/biz/ad', label: '広告・タイアップ' },
-      { href: '/biz/partner', label: '提携パートナー募集' },
-    ],
-  },
-  {
-    label: '情報',
-    items: [
-      { href: '/biz/news', label: '業界ニュース' },
-      { href: '/biz/articles', label: '集客ノウハウ' },
-      { href: '/biz/webinar', label: 'セミナー' },
-    ],
-  },
+/**
+ * MVPリリース (2026/05/01) 版 B2B ヘッダー
+ *
+ * /biz TOP と /biz/contact のみ公開。
+ * biz/service, biz/ad, biz/partner, biz/news, biz/articles, biz/webinar は
+ * middleware で 404 のため、ナビからも除去。
+ */
+const NAV_CONTENT: Array<{
+  label: string;
+  items: Array<{ href: string; label: string }>;
+}> = [
   {
     label: '運営情報',
     items: [

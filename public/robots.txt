@@ -1,7 +1,34 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
+Disallow: /appadmin/
 Disallow: /dashboard/
 Disallow: /api/
+
+# MVPリリース (2026/05/01) 時点で非公開のパス
+# src/middleware.ts の HIDDEN_PATH_PREFIXES と一致させて管理
+Disallow: /articles
+Disallow: /news
+Disallow: /interview
+Disallow: /magazine
+Disallow: /webinar
+Disallow: /sale-homes
+Disallow: /lands
+Disallow: /features
+Disallow: /simulator
+Disallow: /area
+Disallow: /welcome
+Disallow: /property
+Disallow: /builders/compare
+Disallow: /builders/contact
+Disallow: /mypage/catalog
+Disallow: /mypage/questions
+Disallow: /mypage/feedback
+Disallow: /biz/service
+Disallow: /biz/ad
+Disallow: /biz/partner
+Disallow: /biz/articles
+Disallow: /biz/news
+Disallow: /biz/webinar
 
 Sitemap: https://payhome.jp/sitemap.xml

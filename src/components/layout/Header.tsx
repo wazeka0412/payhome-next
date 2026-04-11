@@ -7,21 +7,19 @@ import { useSession, signOut } from 'next-auth/react';
 import MobileMenu from './MobileMenu';
 
 /**
- * v4.0 MVP ナビゲーション（7画面 + α に限定）
+ * MVPリリース (2026/05/01) 版ナビゲーション
  *
- * REQUIREMENTS.md 5.0 に従い、月刊誌 / ウェビナー / ニュース / 取材 /
- * お役立ち記事 はナビから除外（ページは残すが導線を切る）。
+ * 「YouTube → TOP → 工務店ページ → 見学会予約」の核ループのみに絞り込み。
+ * 非公開項目は src/middleware.ts の HIDDEN_PATH_PREFIXES で404を返すため、
+ * 復活させる際はナビ + middleware の2箇所から削除するだけ。
  */
 const NAV_CONTENT = [
   {
     label: 'さがす',
     items: [
       { href: '/videos', label: '動画コンテンツ', desc: '平屋ルームツアー' },
-      { href: '/case-studies', label: '平屋事例ライブラリ', desc: '完成事例を検索' },
-      { href: '/features', label: '特集', desc: 'エリア・サイズ・工務店' },
       { href: '/builders', label: '工務店一覧', desc: '提携工務店を検索' },
-      { href: '/sale-homes', label: '建売情報', desc: '販売中の分譲戸建' },
-      { href: '/lands', label: '土地情報', desc: '工務店取扱の土地' },
+      { href: '/case-studies', label: '平屋事例ライブラリ', desc: '完成事例を確認' },
       { href: '/event', label: '見学会・イベント', desc: '実物を体感' },
     ],
   },
@@ -30,7 +28,6 @@ const NAV_CONTENT = [
     items: [
       { href: '/diagnosis', label: 'AI家づくり診断', desc: '10問で自分に合う家を提案' },
       { href: '/consultation', label: '無料住宅相談', desc: '専門スタッフに相談' },
-      { href: '/simulator', label: 'ローンシミュレーター', desc: '月々の返済を試算' },
     ],
   },
   {

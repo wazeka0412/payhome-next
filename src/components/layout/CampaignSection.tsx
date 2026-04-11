@@ -63,17 +63,17 @@ export default function CampaignSection() {
                 />
                 <StepLink
                   num={2}
-                  href="/signup?redirect=/mypage/catalog"
+                  href="/signup?redirect=/catalog"
                   title="無料会員登録"
                   desc="メール / Google で登録"
                   cta="登録する →"
                 />
                 <StepLink
                   num={3}
-                  href="/mypage/catalog"
+                  href="/catalog"
                   title="デジタルカタログを受け取る"
-                  desc="マイページの「デジタルカタログ」からすぐ閲覧"
-                  cta="受け取り画面へ →"
+                  desc="会員登録後すぐに閲覧いただけます"
+                  cta="カタログ一覧へ →"
                 />
               </div>
 
