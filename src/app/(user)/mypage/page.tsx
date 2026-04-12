@@ -268,6 +268,14 @@ export default function MyPage() {
               stat="Phase 2"
               disabled
             />
+            <MyPageCard
+              title="その後の状況を報告"
+              description="成約のご報告やお祝いギフトの受け取りはこちら"
+              href="/mypage/conversion-report"
+              linkLabel="状況を報告する"
+              stat="🎁"
+              statHighlight
+            />
           </div>
 
           {/* 次のステップCTA */}

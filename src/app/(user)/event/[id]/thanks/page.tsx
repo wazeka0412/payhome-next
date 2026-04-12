@@ -132,6 +132,14 @@ export default function EventThanksPage() {
               </Link>
             </div>
 
+            {/* 見学後アンケート予告 */}
+            <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-6 text-left">
+              <p className="text-xs text-blue-800 leading-relaxed">
+                📩 見学会の数日後に、<strong>かんたんな振り返りアンケート</strong>をメールでお届けします。
+                ご回答いただくと、<strong>工務店比較テンプレート</strong>など家づくりに役立つ特典をお送りします。
+              </p>
+            </div>
+
             {/* Primary CTA: 会員登録で準備を整える (家づくり支援訴求) */}
             <div className="bg-gradient-to-br from-[#FFF8F0] to-white border-2 border-[#E8740C]/30 rounded-2xl p-5 md:p-6 mb-6 text-left">
               <p className="text-[10px] font-bold text-[#E8740C] tracking-widest mb-2">
