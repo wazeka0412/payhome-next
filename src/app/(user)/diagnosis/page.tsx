@@ -136,7 +136,7 @@ export default function DiagnosisPage() {
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 rounded-lg p-3">
               <span>⏱</span>
-              <span>所要時間：約2分</span>
+              <span>所要時間：約3分</span>
             </div>
           </div>
 

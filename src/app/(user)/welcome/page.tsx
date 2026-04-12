@@ -205,11 +205,11 @@ export default function WelcomePage() {
               <h2 className="text-2xl md:text-3xl font-extrabold mb-3 leading-tight">
                 まずはAI家づくり診断
                 <span className="block text-base md:text-lg font-bold opacity-90 mt-2">
-                  (約2分・10問)
+                  (約3分・15問)
                 </span>
               </h2>
               <p className="text-sm md:text-base text-white/95 mb-6 max-w-xl mx-auto leading-relaxed">
-                10問に答えるだけで、あなたの家づくりタイプを判定し、
+                15問に答えるだけで、あなたの家づくりタイプを判定し、
                 <br className="hidden md:block" />
                 相性の良い工務店3社をご提案します。結果は自動で保存されます。
               </p>

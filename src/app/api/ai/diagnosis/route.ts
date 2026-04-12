@@ -80,13 +80,18 @@ export async function POST(request: NextRequest) {
         user_id: userId,
         family_structure: answers.family_structure,
         age_range: answers.age_range,
+        building_trigger: answers.building_trigger,
         budget_range: answers.budget_range,
+        monthly_payment: answers.monthly_payment,
         preferred_area: answers.preferred_area,
         has_land: answers.has_land === 'yes',
+        floor_area: answers.floor_area,
+        parking_needs: answers.parking_needs,
         planned_timing: answers.planned_timing,
         design_orientation: answers.design_orientation,
         performance_orientation: answers.performance_orientation,
         lifestyle_priorities: answers.lifestyle_priorities,
+        sales_preference: answers.sales_preference,
         consideration_phase: answers.consideration_phase,
         user_type: userType,
         updated_at: new Date().toISOString(),
@@ -139,7 +144,14 @@ function recommendBuilders(
     if (candidates.length < 3) candidates = buildersData
   }
 
-  // スコア計算（簡易版）
+  // 新規質問データ
+  const monthlyPayment = answers.monthly_payment as string
+  const floorArea = answers.floor_area as string
+  const parkingNeeds = answers.parking_needs as string
+  const salesPref = (answers.sales_preference as string[]) || []
+  const trigger = answers.building_trigger as string
+
+  // スコア計算（v5.0 拡張版）
   const scored = candidates.map(b => {
     let score = 50
     const reasons: string[] = []
@@ -183,6 +195,34 @@ function recommendBuilders(
     if (b.specialties.some(s => s.includes('平屋'))) {
       score += 5
       reasons.push('平屋の施工経験あり')
+    }
+
+    // ── 新規: 予算帯マッチング（坪単価ベース） ──
+    if (b.pricePerTsubo && monthlyPayment) {
+      const avgTsubo = typeof b.pricePerTsubo === 'object'
+        ? (b.pricePerTsubo.min + b.pricePerTsubo.max) / 2
+        : b.pricePerTsubo
+      // 月返済6万以下 = ローコスト志向、13万+ = ハイグレード志向
+      if (monthlyPayment === '~6' && avgTsubo <= 55) {
+        score += 8
+        reasons.push('予算に合った提案が得意')
+      }
+      if (monthlyPayment === '13+' && avgTsubo >= 65) {
+        score += 5
+      }
+    }
+
+    // ── 新規: 土地探し対応 ──
+    const hasLandVal = answers.has_land as string
+    if ((hasLandVal === 'searching' || hasLandVal === 'need_help') &&
+        b.specialties.some(s => s.includes('土地'))) {
+      score += 8
+      reasons.push('土地探しもサポート')
+    }
+
+    // ── 新規: 結婚きっかけ → 若年層向け提案力 ──
+    if (trigger === 'marriage' && b.specialties.some(s => s.includes('若い') || s.includes('初めて'))) {
+      score += 5
     }
 
     return {

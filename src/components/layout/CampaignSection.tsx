@@ -86,8 +86,8 @@ export default function CampaignSection() {
 
               <StepCard
                 num={1}
-                title="AI家づくり診断 (約2分)"
-                desc="10問で、あなたの家づくりタイプと相性の良い工務店3社を提案"
+                title="AI家づくり診断 (約3分)"
+                desc="15問で、あなたの家づくりタイプと相性の良い工務店3社を提案"
               />
               <StepCard
                 num={2}

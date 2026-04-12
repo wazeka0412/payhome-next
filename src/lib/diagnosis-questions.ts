@@ -13,6 +13,7 @@ export interface DiagnosisQuestion {
 }
 
 export const DIAGNOSIS_QUESTIONS: DiagnosisQuestion[] = [
+  // ── Q1-Q3: あなたのこと ──
   {
     key: 'family_structure',
     question: '家族構成を教えてください',
@@ -35,16 +36,18 @@ export const DIAGNOSIS_QUESTIONS: DiagnosisQuestion[] = [
     ],
   },
   {
-    key: 'budget_range',
-    question: 'ご予算の目安は？（土地代含む総額）',
+    key: 'building_trigger',
+    question: '家づくりを考えたきっかけは？',
     options: [
-      { value: '~2000', label: '2,000万円以下' },
-      { value: '2000-2500', label: '2,000〜2,500万円' },
-      { value: '2500-3000', label: '2,500〜3,000万円' },
-      { value: '3000-4000', label: '3,000〜4,000万円' },
-      { value: '4000+', label: '4,000万円以上' },
+      { value: 'marriage', label: '結婚・入籍' },
+      { value: 'family_change', label: '家族が増える・構成の変化' },
+      { value: 'rent_waste', label: '家賃がもったいない' },
+      { value: 'old_house', label: '今の家が古い・手狭' },
+      { value: 'environment', label: '環境を変えたい' },
+      { value: 'retirement', label: '老後に備えて' },
     ],
   },
+  // ── Q4-Q6: 条件 ──
   {
     key: 'preferred_area',
     question: 'ご希望のエリアは？',
@@ -66,16 +69,50 @@ export const DIAGNOSIS_QUESTIONS: DiagnosisQuestion[] = [
     ],
   },
   {
-    key: 'planned_timing',
-    question: 'いつ頃の建築・入居をお考えですか？',
+    key: 'budget_range',
+    question: 'ご予算の目安は？（土地代含む総額）',
     options: [
-      { value: 'immediately', label: 'すぐにでも（3ヶ月以内）' },
-      { value: '3-6months', label: '3〜6ヶ月以内' },
-      { value: '6-12months', label: '半年〜1年以内' },
-      { value: '1year+', label: '1年以上先' },
-      { value: 'researching', label: 'まだ情報収集中' },
+      { value: '~2000', label: '2,000万円以下' },
+      { value: '2000-2500', label: '2,000〜2,500万円' },
+      { value: '2500-3000', label: '2,500〜3,000万円' },
+      { value: '3000-4000', label: '3,000〜4,000万円' },
+      { value: '4000+', label: '4,000万円以上' },
     ],
   },
+  {
+    key: 'monthly_payment',
+    question: '月々の返済はどのくらいをイメージしていますか？',
+    options: [
+      { value: '~6', label: '6万円以下' },
+      { value: '6-8', label: '6〜8万円' },
+      { value: '8-10', label: '8〜10万円' },
+      { value: '10-13', label: '10〜13万円' },
+      { value: '13+', label: '13万円以上' },
+    ],
+  },
+  // ── Q8-Q9: 広さ・間取り ──
+  {
+    key: 'floor_area',
+    question: '希望の広さ（延床面積）は？',
+    options: [
+      { value: '~25', label: '25坪以下（コンパクト）' },
+      { value: '25-30', label: '25〜30坪' },
+      { value: '30-35', label: '30〜35坪' },
+      { value: '35-40', label: '35〜40坪' },
+      { value: '40+', label: '40坪以上（ゆとり）' },
+    ],
+  },
+  {
+    key: 'parking_needs',
+    question: '駐車スペースは何台分必要ですか？',
+    options: [
+      { value: '0', label: '不要' },
+      { value: '1', label: '1台' },
+      { value: '2', label: '2台' },
+      { value: '3+', label: '3台以上' },
+    ],
+  },
+  // ── Q10-Q12: デザイン・性能・暮らし ──
   {
     key: 'design_orientation',
     question: '好みのテイストは？（複数選択可）',
@@ -113,6 +150,31 @@ export const DIAGNOSIS_QUESTIONS: DiagnosisQuestion[] = [
       { value: 'outdoor', label: '庭・ウッドデッキ' },
     ],
   },
+  // ── Q13-Q14: 営業相性・検討段階 ──
+  {
+    key: 'sales_preference',
+    question: '工務店の営業担当に求めることは？（複数選択可）',
+    multi: true,
+    options: [
+      { value: 'attentive', label: '親身に話を聞いてくれる' },
+      { value: 'responsive', label: 'レスポンスが早い' },
+      { value: 'proactive', label: '積極的にリードしてくれる' },
+      { value: 'visual', label: 'パースや3Dで提案してくれる' },
+      { value: 'consistent', label: '担当が最後まで変わらない' },
+      { value: 'not_pushy', label: 'しつこい営業はNG' },
+    ],
+  },
+  {
+    key: 'planned_timing',
+    question: 'いつ頃の建築・入居をお考えですか？',
+    options: [
+      { value: 'immediately', label: 'すぐにでも（3ヶ月以内）' },
+      { value: '3-6months', label: '3〜6ヶ月以内' },
+      { value: '6-12months', label: '半年〜1年以内' },
+      { value: '1year+', label: '1年以上先' },
+      { value: 'researching', label: 'まだ情報収集中' },
+    ],
+  },
   {
     key: 'consideration_phase',
     question: '家づくりの検討はどの段階ですか？',
@@ -125,7 +187,7 @@ export const DIAGNOSIS_QUESTIONS: DiagnosisQuestion[] = [
   },
 ]
 
-export const TOTAL_QUESTIONS = DIAGNOSIS_QUESTIONS.length
+export const TOTAL_QUESTIONS = DIAGNOSIS_QUESTIONS.length // 15問（v5.0）
 
 /**
  * 診断結果のユーザータイプを算出する（MVP版・ルールベース）
@@ -136,9 +198,10 @@ export function classifyUserType(answers: Record<string, string | string[]>): st
   const lifestyle = (answers.lifestyle_priorities as string[]) || []
   const budget = answers.budget_range as string
   const family = answers.family_structure as string
+  const trigger = answers.building_trigger as string
 
-  // 性能重視
-  if (performance.includes('insulation') && performance.includes('airtight')) {
+  // 性能重視（性能2つ以上選択）
+  if (performance.length >= 2 && (performance.includes('insulation') || performance.includes('airtight'))) {
     return 'performance_focused'
   }
   // デザイン重視
@@ -150,11 +213,11 @@ export function classifyUserType(answers: Record<string, string | string[]>): st
     return 'cost_focused'
   }
   // シニア・バリアフリー重視
-  if (lifestyle.includes('senior_friendly') || family === 'family_seniors') {
+  if (lifestyle.includes('senior_friendly') || family === 'family_seniors' || trigger === 'retirement') {
     return 'senior_friendly'
   }
   // 家族・子育て重視
-  if (family === 'family_kids' || lifestyle.includes('family_friendly')) {
+  if (family === 'family_kids' || trigger === 'family_change' || lifestyle.includes('family_friendly')) {
     return 'family_focused'
   }
   // 自然素材・ナチュラル
