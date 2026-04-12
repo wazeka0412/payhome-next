@@ -28,8 +28,8 @@ function SignupForm() {
       return
     }
 
-    if (password.length < 4) {
-      setError('パスワードは4文字以上で入力してください')
+    if (password.length < 8) {
+      setError('パスワードは8文字以上で入力してください')
       return
     }
 
@@ -101,28 +101,29 @@ function SignupForm() {
           </p>
         </div>
 
-        {/* Value proposition */}
+        {/* Value proposition (MVP v2 - 家づくり支援中心) */}
         <div className="bg-white rounded-xl p-5 mb-6 border border-[#E8740C]/20 shadow-sm">
+          <p className="text-xs font-bold text-[#E8740C] mb-3">会員登録で、家づくりが一気に進みます</p>
           <ul className="space-y-2 text-sm text-gray-700">
+            <li className="flex items-start gap-2">
+              <span className="text-[#E8740C] font-bold">✓</span>
+              <span>AI家づくり診断の結果を保存し、何度でも見返し</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-[#E8740C] font-bold">✓</span>
+              <span>気になる工務店・動画・事例をお気に入りで整理</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-[#E8740C] font-bold">✓</span>
+              <span>平屋事例ライブラリを全件閲覧（非会員は5件まで）</span>
+            </li>
             <li className="flex items-start gap-2">
               <span className="text-[#E8740C] font-bold">✓</span>
               <span>間取り図のフル解像度で閲覧</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-[#E8740C] font-bold">✓</span>
-              <span>AI家づくり診断の結果を保存</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-[#E8740C] font-bold">✓</span>
-              <span>工務店3社のAIレコメンド</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-[#E8740C] font-bold">✓</span>
-              <span>お気に入り保存（無制限）</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-[#E8740C] font-bold">✓</span>
-              <span>工務店の比較機能（最大3社）</span>
+              <span>連絡希望条件を事前設定（Smart Match）— 工務店とお互いのペースで進める</span>
             </li>
           </ul>
         </div>
@@ -172,13 +173,13 @@ function SignupForm() {
               id="password"
               type="password"
               required
-              minLength={4}
+              minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="4文字以上"
+              placeholder="8文字以上"
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#E8740C]/30 focus:border-[#E8740C]"
             />
-            <p className="text-xs text-gray-500 mt-1">4文字以上で設定してください</p>
+            <p className="text-xs text-gray-500 mt-1">8文字以上で設定してください</p>
           </div>
 
           <div>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useCurrentBuilder } from '@/lib/use-current-builder'
 
 type Event = {
   id: string
@@ -14,6 +15,7 @@ type Event = {
 }
 
 export default function EventsPage() {
+  const builder = useCurrentBuilder()
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -26,12 +28,13 @@ export default function EventsPage() {
   const [editData, setEditData] = useState({ title: '', date: '', location: '' })
 
   useEffect(() => {
-    fetch('/api/events?builder=万代ホーム')
+    if (!builder.name) return
+    fetch(`/api/events?builder=${encodeURIComponent(builder.name)}`)
       .then(r => r.json())
-      .then(data => setEvents(data))
+      .then(data => setEvents(Array.isArray(data) ? data : []))
       .catch(err => setError(err.message))
       .finally(() => setLoading(false))
-  }, [])
+  }, [builder.name])
 
   const handleCreateEvent = async () => {
     setSubmitting(true)
@@ -46,7 +49,7 @@ export default function EventsPage() {
           capacity: Number(formData.capacity) || 10,
           reservations: 0,
           status: 'upcoming',
-          builder: '万代ホーム',
+          builder: builder.name,
         }),
       })
       if (res.ok) {

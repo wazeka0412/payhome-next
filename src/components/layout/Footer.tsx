@@ -10,10 +10,11 @@ import {
 } from '@/lib/constants';
 
 /**
- * v4.0 MVP フッター
- * REQUIREMENTS.md §5.0 に従い、月刊 / ウェビナー / ニュース / 取材 /
- * お役立ち記事 / エリアから探す はナビから除外。
- * 資料請求は廃止し、AI診断 / 建売 / 土地 を主導線に置き換え。
+ * MVPリリース版フッター (2026/05/01)
+ *
+ * 「選択と集中」戦略 — 核のループに必要な画面のみをナビに表示。
+ * 非公開項目は src/middleware.ts で 404 を返すため、
+ * 復活時はナビ + middleware の2箇所から削除するだけ。
  */
 const FOOTER_COLUMNS = [
   {
@@ -21,11 +22,16 @@ const FOOTER_COLUMNS = [
     links: [
       { href: '/videos', label: '動画コンテンツ' },
       { href: '/case-studies', label: '平屋事例ライブラリ' },
-      { href: '/features', label: '特集' },
       { href: '/builders', label: '工務店一覧' },
-      { href: '/sale-homes', label: '建売情報' },
-      { href: '/lands', label: '土地情報' },
       { href: '/event', label: '見学会・イベント' },
+    ],
+  },
+  {
+    heading: 'その他のページ',
+    links: [
+      { href: '/features', label: '特集一覧' },
+      { href: '/sale-homes', label: '分譲住宅' },
+      { href: '/lands', label: '土地情報' },
     ],
   },
   {
@@ -33,7 +39,6 @@ const FOOTER_COLUMNS = [
     links: [
       { href: '/diagnosis', label: 'AI家づくり診断' },
       { href: '/consultation', label: '無料住宅相談' },
-      { href: '/simulator', label: 'ローンシミュレーター' },
       { href: '/signup', label: '会員登録' },
       { href: '/login', label: 'ログイン' },
     ],

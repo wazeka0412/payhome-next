@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
 import type { DbLead } from '@/lib/supabase'
+import { localSelect } from '@/lib/local-store'
 import type { ContactPreferences } from '@/lib/contact-preferences'
 import type { ViewingMode } from '@/lib/event-viewing-mode'
 
@@ -63,24 +64,72 @@ export async function GET(request: NextRequest) {
   const builder = request.nextUrl.searchParams.get('builder')
   const email = request.nextUrl.searchParams.get('email')
 
-  const supabase = createServerClient()
-  let query = supabase.from('leads').select('*').order('created_at', { ascending: false })
+  // ── Supabase 優先 ──
+  try {
+    const supabase = createServerClient()
+    let query = supabase.from('leads').select('*').order('created_at', { ascending: false })
 
-  if (builder) {
-    query = query.or(`builder_name.eq.${builder},selected_companies.cs.{${builder}}`)
+    if (builder) {
+      query = query.or(`builder_name.eq.${builder},selected_companies.cs.{${builder}}`)
+    }
+    if (email) {
+      query = query.eq('email', email)
+    }
+
+    const { data, error } = await query
+    if (error) throw error
+    return Response.json((data as DbLead[]).map(formatLead))
+  } catch (err) {
+    console.warn('[leads GET] Supabase unreachable, using local fallback:', (err as Error).message)
   }
-  if (email) {
-    query = query.eq('email', email)
+
+  // ── ローカルフォールバック ──
+  // localStore に保存された raw lead 行を読み出して formatLead 形式で返す
+  try {
+    const where: Record<string, unknown> = {}
+    if (builder) where.builder_name = builder
+    if (email) where.email = email
+    const rows = await localSelect('leads', where)
+    rows.sort((a, b) =>
+      String(b.created_at || '').localeCompare(String(a.created_at || ''))
+    )
+    // localStore の行を DbLead 互換にマップして formatLead に渡す
+    const formatted = rows.map((r) => {
+      const dbLike = {
+        id: r.id,
+        type: r.type,
+        name: r.name,
+        email: r.email,
+        phone: r.phone ?? null,
+        company: r.company ?? null,
+        area: r.area ?? null,
+        budget: r.budget ?? null,
+        layout: r.layout ?? null,
+        message: r.message ?? null,
+        video: r.video ?? null,
+        builder_id: r.builder_id ?? null,
+        builder_name: r.builder_name ?? null,
+        selected_companies: r.selected_companies ?? null,
+        selected_services: r.selected_services ?? null,
+        status: r.status ?? '新規',
+        score: r.score ?? 50,
+        memo: r.memo ?? null,
+        user_id: r.user_id ?? null,
+        source_channel: r.source_channel ?? null,
+        source_content_id: r.source_content_id ?? null,
+        recent_views: r.recent_views ?? null,
+        anonymous_id: r.anonymous_id ?? null,
+        chat_session_id: r.chat_session_id ?? null,
+        created_at: r.created_at ?? new Date().toISOString(),
+        updated_at: r.updated_at ?? new Date().toISOString(),
+      } as DbLead
+      return formatLead(dbLike)
+    })
+    return Response.json(formatted)
+  } catch (err) {
+    console.error('[leads GET] local fallback failed:', err)
+    return Response.json([])
   }
-
-  const { data, error } = await query
-
-  if (error) {
-    console.error('Leads GET error:', error)
-    return Response.json({ error: 'Failed to fetch leads' }, { status: 500 })
-  }
-
-  return Response.json((data as DbLead[]).map(formatLead))
 }
 
 export async function POST(request: NextRequest) {

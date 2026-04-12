@@ -75,13 +75,13 @@ export default function CaseStudyDetailPage({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
-            <p className="text-[10px] font-bold text-[#E8740C] tracking-widest mb-2">MEMBERS ONLY</p>
+            <p className="text-[10px] font-bold text-[#E8740C] tracking-widest mb-2">MEMBER REGISTRATION</p>
             <h1 className="text-2xl font-extrabold text-[#3D2200] mb-3 leading-tight">
-              この事例は会員限定です
+              会員登録で、家づくりが一気に進みます
             </h1>
             <p className="text-sm text-gray-600 leading-relaxed mb-6">
-              非会員の方は新着{FREE_VIEW_LIMIT}件までの完成事例を閲覧できます。
-              6件目以降の事例の詳細をご覧いただくには無料会員登録が必要です。
+              事例ライブラリ全件閲覧・間取り図フル解像度・お気に入り保存・AI診断結果の保存まで全て無料です。
+              (非会員は新着{FREE_VIEW_LIMIT}件まで閲覧可)
             </p>
             <div className="flex flex-col gap-2">
               <Link
@@ -110,6 +110,8 @@ export default function CaseStudyDetailPage({
 }
 
 function CaseStudyContent({ caseStudy }: { caseStudy: CaseStudy }) {
+  const { status } = useSession();
+  const isMember = status === 'authenticated';
   const builder = getBuilderById(caseStudy.builderId);
 
   // 同工務店の他事例（最大3件）
@@ -172,22 +174,8 @@ function CaseStudyContent({ caseStudy }: { caseStudy: CaseStudy }) {
 
       <section className="py-12 md:py-16">
         <div className="max-w-5xl mx-auto px-4 space-y-12">
-          {/* ── YouTube ルームツアー ── */}
-          <div>
-            <SectionTitle>ルームツアー動画</SectionTitle>
-            <div className="aspect-video rounded-2xl overflow-hidden shadow-md">
-              <iframe
-                width="100%"
-                height="100%"
-                src={`https://www.youtube.com/embed/${caseStudy.youtubeId}`}
-                title={caseStudy.title}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="w-full h-full"
-              />
-            </div>
-          </div>
+          {/* ── 外観・内観写真ギャラリー ── */}
+          <PhotoGallery photos={caseStudy.photos} title={caseStudy.title} />
 
           {/* ── 設計のポイント ── */}
           <div>
@@ -202,6 +190,98 @@ function CaseStudyContent({ caseStudy }: { caseStudy: CaseStudy }) {
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* ── 間取り図 (会員限定) ── */}
+          <div>
+            <SectionTitle>間取り図</SectionTitle>
+            <div className="relative bg-white border border-gray-200 rounded-2xl overflow-hidden">
+              {/* 間取り図 SVG (非会員はブラー) */}
+              <div
+                className={`relative aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 transition-all duration-300 ${
+                  isMember ? '' : 'blur-md scale-105'
+                }`}
+              >
+                <svg
+                  viewBox="0 0 600 450"
+                  className="w-full h-full"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  {/* 外壁 */}
+                  <rect x="40" y="40" width="520" height="370" fill="none" stroke="#3D2200" strokeWidth="3" />
+                  {/* LDK */}
+                  <rect x="40" y="40" width="300" height="220" fill="#FFF8F0" stroke="#3D2200" strokeWidth="1.5" />
+                  <text x="190" y="160" textAnchor="middle" fontSize="16" fontWeight="bold" fill="#3D2200">LDK</text>
+                  <text x="190" y="180" textAnchor="middle" fontSize="10" fill="#6B7280">{Math.round(caseStudy.buildingArea * 0.4)}㎡</text>
+                  {/* 主寝室 */}
+                  <rect x="340" y="40" width="220" height="150" fill="#FFECD4" stroke="#3D2200" strokeWidth="1.5" />
+                  <text x="450" y="120" textAnchor="middle" fontSize="14" fontWeight="bold" fill="#3D2200">主寝室</text>
+                  <text x="450" y="140" textAnchor="middle" fontSize="10" fill="#6B7280">{Math.round(caseStudy.buildingArea * 0.15)}㎡</text>
+                  {/* 子ども部屋 / 洋室 */}
+                  <rect x="340" y="190" width="110" height="120" fill="#FFF3E6" stroke="#3D2200" strokeWidth="1.5" />
+                  <text x="395" y="255" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#3D2200">洋室1</text>
+                  <rect x="450" y="190" width="110" height="120" fill="#FFF3E6" stroke="#3D2200" strokeWidth="1.5" />
+                  <text x="505" y="255" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#3D2200">洋室2</text>
+                  {/* 水回り */}
+                  <rect x="40" y="260" width="150" height="150" fill="#E8F4FD" stroke="#3D2200" strokeWidth="1.5" />
+                  <text x="115" y="340" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#3D2200">水回り</text>
+                  {/* 玄関 */}
+                  <rect x="190" y="260" width="150" height="150" fill="#F0FDF4" stroke="#3D2200" strokeWidth="1.5" />
+                  <text x="265" y="340" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#3D2200">玄関</text>
+                  {/* WIC */}
+                  <rect x="340" y="310" width="220" height="100" fill="#FAF5FF" stroke="#3D2200" strokeWidth="1.5" />
+                  <text x="450" y="365" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#3D2200">WIC・収納</text>
+                  {/* ラベル */}
+                  <text x="300" y="430" textAnchor="middle" fontSize="11" fill="#6B7280">
+                    {caseStudy.layout} / {caseStudy.tsubo}坪（{caseStudy.buildingArea}㎡）
+                  </text>
+                </svg>
+              </div>
+
+              {/* 非会員向けロックオーバーレイ */}
+              {!isMember && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-white/80 via-white/70 to-white/80 backdrop-blur-sm">
+                  <div className="bg-white rounded-2xl shadow-xl border border-[#E8740C]/20 p-6 md:p-8 max-w-sm mx-4 text-center">
+                    <div className="w-12 h-12 mx-auto mb-3 bg-[#FFF8F0] rounded-full flex items-center justify-center">
+                      <svg className="w-6 h-6 text-[#E8740C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-base font-bold text-[#3D2200] mb-2">
+                      会員登録で間取り図を閲覧
+                    </h3>
+                    <p className="text-xs text-gray-600 leading-relaxed mb-5">
+                      間取り図の詳細は、無料会員登録でご覧いただけます。
+                      寸法・収納配置・動線まで確認して、家づくりの参考にしましょう。
+                    </p>
+                    <div className="flex flex-col gap-2">
+                      <Link
+                        href={`/signup?redirect=/case-studies/${caseStudy.id}`}
+                        className="bg-[#E8740C] hover:bg-[#D4660A] text-white font-bold px-6 py-2.5 rounded-full text-sm transition shadow-md"
+                      >
+                        無料会員登録して見る →
+                      </Link>
+                      <Link
+                        href={`/login?redirect=/case-studies/${caseStudy.id}`}
+                        className="text-xs text-gray-500 hover:text-[#E8740C] transition"
+                      >
+                        すでに会員の方はログイン →
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 会員向け表示ラベル */}
+              {isMember && (
+                <div className="absolute bottom-3 left-3 bg-green-100 text-green-700 text-[10px] font-bold px-3 py-1 rounded-full">
+                  ✓ 会員限定：間取り図を閲覧中
+                </div>
+              )}
+            </div>
+            <p className="text-[10px] text-gray-400 mt-2 text-center">
+              ※ 間取り図はイメージです。実際の設計と異なる場合があります。
+            </p>
           </div>
 
           {/* ── 費用内訳 ── */}
@@ -405,5 +485,113 @@ function Row({
         {value}
       </td>
     </tr>
+  );
+}
+
+/**
+ * 外観・内観写真ギャラリー (約20枚)
+ *
+ * 外観タブ / 内観タブで切り替え可能。
+ * メイン画像 + サムネイルリストの構成。
+ */
+function PhotoGallery({
+  photos,
+  title,
+}: {
+  photos: import('@/lib/case-studies-data').CaseStudyPhoto[];
+  title: string;
+}) {
+  const [tab, setTab] = useState<'exterior' | 'interior'>('exterior');
+  const filtered = photos.filter((p) => p.category === tab);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const selected = filtered[selectedIndex] || filtered[0];
+
+  // タブ切り替え時にインデックスをリセット
+  const handleTabChange = (newTab: 'exterior' | 'interior') => {
+    setTab(newTab);
+    setSelectedIndex(0);
+  };
+
+  if (!photos || photos.length === 0) return null;
+
+  const exteriorCount = photos.filter((p) => p.category === 'exterior').length;
+  const interiorCount = photos.filter((p) => p.category === 'interior').length;
+
+  return (
+    <div>
+      <SectionTitle>外観・内観写真</SectionTitle>
+
+      {/* タブ */}
+      <div className="flex gap-2 mb-4">
+        <button
+          onClick={() => handleTabChange('exterior')}
+          className={`px-4 py-2 rounded-full text-sm font-bold transition cursor-pointer ${
+            tab === 'exterior'
+              ? 'bg-[#E8740C] text-white'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          }`}
+        >
+          外観 ({exteriorCount})
+        </button>
+        <button
+          onClick={() => handleTabChange('interior')}
+          className={`px-4 py-2 rounded-full text-sm font-bold transition cursor-pointer ${
+            tab === 'interior'
+              ? 'bg-[#E8740C] text-white'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          }`}
+        >
+          内観 ({interiorCount})
+        </button>
+      </div>
+
+      {/* メイン画像 */}
+      {selected && (
+        <div className="bg-gray-100 rounded-2xl overflow-hidden mb-3 aspect-[4/3] flex items-center justify-center">
+          {/* MVP: プレースホルダ (実運用では <Image> で実写真を表示) */}
+          <div className="w-full h-full bg-gradient-to-br from-[#FFF8F0] via-[#FFF3E6] to-[#FFECD4] flex flex-col items-center justify-center p-8 text-center">
+            <div className="text-4xl mb-3">
+              {tab === 'exterior' ? '🏠' : '🛋️'}
+            </div>
+            <p className="text-base font-bold text-[#3D2200] mb-1">
+              {selected.alt}
+            </p>
+            <p className="text-xs text-gray-500">
+              {selectedIndex + 1} / {filtered.length} 枚
+            </p>
+            <p className="text-[10px] text-gray-400 mt-3">
+              ※ 実際の施工写真は準備中です
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* サムネイルリスト */}
+      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        {filtered.map((photo, idx) => (
+          <button
+            key={idx}
+            onClick={() => setSelectedIndex(idx)}
+            className={`flex-shrink-0 w-20 h-16 rounded-lg overflow-hidden border-2 transition cursor-pointer ${
+              idx === selectedIndex
+                ? 'border-[#E8740C] shadow-md'
+                : 'border-transparent opacity-70 hover:opacity-100'
+            }`}
+          >
+            <div className={`w-full h-full flex items-center justify-center text-[10px] font-bold ${
+              tab === 'exterior'
+                ? 'bg-gradient-to-br from-emerald-50 to-emerald-100 text-emerald-700'
+                : 'bg-gradient-to-br from-orange-50 to-orange-100 text-orange-700'
+            }`}>
+              {idx + 1}
+            </div>
+          </button>
+        ))}
+      </div>
+
+      <p className="text-[10px] text-gray-400 mt-2">
+        {tab === 'exterior' ? '外観' : '内観'}写真 {filtered.length} 枚 — {title}
+      </p>
+    </div>
   );
 }

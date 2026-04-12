@@ -114,10 +114,10 @@ export default function CaseStudiesPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-[#3D2200] mb-0.5">
-                  非会員は{FREE_VIEW_LIMIT}件まで閲覧可能
+                  会員登録で、家づくりが一気に進みます
                 </p>
                 <p className="text-xs text-gray-600">
-                  6件目以降は無料会員登録でご覧いただけます。会員登録で間取り図フル解像度やお気に入り無制限も解放されます。
+                  事例ライブラリ全件閲覧・間取り図フル解像度・お気に入り保存・AI診断結果の保存まで全て無料。検討状況を整理して、迷わず次のステップへ進めます (非会員は{FREE_VIEW_LIMIT}件まで閲覧可)。
                 </p>
               </div>
               <Link

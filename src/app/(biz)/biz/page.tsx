@@ -3,55 +3,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import MobileMarquee from '@/components/ui/MobileMarquee';
+import { SITE_STATS, USER_SIDE_FEATURES, CONTENT_TYPES } from '@/lib/site-config';
+import { LINE_URL } from '@/lib/constants';
 
 const stats = [
-  { number: '4.28万+', label: 'YouTube登録者数' },
-  { number: '257本', label: '公開動画数' },
-  { number: '100+', label: '取材企業数' },
-];
-
-const services = [
-  {
-    title: 'ルームツアー撮影',
-    desc: 'プロの映像クルーが完成物件を撮影。YouTube・Instagram・ホームページで活用できる高品質な動画を制作します。',
-    icon: '/images/service_roomtour.png',
-  },
-  {
-    title: 'SNS運用代行',
-    desc: 'Instagram・YouTube・TikTokの企画・投稿・分析をまるごとお任せ。住宅特化のコンテンツ設計でフォロワーと反響を獲得します。',
-    icon: '/images/service_sns.png',
-  },
-  {
-    title: 'WEB制作',
-    desc: '住宅会社に特化したホームページ・LP制作。SEO対策とコンバージョン設計で、WEBからの反響数を最大化します。',
-    icon: '/images/service_web.png',
-  },
-  {
-    title: 'ポータルサイト掲載',
-    desc: 'ぺいほーむが運営する住宅会社ポータルサイトに掲載。AIチャット相談機能を通じて見込み顧客をご紹介します。',
-    icon: '/images/service_portal.png',
-  },
-];
-
-const caseStudies = [
-  {
-    company: 'A工務店（鹿児島市）',
-    title: 'YouTube経由の問い合わせが月3件→月15件に増加',
-    excerpt:
-      'ルームツアー動画の定期配信とInstagram運用代行を導入。6ヶ月でYouTube登録者1,200人を達成し、動画経由の反響が5倍に。',
-  },
-  {
-    company: 'Bハウス（福岡市）',
-    title: 'WEBリニューアルで資料請求数が2.8倍に',
-    excerpt:
-      'ホームページリニューアルとSEO対策を実施。施工事例ページの充実と動線改善により、月間資料請求数が大幅に向上しました。',
-  },
-  {
-    company: 'Cホーム（熊本市）',
-    title: 'SNS運用開始3ヶ月でモデルハウス来場数1.5倍',
-    excerpt:
-      'Instagramリール動画を中心としたSNS運用を開始。地元ユーザーへのリーチが大幅に増加し、来場予約数の増加に貢献。',
-  },
+  { number: SITE_STATS.youtubeSubscribers, label: 'YouTube登録者数' },
+  { number: SITE_STATS.videoCount, label: '公開ルームツアー' },
+  { number: SITE_STATS.partnerCount, label: '提携工務店' },
+  { number: SITE_STATS.prefectureCoverage, label: '対応エリア' },
 ];
 
 const latestInfo = [
@@ -90,13 +49,13 @@ export default function BizTopPage() {
               動画とWEBで変える。
             </h1>
             <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-8">
-              YouTube登録者4.28万人・動画257本の住宅メディア「ぺいほーむ」が、
+              YouTube登録者{SITE_STATS.youtubeSubscribers}・ルームツアー{SITE_STATS.videoCount}の住宅メディア「ぺいほーむ」が、
               <br className="hidden md:block" />
-              住宅会社の集客をワンストップでサポートします。
+              AI家づくり診断＋Smart Match 送客システムで、工務店の集客を次のステージへ。
             </p>
             <div className="flex flex-wrap gap-3">
               <Link
-                href="/biz/service"
+                href="/biz/contact"
                 className="bg-[#E8740C] text-white font-semibold px-8 py-3 rounded-full hover:bg-[#D4660A] transition"
               >
                 サービス詳細を見る
@@ -145,84 +104,64 @@ export default function BizTopPage() {
         </div>
       </section>
 
-      {/* ===== SERVICE CARDS ===== */}
-      <section className="bg-gray-50 py-20 relative">
-        <Image
-          src="/images/pei_think.png"
-          alt=""
-          width={120}
-          height={120}
-          className="absolute top-8 right-8 w-20 h-20 object-contain opacity-50 hidden lg:block"
-          aria-hidden="true"
-        />
+      {/* ===== PLATFORM FEATURES (USER-SIDE) ===== */}
+      <section className="bg-white py-20 border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <p className="text-[#E8740C] font-semibold text-sm tracking-widest uppercase mb-2">
-              SERVICE
+              PLATFORM
             </p>
-            <h2 className="text-2xl md:text-3xl font-extrabold">パッケージプラン</h2>
+            <h2 className="text-2xl md:text-3xl font-extrabold">
+              ぺいほーむが提供するユーザー向け機能
+            </h2>
+            <p className="text-gray-500 mt-4 text-sm md:text-base">
+              ユーザーが使う機能だから、工務店は &quot;本気度の高い&quot; リードだけを受け取れる
+            </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {services.map((service) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {USER_SIDE_FEATURES.map((f) => (
               <Link
-                key={service.title}
-                href="/biz/service"
-                className="group bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition"
+                key={f.title}
+                href={f.href}
+                className="group bg-white border border-gray-200 rounded-2xl p-6 hover:border-[#E8740C] hover:shadow-lg transition"
               >
-                <div className="w-16 h-16 mb-4">
-                  <Image src={service.icon} alt={service.title} width={64} height={64} className="w-full h-full object-contain" />
+                <div className="flex items-start gap-4">
+                  <div className="text-4xl">{f.icon}</div>
+                  <div className="flex-1">
+                    <h3 className="text-base font-bold mb-1.5 group-hover:text-[#E8740C] transition">
+                      {f.title}
+                    </h3>
+                    <p className="text-sm text-gray-500 leading-relaxed">{f.description}</p>
+                  </div>
                 </div>
-                <h3 className="text-lg font-bold mb-2 group-hover:text-[#E8740C] transition">
-                  {service.title}
-                </h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{service.desc}</p>
+                <div className="mt-4 text-xs text-[#E8740C] font-semibold">
+                  ユーザー画面で見る →
+                </div>
               </Link>
             ))}
           </div>
-          <div className="text-center mt-10">
-            <Link
-              href="/biz/service"
-              className="inline-block border-2 border-[#E8740C] text-[#E8740C] font-semibold px-8 py-3 rounded-full hover:bg-orange-50 transition"
-            >
-              サービス詳細を見る
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== CASE STUDY ===== */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <p className="text-[#E8740C] font-semibold text-sm tracking-widest uppercase mb-2">
-              CASE STUDY
-            </p>
-            <h2 className="text-2xl md:text-3xl font-extrabold">導入事例</h2>
-          </div>
-          <MobileMarquee desktopGridClass="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {caseStudies.map((cs) => (
-              <div
-                key={cs.company}
-                className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition"
-              >
-                <div className="h-48 bg-gray-200 flex items-center justify-center text-gray-400 text-sm">
-                  Photo
-                </div>
-                <div className="p-6">
-                  <p className="text-xs text-[#E8740C] font-semibold mb-2">{cs.company}</p>
-                  <h3 className="font-bold mb-2 leading-snug">{cs.title}</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">{cs.excerpt}</p>
-                </div>
+          <div className="mt-12 bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl p-6 md:p-8 border border-orange-100">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div>
+                <h3 className="font-bold text-gray-900 text-lg mb-1">
+                  ぺいほーむ CMS は全 {CONTENT_TYPES.length} 種類のコンテンツを一元管理
+                </h3>
+                <p className="text-sm text-gray-600">
+                  動画 {SITE_STATS.videoCount} / 施工事例 {SITE_STATS.totalCaseStudies} / 平屋間取り {SITE_STATS.totalFloorPlans} / 取材 {SITE_STATS.totalInterviews} ほか、提携工務店の情報をまとめて配信
+                </p>
               </div>
-            ))}
-          </MobileMarquee>
-          <div className="text-center mt-10">
-            <Link
-              href="/biz/service"
-              className="inline-block border-2 border-[#E8740C] text-[#E8740C] font-semibold px-8 py-3 rounded-full hover:bg-orange-50 transition"
-            >
-              導入事例の詳細を見る
-            </Link>
+              <div className="flex flex-wrap gap-2 max-w-md">
+                {CONTENT_TYPES.slice(0, 8).map((c) => (
+                  <span
+                    key={c.key}
+                    className="inline-flex items-center gap-1 bg-white border border-orange-200 text-xs text-gray-700 px-3 py-1.5 rounded-full"
+                  >
+                    <span>{c.icon}</span>
+                    <span>{c.label}</span>
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -280,44 +219,58 @@ export default function BizTopPage() {
           </MobileMarquee>
           <div className="text-center mt-10">
             <Link
-              href="/biz/news"
+              href="/biz/contact"
               className="inline-block border-2 border-[#E8740C] text-[#E8740C] font-semibold px-8 py-3 rounded-full hover:bg-orange-50 transition"
             >
-              最新情報をもっと見る
+              お問い合わせはこちら
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ===== PARTNER CTA BANNER ===== */}
-      <section className="py-12">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="relative bg-gradient-to-r from-[#E8740C] to-[#F5A623] rounded-3xl p-10 md:p-14 text-center text-white overflow-hidden">
-            <div className="absolute -top-8 -right-8 w-40 h-40 bg-white/10 rounded-full" />
-            <div className="absolute -bottom-6 -left-6 w-28 h-28 bg-white/10 rounded-full" />
-            <h2 className="relative text-xl md:text-2xl font-extrabold mb-3">
-              提携パートナーを募集しています
-            </h2>
-            <p className="relative text-sm opacity-90 mb-1">
-              記事掲載は無料。ルームツアー動画はオプション。
-            </p>
-            <p className="relative text-xs opacity-80 mb-6">
-              反響課金型なので、初期費用ゼロでスタートできます。
-            </p>
-            <div className="relative flex flex-wrap gap-3 justify-center">
-              <Link
-                href="/biz/partner"
-                className="bg-white text-[#E8740C] font-bold px-8 py-3 rounded-full hover:bg-gray-50 transition text-sm"
-              >
-                パートナープログラムの詳細 &rarr;
-              </Link>
-              <Link
-                href="/biz/contact"
-                className="border-2 border-white/60 text-white font-bold px-8 py-3 rounded-full hover:bg-white/10 transition text-sm"
-              >
-                お問い合わせ
-              </Link>
-            </div>
+      {/* ===== SIMPLE 3-CTA ===== */}
+      <section className="py-16">
+        <div className="max-w-3xl mx-auto px-4">
+          <h2 className="text-xl font-bold text-center mb-3">まずはお気軽にご連絡ください</h2>
+          <p className="text-center text-sm text-gray-500 mb-10">
+            広告掲載・ルームツアー撮影のご相談を承ります。
+          </p>
+          <div className="space-y-4">
+            <Link
+              href="/biz/contact"
+              className="flex items-center gap-4 bg-[#E8740C] text-white rounded-2xl p-6 hover:bg-[#D4660A] transition group"
+            >
+              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl flex-shrink-0">&#9993;</div>
+              <div>
+                <div className="font-bold text-lg">お問い合わせ</div>
+                <div className="text-sm opacity-90">広告掲載・ルームツアー撮影のご相談</div>
+              </div>
+              <div className="ml-auto text-2xl opacity-70 group-hover:translate-x-1 transition">&rarr;</div>
+            </Link>
+            <Link
+              href="/biz/contact?type=document"
+              className="flex items-center gap-4 bg-white border-2 border-[#E8740C] text-gray-900 rounded-2xl p-6 hover:bg-orange-50 transition group"
+            >
+              <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-2xl flex-shrink-0">&#128196;</div>
+              <div>
+                <div className="font-bold text-lg">資料請求</div>
+                <div className="text-sm text-gray-500">メディアデータ・料金表をお送りします</div>
+              </div>
+              <div className="ml-auto text-2xl text-[#E8740C] opacity-70 group-hover:translate-x-1 transition">&rarr;</div>
+            </Link>
+            <a
+              href={LINE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-4 bg-[#06C755] text-white rounded-2xl p-6 hover:bg-[#05b34d] transition group"
+            >
+              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl flex-shrink-0">&#128172;</div>
+              <div>
+                <div className="font-bold text-lg">公式LINEでお問い合わせ</div>
+                <div className="text-sm opacity-90">チャットで気軽にご相談いただけます</div>
+              </div>
+              <div className="ml-auto text-2xl opacity-70 group-hover:translate-x-1 transition">&rarr;</div>
+            </a>
           </div>
         </div>
       </section>

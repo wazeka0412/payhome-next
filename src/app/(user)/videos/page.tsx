@@ -170,7 +170,7 @@ export default function VideosPage() {
             {paginatedItems.map((video) => (
               <Card
                 key={video.id}
-                href={`/property/${video.id}`}
+                href={`/videos/${video.id}`}
                 imageSrc={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`}
                 imageAlt={video.title}
                 tag={video.category}

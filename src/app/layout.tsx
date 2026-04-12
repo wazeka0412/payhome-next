@@ -20,11 +20,11 @@ const notoSansJP = Noto_Sans_JP({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://payhome.jp'),
   title: {
-    default: 'ぺいほーむ | 住宅メディア - 家づくりをもっと楽しく',
+    default: 'ぺいほーむ | 鹿児島の平屋づくりをAI診断×動画で支援',
     template: '%s | ぺいほーむ',
   },
   description:
-    'YouTube登録者4.28万人の住宅メディア「ぺいほーむ」。平屋のルームツアー動画と記事で、家づくりの情報をわかりやすくお届けします。無料住宅相談も受付中。',
+    'YouTube累計1,000万再生のぺいほーむ。AI家づくり診断で相性の良い工務店3社を提案。平屋ルームツアー動画42本・施工事例・見学会予約で、鹿児島の平屋づくりを意思決定まで支援するプラットフォームです。',
   openGraph: {
     type: 'website',
     locale: 'ja_JP',

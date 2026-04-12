@@ -108,22 +108,69 @@ export default function EventThanksPage() {
               </div>
             )}
 
-            <p className="text-sm text-gray-500 leading-relaxed mb-8">
+            <p className="text-sm text-gray-500 leading-relaxed mb-6">
               ご入力いただいたメールアドレスに確認メールをお送りしました。<br />
               当日のご来場をお待ちしております。
             </p>
 
-            {/* Actions */}
+            {/* Survey CTA: 予約後アンケート */}
+            <div className="bg-gradient-to-br from-orange-50 to-amber-50 border-2 border-amber-200 rounded-2xl p-5 md:p-6 mb-6 text-left">
+              <p className="text-[10px] font-bold text-amber-600 tracking-widest mb-2">
+                1分で完了 · 特典つき
+              </p>
+              <h3 className="text-base md:text-lg font-extrabold text-[#3D2200] mb-2 leading-tight">
+                見学会をもっと有意義にするために
+              </h3>
+              <p className="text-xs text-gray-600 leading-relaxed mb-4">
+                簡単なアンケートにお答えいただくと、見学会チェックリスト・家づくり失敗回避ガイド・平屋比較シートをプレゼントします。
+              </p>
+              <Link
+                href={`/survey/post-booking?event_id=${params.id}&builder=${event?.builder || ''}`}
+                className="inline-block bg-amber-500 text-white font-bold px-6 py-3 rounded-full text-sm hover:bg-amber-600 transition shadow-[0_2px_8px_rgba(245,158,11,0.3)]"
+              >
+                アンケートに答えて特典を受け取る →
+              </Link>
+            </div>
+
+            {/* 見学後アンケート予告 */}
+            <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-6 text-left">
+              <p className="text-xs text-blue-800 leading-relaxed">
+                📩 見学会の数日後に、<strong>かんたんな振り返りアンケート</strong>をメールでお届けします。
+                ご回答いただくと、<strong>工務店比較テンプレート</strong>など家づくりに役立つ特典をお送りします。
+              </p>
+            </div>
+
+            {/* Primary CTA: 会員登録で準備を整える (家づくり支援訴求) */}
+            <div className="bg-gradient-to-br from-[#FFF8F0] to-white border-2 border-[#E8740C]/30 rounded-2xl p-5 md:p-6 mb-6 text-left">
+              <p className="text-[10px] font-bold text-[#E8740C] tracking-widest mb-2">
+                見学当日をもっと有意義にする
+              </p>
+              <h3 className="text-base md:text-lg font-extrabold text-[#3D2200] mb-2 leading-tight">
+                会員登録で、見学までの準備が進みます
+              </h3>
+              <p className="text-xs text-gray-600 leading-relaxed mb-4">
+                連絡条件の事前設定・気になる工務店のお気に入り保存・事例ライブラリの全件閲覧で、
+                見学当日までに質問をまとめられます。
+              </p>
+              <Link
+                href="/signup?redirect=/mypage/contact-preferences"
+                className="inline-block bg-[#E8740C] text-white font-bold px-6 py-3 rounded-full text-sm hover:bg-[#D4660A] transition shadow-[0_2px_8px_rgba(232,116,12,0.3)]"
+              >
+                無料会員登録して準備する →
+              </Link>
+            </div>
+
+            {/* Secondary Actions */}
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 href="/diagnosis"
-                className="inline-flex items-center justify-center bg-[#E8740C] text-white font-bold px-8 py-3 rounded-full text-sm hover:bg-[#D4660A] transition"
+                className="inline-flex items-center justify-center bg-white border-2 border-[#E8740C] text-[#E8740C] font-bold px-8 py-3 rounded-full text-sm hover:bg-[#FFF8F0] transition"
               >
                 AI診断で他の工務店も見る
               </Link>
               <Link
                 href="/mypage"
-                className="inline-flex items-center justify-center bg-white border-2 border-[#E8740C] text-[#E8740C] font-bold px-8 py-3 rounded-full text-sm hover:bg-[#FFF8F0] transition"
+                className="inline-flex items-center justify-center bg-white border border-gray-200 text-gray-600 font-bold px-8 py-3 rounded-full text-sm hover:bg-gray-50 transition"
               >
                 マイページへ
               </Link>
@@ -139,18 +186,18 @@ export default function EventThanksPage() {
               </p>
               <div className="grid grid-cols-2 gap-2">
                 <Link
-                  href="/sale-homes"
+                  href="/case-studies"
                   className="block bg-[#FFF8F0] hover:bg-[#FFF3E6] rounded-lg p-3 transition text-left"
                 >
-                  <p className="text-xs font-bold text-[#3D2200] mb-0.5">建売を見る</p>
-                  <p className="text-[10px] text-gray-500">販売中の分譲戸建</p>
+                  <p className="text-xs font-bold text-[#3D2200] mb-0.5">事例を見る</p>
+                  <p className="text-[10px] text-gray-500">平屋事例ライブラリ</p>
                 </Link>
                 <Link
-                  href="/lands"
+                  href="/videos"
                   className="block bg-[#FFF8F0] hover:bg-[#FFF3E6] rounded-lg p-3 transition text-left"
                 >
-                  <p className="text-xs font-bold text-[#3D2200] mb-0.5">土地を見る</p>
-                  <p className="text-[10px] text-gray-500">提携工務店の土地</p>
+                  <p className="text-xs font-bold text-[#3D2200] mb-0.5">動画を見る</p>
+                  <p className="text-[10px] text-gray-500">ルームツアー42本</p>
                 </Link>
                 <Link
                   href="/builders"

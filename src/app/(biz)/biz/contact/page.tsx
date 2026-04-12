@@ -4,12 +4,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 const serviceOptions = [
+  '広告掲載',
   'ルームツアー撮影',
-  'SNS運用代行',
-  'WEB制作',
-  'ポータルサイト掲載',
-  '広告・タイアップ',
-  'その他',
 ];
 
 export default function ContactPage() {
@@ -44,7 +40,6 @@ export default function ContactPage() {
           <p className="text-sm text-gray-500 mb-6">内容を確認の上、2営業日以内にご連絡いたします。</p>
           <div className="flex gap-3 justify-center">
             <Link href="/biz" className="bg-[#E8740C] text-white font-semibold px-8 py-3 rounded-full hover:bg-[#D4660A] transition text-sm">トップに戻る</Link>
-            <Link href="/biz/service" className="border-2 border-[#E8740C] text-[#E8740C] font-semibold px-8 py-3 rounded-full hover:bg-orange-50 transition text-sm">サービス一覧</Link>
           </div>
           <div className="mt-6 p-4 bg-[#06C755]/10 rounded-xl">
             <p className="text-sm font-semibold text-[#06C755] mb-2">📱 LINEで最新情報を受け取る</p>

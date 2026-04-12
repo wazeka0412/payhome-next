@@ -141,3 +141,21 @@ export async function localFindOne(
   const matches = await localSelect(table, where)
   return matches[0] || null
 }
+
+/**
+ * DELETE: 条件に一致する行を削除し、削除件数を返す
+ */
+export async function localDelete(
+  table: string,
+  where: Record<string, unknown>
+): Promise<number> {
+  const rows = await readTable(table)
+  const before = rows.length
+  const filtered = rows.filter(
+    (row) => !Object.entries(where).every(([k, v]) => row[k] === v)
+  )
+  if (filtered.length !== before) {
+    await writeTable(table, filtered)
+  }
+  return before - filtered.length
+}

@@ -74,7 +74,7 @@ export default function LeadsPage() {
   useEffect(() => {
     fetch('/api/leads')
       .then(r => r.json())
-      .then(data => setLeads(data))
+      .then(data => setLeads(Array.isArray(data) ? data : []))
       .catch(err => setError(err.message))
       .finally(() => setLoading(false))
   }, []);
