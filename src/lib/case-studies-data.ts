@@ -62,6 +62,43 @@ export interface CaseStudy {
   ownerComment: string;
 }
 
+/**
+ * 事例写真データを生成する（MVP はプレースホルダ画像）
+ *
+ * 実運用では Supabase Storage に実写真をアップロードし、URLを参照する。
+ * 現在は SVG プレースホルダを利用。外観 8 枚 + 内観 12 枚 = 20 枚構成。
+ */
+function generatePhotos(title: string, tsubo: number, layout: string): CaseStudyPhoto[] {
+  const exteriorLabels = [
+    '外観正面', '外観全体', '外観 玄関アプローチ', '外観 庭側',
+    '外観 夕景', '外観 駐車場側', '外観 屋根', '外観 植栽',
+  ];
+  const interiorLabels = [
+    'LDK 全体', 'キッチン', 'ダイニング', 'リビング',
+    '主寝室', '洋室', 'WIC・収納', '洗面脱衣室',
+    '浴室', 'トイレ', '玄関ホール', 'ウッドデッキ',
+  ];
+
+  const photos: CaseStudyPhoto[] = [];
+
+  for (const label of exteriorLabels) {
+    photos.push({
+      src: `/api/placeholder/800/600?text=${encodeURIComponent(label + ' ' + tsubo + '坪 ' + layout)}`,
+      alt: `${title} ${label}`,
+      category: 'exterior',
+    });
+  }
+  for (const label of interiorLabels) {
+    photos.push({
+      src: `/api/placeholder/800/600?text=${encodeURIComponent(label + ' ' + tsubo + '坪 ' + layout)}`,
+      alt: `${title} ${label}`,
+      category: 'interior',
+    });
+  }
+
+  return photos;
+}
+
 // ── 事例は videos-data の上位を元に "完成事例化" する ──
 // 実運用では Supabase の case_studies テーブルから引くが、v4.0 は mock。
 
@@ -204,43 +241,6 @@ export const caseStudies: CaseStudy[] = sourceVideos.map((v, i) => {
     ownerComment: inferOwnerComment(family, v.tsubo),
   };
 });
-
-/**
- * 事例写真データを生成する（MVP はプレースホルダ画像）
- *
- * 実運用では Supabase Storage に実写真をアップロードし、URLを参照する。
- * 現在は SVG プレースホルダを利用。外観 8 枚 + 内観 12 枚 = 20 枚構成。
- */
-function generatePhotos(title: string, tsubo: number, layout: string): CaseStudyPhoto[] {
-  const exteriorLabels = [
-    '外観正面', '外観全体', '外観 玄関アプローチ', '外観 庭側',
-    '外観 夕景', '外観 駐車場側', '外観 屋根', '外観 植栽',
-  ];
-  const interiorLabels = [
-    'LDK 全体', 'キッチン', 'ダイニング', 'リビング',
-    '主寝室', '洋室', 'WIC・収納', '洗面脱衣室',
-    '浴室', 'トイレ', '玄関ホール', 'ウッドデッキ',
-  ];
-
-  const photos: CaseStudyPhoto[] = [];
-
-  for (const label of exteriorLabels) {
-    photos.push({
-      src: `/api/placeholder/800/600?text=${encodeURIComponent(label + ' ' + tsubo + '坪 ' + layout)}`,
-      alt: `${title} ${label}`,
-      category: 'exterior',
-    });
-  }
-  for (const label of interiorLabels) {
-    photos.push({
-      src: `/api/placeholder/800/600?text=${encodeURIComponent(label + ' ' + tsubo + '坪 ' + layout)}`,
-      alt: `${title} ${label}`,
-      category: 'interior',
-    });
-  }
-
-  return photos;
-}
 
 // ── ヘルパー ──
 export function getCaseStudyById(id: string): CaseStudy | undefined {

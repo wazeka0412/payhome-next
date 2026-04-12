@@ -39,9 +39,10 @@ const HIDDEN_PATH_PREFIXES: readonly string[] = [
   // '/mypage/catalog',
   '/mypage/questions',
   '/mypage/feedback',
-  // ── B2B 側 (TOP と /biz/contact のみ残す) ──
+  // ── B2B 側 (TOP と /biz/contact と /biz/ad のみ残す) ──
   '/biz/service',
-  '/biz/ad',
+  // 2026-04-12 修正: /biz/ad は広告掲載ページとして公開
+  // '/biz/ad',
   '/biz/partner',
   '/biz/articles',
   '/biz/news',

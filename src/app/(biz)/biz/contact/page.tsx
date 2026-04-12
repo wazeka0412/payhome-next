@@ -4,12 +4,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 const serviceOptions = [
+  '広告掲載',
   'ルームツアー撮影',
-  'SNS運用代行',
-  'WEB制作',
-  'ポータルサイト掲載',
-  '広告・タイアップ',
-  'その他',
 ];
 
 export default function ContactPage() {
