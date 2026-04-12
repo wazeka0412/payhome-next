@@ -261,6 +261,14 @@ export default function MyPage() {
               statHighlight
             />
             <MyPageCard
+              title="お家づくりカルテ"
+              description="希望条件を整理して、工務店に要望を正確に伝えましょう"
+              href="/mypage/home-building"
+              linkLabel="カルテを記入する"
+              stat="✍️"
+              statHighlight
+            />
+            <MyPageCard
               title="予約履歴"
               description="見学会予約の一覧"
               href="/event"
