@@ -110,11 +110,17 @@ export default function WelcomePage() {
             <h1 className="text-2xl md:text-3xl font-extrabold text-[#3D2200] mb-3 leading-relaxed">
               ようこそ、{userName} さん
             </h1>
-            <p className="text-sm text-gray-600 leading-relaxed max-w-xl mx-auto mb-2">
-              これからぺいほーむで、
+            <p className="text-sm text-gray-600 leading-relaxed max-w-xl mx-auto mb-3">
+              これからぺいほーむが、あなたの家づくりを<span className="font-bold text-[#3D2200]">第三者の立場で一緒に整理・伴走</span>します。
               <span className="font-bold text-[#3D2200]">動画で比較 → 工務店を知る → 実物を体感</span>
-              の順で、あなたの家づくりを一緒に進めていきます。
+              の順で、最適な工務店との出会いまでサポートします。
             </p>
+            <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 max-w-md mx-auto mb-2">
+              <p className="text-xs text-amber-800 leading-relaxed">
+                🏡 ぺいほーむは特定の工務店の味方ではなく、<strong>あなたの家づくりの味方</strong>です。
+                比較整理・情報提供・不安解消を通じて、納得のいく意思決定をお手伝いします。
+              </p>
+            </div>
             <p className="text-xs text-gray-500">
               登録前の閲覧履歴・お気に入り・AI診断結果はすべてこのアカウントに引き継がれています。
             </p>

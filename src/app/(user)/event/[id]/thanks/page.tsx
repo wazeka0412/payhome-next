@@ -108,10 +108,29 @@ export default function EventThanksPage() {
               </div>
             )}
 
-            <p className="text-sm text-gray-500 leading-relaxed mb-8">
+            <p className="text-sm text-gray-500 leading-relaxed mb-6">
               ご入力いただいたメールアドレスに確認メールをお送りしました。<br />
               当日のご来場をお待ちしております。
             </p>
+
+            {/* Survey CTA: 予約後アンケート */}
+            <div className="bg-gradient-to-br from-orange-50 to-amber-50 border-2 border-amber-200 rounded-2xl p-5 md:p-6 mb-6 text-left">
+              <p className="text-[10px] font-bold text-amber-600 tracking-widest mb-2">
+                1分で完了 · 特典つき
+              </p>
+              <h3 className="text-base md:text-lg font-extrabold text-[#3D2200] mb-2 leading-tight">
+                見学会をもっと有意義にするために
+              </h3>
+              <p className="text-xs text-gray-600 leading-relaxed mb-4">
+                簡単なアンケートにお答えいただくと、見学会チェックリスト・家づくり失敗回避ガイド・平屋比較シートをプレゼントします。
+              </p>
+              <Link
+                href={`/survey/post-booking?event_id=${params.id}&builder=${event?.builder || ''}`}
+                className="inline-block bg-amber-500 text-white font-bold px-6 py-3 rounded-full text-sm hover:bg-amber-600 transition shadow-[0_2px_8px_rgba(245,158,11,0.3)]"
+              >
+                アンケートに答えて特典を受け取る →
+              </Link>
+            </div>
 
             {/* Primary CTA: 会員登録で準備を整える (家づくり支援訴求) */}
             <div className="bg-gradient-to-br from-[#FFF8F0] to-white border-2 border-[#E8740C]/30 rounded-2xl p-5 md:p-6 mb-6 text-left">
