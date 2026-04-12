@@ -174,22 +174,8 @@ function CaseStudyContent({ caseStudy }: { caseStudy: CaseStudy }) {
 
       <section className="py-12 md:py-16">
         <div className="max-w-5xl mx-auto px-4 space-y-12">
-          {/* ── YouTube ルームツアー ── */}
-          <div>
-            <SectionTitle>ルームツアー動画</SectionTitle>
-            <div className="aspect-video rounded-2xl overflow-hidden shadow-md">
-              <iframe
-                width="100%"
-                height="100%"
-                src={`https://www.youtube.com/embed/${caseStudy.youtubeId}`}
-                title={caseStudy.title}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="w-full h-full"
-              />
-            </div>
-          </div>
+          {/* ── 外観・内観写真ギャラリー ── */}
+          <PhotoGallery photos={caseStudy.photos} title={caseStudy.title} />
 
           {/* ── 設計のポイント ── */}
           <div>
@@ -499,5 +485,113 @@ function Row({
         {value}
       </td>
     </tr>
+  );
+}
+
+/**
+ * 外観・内観写真ギャラリー (約20枚)
+ *
+ * 外観タブ / 内観タブで切り替え可能。
+ * メイン画像 + サムネイルリストの構成。
+ */
+function PhotoGallery({
+  photos,
+  title,
+}: {
+  photos: import('@/lib/case-studies-data').CaseStudyPhoto[];
+  title: string;
+}) {
+  const [tab, setTab] = useState<'exterior' | 'interior'>('exterior');
+  const filtered = photos.filter((p) => p.category === tab);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const selected = filtered[selectedIndex] || filtered[0];
+
+  // タブ切り替え時にインデックスをリセット
+  const handleTabChange = (newTab: 'exterior' | 'interior') => {
+    setTab(newTab);
+    setSelectedIndex(0);
+  };
+
+  if (!photos || photos.length === 0) return null;
+
+  const exteriorCount = photos.filter((p) => p.category === 'exterior').length;
+  const interiorCount = photos.filter((p) => p.category === 'interior').length;
+
+  return (
+    <div>
+      <SectionTitle>外観・内観写真</SectionTitle>
+
+      {/* タブ */}
+      <div className="flex gap-2 mb-4">
+        <button
+          onClick={() => handleTabChange('exterior')}
+          className={`px-4 py-2 rounded-full text-sm font-bold transition cursor-pointer ${
+            tab === 'exterior'
+              ? 'bg-[#E8740C] text-white'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          }`}
+        >
+          外観 ({exteriorCount})
+        </button>
+        <button
+          onClick={() => handleTabChange('interior')}
+          className={`px-4 py-2 rounded-full text-sm font-bold transition cursor-pointer ${
+            tab === 'interior'
+              ? 'bg-[#E8740C] text-white'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          }`}
+        >
+          内観 ({interiorCount})
+        </button>
+      </div>
+
+      {/* メイン画像 */}
+      {selected && (
+        <div className="bg-gray-100 rounded-2xl overflow-hidden mb-3 aspect-[4/3] flex items-center justify-center">
+          {/* MVP: プレースホルダ (実運用では <Image> で実写真を表示) */}
+          <div className="w-full h-full bg-gradient-to-br from-[#FFF8F0] via-[#FFF3E6] to-[#FFECD4] flex flex-col items-center justify-center p-8 text-center">
+            <div className="text-4xl mb-3">
+              {tab === 'exterior' ? '🏠' : '🛋️'}
+            </div>
+            <p className="text-base font-bold text-[#3D2200] mb-1">
+              {selected.alt}
+            </p>
+            <p className="text-xs text-gray-500">
+              {selectedIndex + 1} / {filtered.length} 枚
+            </p>
+            <p className="text-[10px] text-gray-400 mt-3">
+              ※ 実際の施工写真は準備中です
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* サムネイルリスト */}
+      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        {filtered.map((photo, idx) => (
+          <button
+            key={idx}
+            onClick={() => setSelectedIndex(idx)}
+            className={`flex-shrink-0 w-20 h-16 rounded-lg overflow-hidden border-2 transition cursor-pointer ${
+              idx === selectedIndex
+                ? 'border-[#E8740C] shadow-md'
+                : 'border-transparent opacity-70 hover:opacity-100'
+            }`}
+          >
+            <div className={`w-full h-full flex items-center justify-center text-[10px] font-bold ${
+              tab === 'exterior'
+                ? 'bg-gradient-to-br from-emerald-50 to-emerald-100 text-emerald-700'
+                : 'bg-gradient-to-br from-orange-50 to-orange-100 text-orange-700'
+            }`}>
+              {idx + 1}
+            </div>
+          </button>
+        ))}
+      </div>
+
+      <p className="text-[10px] text-gray-400 mt-2">
+        {tab === 'exterior' ? '外観' : '内観'}写真 {filtered.length} 枚 — {title}
+      </p>
+    </div>
   );
 }

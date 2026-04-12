@@ -15,6 +15,12 @@ import { builders } from './builders-data';
 
 export type LayoutType = '1LDK' | '2LDK' | '3LDK' | '4LDK' | '5LDK+';
 
+export interface CaseStudyPhoto {
+  src: string;
+  alt: string;
+  category: 'exterior' | 'interior';
+}
+
 export interface CaseStudy {
   id: string;
   builderId: string;
@@ -42,6 +48,8 @@ export interface CaseStudy {
   familyStructure: string;
   /** サムネ用 YouTube ID（実写真がない間の代替） */
   youtubeId: string;
+  /** 外観・内観写真（約20枚） */
+  photos: CaseStudyPhoto[];
   /** タグ（絞り込み用） */
   tags: string[];
   /** キャッチコピー */
@@ -188,6 +196,7 @@ export const caseStudies: CaseStudy[] = sourceVideos.map((v, i) => {
     totalPrice,
     familyStructure: family,
     youtubeId: v.youtubeId,
+    photos: generatePhotos(v.title, v.tsubo, layout),
     tags,
     catchphrase: inferCatchphrase(v.tsubo, family),
     description: `${v.builder}が手掛けた${v.tsubo}坪の${layout}。${family}のための平屋として、動線・収納・採光にこだわって設計されました。YouTube累計${v.views}を記録した、ぺいほーむ注目の完成事例です。`,
@@ -195,6 +204,43 @@ export const caseStudies: CaseStudy[] = sourceVideos.map((v, i) => {
     ownerComment: inferOwnerComment(family, v.tsubo),
   };
 });
+
+/**
+ * 事例写真データを生成する（MVP はプレースホルダ画像）
+ *
+ * 実運用では Supabase Storage に実写真をアップロードし、URLを参照する。
+ * 現在は SVG プレースホルダを利用。外観 8 枚 + 内観 12 枚 = 20 枚構成。
+ */
+function generatePhotos(title: string, tsubo: number, layout: string): CaseStudyPhoto[] {
+  const exteriorLabels = [
+    '外観正面', '外観全体', '外観 玄関アプローチ', '外観 庭側',
+    '外観 夕景', '外観 駐車場側', '外観 屋根', '外観 植栽',
+  ];
+  const interiorLabels = [
+    'LDK 全体', 'キッチン', 'ダイニング', 'リビング',
+    '主寝室', '洋室', 'WIC・収納', '洗面脱衣室',
+    '浴室', 'トイレ', '玄関ホール', 'ウッドデッキ',
+  ];
+
+  const photos: CaseStudyPhoto[] = [];
+
+  for (const label of exteriorLabels) {
+    photos.push({
+      src: `/api/placeholder/800/600?text=${encodeURIComponent(label + ' ' + tsubo + '坪 ' + layout)}`,
+      alt: `${title} ${label}`,
+      category: 'exterior',
+    });
+  }
+  for (const label of interiorLabels) {
+    photos.push({
+      src: `/api/placeholder/800/600?text=${encodeURIComponent(label + ' ' + tsubo + '坪 ' + layout)}`,
+      alt: `${title} ${label}`,
+      category: 'interior',
+    });
+  }
+
+  return photos;
+}
 
 // ── ヘルパー ──
 export function getCaseStudyById(id: string): CaseStudy | undefined {
