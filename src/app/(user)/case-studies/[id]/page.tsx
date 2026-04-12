@@ -110,6 +110,8 @@ export default function CaseStudyDetailPage({
 }
 
 function CaseStudyContent({ caseStudy }: { caseStudy: CaseStudy }) {
+  const { status } = useSession();
+  const isMember = status === 'authenticated';
   const builder = getBuilderById(caseStudy.builderId);
 
   // 同工務店の他事例（最大3件）
@@ -202,6 +204,98 @@ function CaseStudyContent({ caseStudy }: { caseStudy: CaseStudy }) {
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* ── 間取り図 (会員限定) ── */}
+          <div>
+            <SectionTitle>間取り図</SectionTitle>
+            <div className="relative bg-white border border-gray-200 rounded-2xl overflow-hidden">
+              {/* 間取り図 SVG (非会員はブラー) */}
+              <div
+                className={`relative aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 transition-all duration-300 ${
+                  isMember ? '' : 'blur-md scale-105'
+                }`}
+              >
+                <svg
+                  viewBox="0 0 600 450"
+                  className="w-full h-full"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  {/* 外壁 */}
+                  <rect x="40" y="40" width="520" height="370" fill="none" stroke="#3D2200" strokeWidth="3" />
+                  {/* LDK */}
+                  <rect x="40" y="40" width="300" height="220" fill="#FFF8F0" stroke="#3D2200" strokeWidth="1.5" />
+                  <text x="190" y="160" textAnchor="middle" fontSize="16" fontWeight="bold" fill="#3D2200">LDK</text>
+                  <text x="190" y="180" textAnchor="middle" fontSize="10" fill="#6B7280">{Math.round(caseStudy.buildingArea * 0.4)}㎡</text>
+                  {/* 主寝室 */}
+                  <rect x="340" y="40" width="220" height="150" fill="#FFECD4" stroke="#3D2200" strokeWidth="1.5" />
+                  <text x="450" y="120" textAnchor="middle" fontSize="14" fontWeight="bold" fill="#3D2200">主寝室</text>
+                  <text x="450" y="140" textAnchor="middle" fontSize="10" fill="#6B7280">{Math.round(caseStudy.buildingArea * 0.15)}㎡</text>
+                  {/* 子ども部屋 / 洋室 */}
+                  <rect x="340" y="190" width="110" height="120" fill="#FFF3E6" stroke="#3D2200" strokeWidth="1.5" />
+                  <text x="395" y="255" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#3D2200">洋室1</text>
+                  <rect x="450" y="190" width="110" height="120" fill="#FFF3E6" stroke="#3D2200" strokeWidth="1.5" />
+                  <text x="505" y="255" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#3D2200">洋室2</text>
+                  {/* 水回り */}
+                  <rect x="40" y="260" width="150" height="150" fill="#E8F4FD" stroke="#3D2200" strokeWidth="1.5" />
+                  <text x="115" y="340" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#3D2200">水回り</text>
+                  {/* 玄関 */}
+                  <rect x="190" y="260" width="150" height="150" fill="#F0FDF4" stroke="#3D2200" strokeWidth="1.5" />
+                  <text x="265" y="340" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#3D2200">玄関</text>
+                  {/* WIC */}
+                  <rect x="340" y="310" width="220" height="100" fill="#FAF5FF" stroke="#3D2200" strokeWidth="1.5" />
+                  <text x="450" y="365" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#3D2200">WIC・収納</text>
+                  {/* ラベル */}
+                  <text x="300" y="430" textAnchor="middle" fontSize="11" fill="#6B7280">
+                    {caseStudy.layout} / {caseStudy.tsubo}坪（{caseStudy.buildingArea}㎡）
+                  </text>
+                </svg>
+              </div>
+
+              {/* 非会員向けロックオーバーレイ */}
+              {!isMember && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-white/80 via-white/70 to-white/80 backdrop-blur-sm">
+                  <div className="bg-white rounded-2xl shadow-xl border border-[#E8740C]/20 p-6 md:p-8 max-w-sm mx-4 text-center">
+                    <div className="w-12 h-12 mx-auto mb-3 bg-[#FFF8F0] rounded-full flex items-center justify-center">
+                      <svg className="w-6 h-6 text-[#E8740C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-base font-bold text-[#3D2200] mb-2">
+                      会員登録で間取り図を閲覧
+                    </h3>
+                    <p className="text-xs text-gray-600 leading-relaxed mb-5">
+                      間取り図の詳細は、無料会員登録でご覧いただけます。
+                      寸法・収納配置・動線まで確認して、家づくりの参考にしましょう。
+                    </p>
+                    <div className="flex flex-col gap-2">
+                      <Link
+                        href={`/signup?redirect=/case-studies/${caseStudy.id}`}
+                        className="bg-[#E8740C] hover:bg-[#D4660A] text-white font-bold px-6 py-2.5 rounded-full text-sm transition shadow-md"
+                      >
+                        無料会員登録して見る →
+                      </Link>
+                      <Link
+                        href={`/login?redirect=/case-studies/${caseStudy.id}`}
+                        className="text-xs text-gray-500 hover:text-[#E8740C] transition"
+                      >
+                        すでに会員の方はログイン →
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 会員向け表示ラベル */}
+              {isMember && (
+                <div className="absolute bottom-3 left-3 bg-green-100 text-green-700 text-[10px] font-bold px-3 py-1 rounded-full">
+                  ✓ 会員限定：間取り図を閲覧中
+                </div>
+              )}
+            </div>
+            <p className="text-[10px] text-gray-400 mt-2 text-center">
+              ※ 間取り図はイメージです。実際の設計と異なる場合があります。
+            </p>
           </div>
 
           {/* ── 費用内訳 ── */}
