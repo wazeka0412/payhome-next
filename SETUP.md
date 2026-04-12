@@ -134,23 +134,27 @@ npm run dev
 
 ```
 /articles         /news               /interview
-/magazine         /webinar            /sale-homes
-/lands            /features           /simulator
+/magazine         /webinar            /simulator
 /biz/service      /biz/ad             /biz/partner
-...他 30+
+/builders/compare /mypage/questions   /mypage/feedback
+...他 20+
 ```
+
+※ `/sale-homes`, `/lands`, `/features` は 2026-04-12 以降 **公開済み** (200) です。
 
 一括検証コマンド:
 
 ```bash
-# 公開ページ
-for p in / /about /company /diagnosis /videos /builders /case-studies /event /biz; do
+# 公開ページ (200 であるべき)
+for p in / /about /company /diagnosis /consultation /quiz /videos /builders \
+         /case-studies /event /features /sale-homes /lands /signup /welcome /biz; do
   echo -n "$p → "
   curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3000$p
 done
 
 # 非公開ページ (全て 404 であるべき)
-for p in /articles /news /sale-homes /lands /features /simulator; do
+for p in /articles /news /simulator /interview /magazine /webinar \
+         /builders/compare /mypage/questions /mypage/feedback; do
   echo -n "$p → "
   curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3000$p
 done

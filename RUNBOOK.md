@@ -202,16 +202,18 @@ Vercel は **main ブランチへの push = 自動デプロイ** されます。
 
 ```bash
 # 17 公開ページ
-for p in / /about /company /privacy /terms /diagnosis /consultation \
+for p in / /about /company /privacy /terms /diagnosis /consultation /quiz \
          /catalog /videos /builders /case-studies /voice /event \
-         /login /signup /biz /biz/contact; do
+         /features /sale-homes /lands \
+         /login /signup /welcome /biz /biz/contact /mypage/catalog; do
   echo -n "$p → "
   curl -s -o /dev/null -w "%{http_code}\n" https://payhome.jp$p
 done
 
 # 非公開パス (404 必須)
-for p in /articles /news /sale-homes /lands /features /simulator \
-         /biz/service /biz/ad /biz/partner /admin/articles; do
+for p in /articles /news /simulator /interview /magazine /webinar \
+         /builders/compare /mypage/questions /mypage/feedback \
+         /biz/service /biz/ad /admin/articles; do
   echo -n "$p → "
   curl -s -o /dev/null -w "%{http_code}\n" https://payhome.jp$p
 done

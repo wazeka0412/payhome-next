@@ -13,7 +13,7 @@ import { caseStudies } from '@/lib/case-studies-data';
 
 const reviews = [
   { name: 'A様ご家族', area: '鹿児島市', text: '動画で見た平屋に一目惚れ。AI診断で同じ工務店を紹介してもらえました。動画で間取りを確認していたので、見学会もスムーズでした。' },
-  { name: 'B様ご夫婦', area: '福岡市', text: '住宅展示場を何件も回るのが大変でしたが、ぺいほーむの動画と比較機能で効率よく工務店を比較できました。' },
+  { name: 'B様ご夫婦', area: '福岡市', text: '住宅展示場を何件も回るのが大変でしたが、ぺいほーむの動画と事例ライブラリで効率よく工務店を比較できました。' },
   { name: 'C様', area: '熊本市', text: 'セカンドライフの平屋を探していました。AI診断で「シニア向けバリアフリーの平屋」とぴったりの物件を3社も紹介してくれました。' },
   { name: 'D様ご家族', area: '宮崎市', text: '初めての家づくりで不安でしたが、ぺいほーむの動画と特集で基礎知識を学べました。紹介してもらった工務店さんも親切で、大満足の家が建ちました。' },
   { name: 'E様', area: '大分市', text: '予算2,000万円台で平屋を探していましたが、ぺいほーむで理想の間取りを見つけることができました。' },
@@ -82,8 +82,8 @@ const memberBenefits = [
     desc: '物件・工務店・建売・土地を上限なくお気に入り登録できます。',
   },
   {
-    title: '工務店比較機能（最大3社）',
-    desc: '坪単価・性能・実績まで12項目で並べて比較できます。',
+    title: '平屋事例ライブラリ全件閲覧',
+    desc: '非会員は5件までの事例が、会員登録で全件閲覧可能になります。',
   },
 ];
 
@@ -173,7 +173,7 @@ export default function HomePage() {
                   <div className="text-xs opacity-80 mt-1">公開ルームツアー</div>
                 </div>
                 <div>
-                  <div className="text-2xl md:text-3xl font-extrabold font-mono">12社</div>
+                  <div className="text-2xl md:text-3xl font-extrabold font-mono">10社</div>
                   <div className="text-xs opacity-80 mt-1">提携工務店</div>
                 </div>
               </div>
@@ -226,7 +226,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-[900px] mx-auto">
             {[
               { num: 1, title: 'AI家づくり診断', desc: '10問・約2分。家族構成・予算・好みからあなたに合う工務店3社をAIが提案します。', cta: '診断する', href: '/diagnosis' },
-              { num: 2, title: '動画で比較・特集で深堀り', desc: 'プロが撮影したルームツアー動画と、エリア・サイズ別特集で気になる物件を絞り込み。', cta: '動画を見る', href: '/videos' },
+              { num: 2, title: '動画と事例で比較', desc: 'プロが撮影したルームツアー動画42本と、完成事例ライブラリで気になる工務店を絞り込み。', cta: '動画を見る', href: '/videos' },
               { num: 3, title: '見学会で実物を体感', desc: 'モデルハウス・完成見学会の予約で、動画では伝わらない広さや素材感を実体験。', cta: '見学会を予約', href: '/event' },
             ].map((step) => (
               <div key={step.num} className="bg-[#FFF8F0] rounded-2xl py-7 px-5 text-center">
@@ -407,7 +407,7 @@ export default function HomePage() {
               <h2 className="text-2xl font-bold text-[#3D2200]">提携工務店</h2>
               <p className="text-sm text-gray-500 mt-2">ぺいほーむが取材した実力派工務店</p>
             </div>
-            <Link href="/builders" className="hidden md:block text-sm text-[#E8740C] font-bold hover:underline">12社すべて見る →</Link>
+            <Link href="/builders" className="hidden md:block text-sm text-[#E8740C] font-bold hover:underline">10社すべて見る →</Link>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {topBuilders.map((b) => (
@@ -508,7 +508,7 @@ export default function HomePage() {
           <p className="text-sm md:text-base opacity-95 leading-relaxed mb-8 max-w-2xl mx-auto">
             10問・約2分の診断で、あなたの家づくりタイプを判定し、相性の良い工務店3社をご提案します。
             <br className="hidden md:block" />
-            会員登録でデジタルカタログ（施工事例集＋間取り図集）を無料プレゼント中。
+            会員登録で、AI診断結果の保存・お気に入り整理・事例全件閲覧など家づくりが一気に進みます。
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link

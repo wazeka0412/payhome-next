@@ -10,7 +10,7 @@ import { localFindOne, localInsert, localUpdate } from '@/lib/local-store'
  * Body:
  *   - email: string (required)
  *   - name?: string
- *   - password?: string (min 4 chars; defaults to email if omitted)
+ *   - password?: string (min 8 chars; defaults to email if omitted)
  *   - anonymous_id?: string (to merge existing anonymous activity)
  *
  * Response:
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     const effectivePassword = password || email.split('@')[0]
-    if (effectivePassword.length < 4) {
+    if (effectivePassword.length < 8) {
       return Response.json({ error: 'password_too_short' }, { status: 400 })
     }
 

@@ -28,8 +28,8 @@ function SignupForm() {
       return
     }
 
-    if (password.length < 4) {
-      setError('パスワードは4文字以上で入力してください')
+    if (password.length < 8) {
+      setError('パスワードは8文字以上で入力してください')
       return
     }
 
@@ -173,13 +173,13 @@ function SignupForm() {
               id="password"
               type="password"
               required
-              minLength={4}
+              minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="4文字以上"
+              placeholder="8文字以上"
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#E8740C]/30 focus:border-[#E8740C]"
             />
-            <p className="text-xs text-gray-500 mt-1">4文字以上で設定してください</p>
+            <p className="text-xs text-gray-500 mt-1">8文字以上で設定してください</p>
           </div>
 
           <div>
