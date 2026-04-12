@@ -8,15 +8,20 @@ import PageHeader from '@/components/ui/PageHeader';
 import { getOrCreateAnonymousId } from '@/lib/anonymous-id';
 
 /**
- * 会員登録完了後のウェルカム画面
- * REQUIREMENTS.md §F-07-new に従い「登録完了後、診断結果に基づく工務店3社を提示」
- * を実現するための着地点。
+ * /welcome — 会員登録完了直後の最重要ページ (MVP v2 - 2026-05-01)
  *
- * 動作:
- *  1. ログイン済みであることを前提とする
- *  2. localStorage の最新診断結果（diagnosis_result）を確認
- *  3. ある場合 → 推薦工務店3社をハイライト + 次のアクション
- *  4. ない場合 → AI診断を促す + 主要動線を提示
+ * 役割:
+ *   1. 登録完了を歓迎する
+ *   2. 診断結果 3 社を目立たせる (診断済みの場合)
+ *   3. 次の行動を 1 つだけ明示する (見学会予約 or 無料相談 or AI診断)
+ *   4. カタログは補助特典として折りたたみ
+ *
+ * 設計思想:
+ *   /welcome は「ここから家づくりが始まる」起点。
+ *   ユーザー状態に応じて主CTA を出し分ける。
+ *
+ *   - 診断済み + 推薦あり → 主CTA = 見学会予約 (/event?builder=...)
+ *   - 診断未実施         → 主CTA = AI診断 (/diagnosis)
  */
 type Recommendation = {
   id: string;
@@ -37,14 +42,12 @@ export default function WelcomePage() {
   const [diagnosis, setDiagnosis] = useState<DiagnosisCache | null>(null);
 
   useEffect(() => {
-    // ① まず localStorage から即座に表示
     try {
       const raw = localStorage.getItem('payhome_diagnosis_result');
       if (raw) setDiagnosis(JSON.parse(raw) as DiagnosisCache);
     } catch {
       /* ignore */
     }
-    // ② 同時に API からサーバ側保存の最新を取得（会員ログイン後の信頼できるデータ）
     const anonymousId = getOrCreateAnonymousId();
     fetch(`/api/ai/diagnosis/me?anonymous_id=${anonymousId}`)
       .then((r) => r.json())
@@ -60,7 +63,6 @@ export default function WelcomePage() {
       .catch(() => {});
   }, []);
 
-  // 未ログインなら /signup へ誘導
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.replace('/signup');
@@ -80,6 +82,10 @@ export default function WelcomePage() {
     (session?.user as { email?: string | null } | undefined)?.email?.split('@')[0] ||
     'ゲスト';
 
+  const hasRecommendations = !!(
+    diagnosis && diagnosis.recommended_builders && diagnosis.recommended_builders.length > 0
+  );
+
   return (
     <>
       <PageHeader
@@ -91,6 +97,7 @@ export default function WelcomePage() {
         subtitle={`${userName} さん、登録ありがとうございます`}
       />
 
+      {/* ── Hero: 登録完了 + 次の1歩 ── */}
       <div className="bg-gradient-to-br from-[#FFF8F0] via-[#FFF3E6] to-[#FFECD4]">
         <div className="max-w-4xl mx-auto px-4 py-12 md:py-16">
           <div className="bg-white rounded-3xl shadow-lg p-8 md:p-12 text-center">
@@ -103,9 +110,13 @@ export default function WelcomePage() {
             <h1 className="text-2xl md:text-3xl font-extrabold text-[#3D2200] mb-3 leading-relaxed">
               ようこそ、{userName} さん
             </h1>
-            <p className="text-sm text-gray-600 leading-relaxed max-w-xl mx-auto">
-              ぺいほーむでは「動画でしっかり比較 → 実物を体感 → 工務店と直接相談」の流れで、
-              あなたの理想の家づくりをサポートします。
+            <p className="text-sm text-gray-600 leading-relaxed max-w-xl mx-auto mb-2">
+              これからぺいほーむで、
+              <span className="font-bold text-[#3D2200]">動画で比較 → 工務店を知る → 実物を体感</span>
+              の順で、あなたの家づくりを一緒に進めていきます。
+            </p>
+            <p className="text-xs text-gray-500">
+              登録前の閲覧履歴・お気に入り・AI診断結果はすべてこのアカウントに引き継がれています。
             </p>
           </div>
         </div>
@@ -113,132 +124,158 @@ export default function WelcomePage() {
 
       <section className="py-12 md:py-16">
         <div className="max-w-5xl mx-auto px-4 space-y-12">
-          {/* ── デジタルカタログ受け取りプロモ ── */}
-          <div className={`relative overflow-hidden rounded-3xl text-white p-8 md:p-10 shadow-xl ${
-            diagnosis ? 'bg-gradient-to-br from-[#3D2200] via-[#8B4513] to-[#3D2200]' : 'bg-gradient-to-br from-[#E8740C] via-[#F5A623] to-[#E8740C]'
-          }`}>
-            <p className="text-[10px] font-bold tracking-widest text-yellow-300 mb-2">
-              OPENING CAMPAIGN
-            </p>
-            <h2 className="text-2xl md:text-3xl font-extrabold mb-3 leading-tight">
-              {diagnosis
-                ? 'デジタルカタログを受け取れます'
-                : 'AI診断完了でデジタルカタログ進呈'}
-            </h2>
-            <p className="text-sm md:text-base text-white/95 leading-relaxed mb-6 max-w-2xl">
-              ぺいほーむ住宅ポータルサイト開設記念キャンペーン。
-              <br />
-              <span className="font-bold">施工事例集 30邸</span>と
-              <span className="font-bold">平屋間取り図集 30プラン</span>のデジタルカタログを
-              {diagnosis ? '今すぐマイページから' : 'AI家づくり診断完了後にマイページから'}
-              ご覧いただけます。
-            </p>
-            <Link
-              href={diagnosis ? '/mypage/catalog' : '/diagnosis'}
-              className="inline-flex items-center gap-2 bg-white text-[#E8740C] font-bold px-8 py-3.5 rounded-full text-sm hover:bg-gray-50 transition shadow-lg"
-            >
-              {diagnosis
-                ? 'カタログ受け取り画面へ →'
-                : 'AI診断をはじめる（カタログ進呈）→'}
-            </Link>
-          </div>
-
-          {/* ── 診断結果がある場合：推薦工務店3社 ── */}
-          {diagnosis && diagnosis.recommended_builders?.length > 0 ? (
+          {/* ═══════════════════════════════════════ */}
+          {/* 主ブロック: 診断結果3社 または 診断促進 */}
+          {/* ═══════════════════════════════════════ */}
+          {hasRecommendations ? (
             <div>
-              <SectionTitle>あなたにおすすめの工務店</SectionTitle>
+              <SectionTitle>あなたにおすすめの工務店 3社</SectionTitle>
               <p className="text-sm text-gray-600 mb-6">
-                先ほどの診断結果に基づき、{diagnosis.recommended_builders.length}社をご提案します。マイページに保存済みです。
+                先ほどの診断結果に基づき、相性の良い工務店を
+                {diagnosis!.recommended_builders.length}社ご提案します。診断結果はマイページに保存済みです。
               </p>
               <div className="space-y-4">
-                {diagnosis.recommended_builders.map((b, idx) => (
+                {diagnosis!.recommended_builders.map((b, idx) => (
                   <div
                     key={b.id}
                     className="bg-white border border-gray-100 rounded-2xl p-6 hover:shadow-md transition"
                   >
                     <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-[#E8740C] text-white rounded-full flex items-center justify-center font-extrabold">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 bg-[#E8740C] text-white rounded-full flex items-center justify-center font-extrabold shrink-0">
                           {idx + 1}
                         </div>
-                        <div>
-                          <h3 className="font-bold text-[#3D2200] text-lg">{b.name}</h3>
+                        <div className="min-w-0">
+                          <h3 className="font-bold text-[#3D2200] text-lg truncate">{b.name}</h3>
                           <p className="text-xs text-gray-500">{b.area}</p>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right shrink-0">
                         <div className="text-xl font-extrabold text-[#E8740C]">{b.score}</div>
                         <div className="text-[10px] text-gray-500">マッチ度</div>
                       </div>
                     </div>
-                    <p className="text-xs text-gray-600 bg-[#FFF8F0] rounded-lg p-3 mb-3">{b.reason}</p>
-                    <div className="flex gap-2">
-                      <Link
-                        href={`/builders/${b.id}`}
-                        className="flex-1 bg-[#E8740C] text-white text-center text-xs font-bold py-2.5 rounded-full hover:bg-[#D4660A] transition"
-                      >
-                        工務店ページへ
-                      </Link>
+                    <p className="text-xs text-gray-600 bg-[#FFF8F0] rounded-lg p-3 mb-3">
+                      {b.reason}
+                    </p>
+                    {/* MVP v2: 次の 1 歩を絞る — 主CTA=見学会予約、副CTA=詳細 */}
+                    <div className="grid grid-cols-3 gap-2">
                       <Link
                         href={`/event?builder=${encodeURIComponent(b.name)}`}
-                        className="flex-1 border border-[#E8740C] text-[#E8740C] text-center text-xs font-bold py-2.5 rounded-full hover:bg-[#FFF8F0] transition"
+                        className="col-span-2 text-center bg-[#E8740C] text-white text-sm font-bold py-3 rounded-full hover:bg-[#D4660A] transition shadow-[0_2px_8px_rgba(232,116,12,0.3)]"
                       >
-                        見学会予約
+                        見学会を予約する
+                      </Link>
+                      <Link
+                        href={`/builders/${b.id}`}
+                        className="text-center border border-[#E8740C] text-[#E8740C] text-xs font-bold py-3 rounded-full hover:bg-[#FFF8F0] transition"
+                      >
+                        工務店を見る
                       </Link>
                     </div>
                   </div>
                 ))}
               </div>
+              {/* 迷っている人への副導線 */}
+              <div className="mt-8 bg-[#FFF8F0] border border-[#E8740C]/20 rounded-2xl p-6 text-center">
+                <p className="text-sm font-bold text-[#3D2200] mb-2">
+                  まだ決められない時は
+                </p>
+                <p className="text-xs text-gray-600 mb-4">
+                  ぺいほーむの専門スタッフが、診断結果を踏まえてご相談を承ります。連絡条件も事前にお伝えできます。
+                </p>
+                <Link
+                  href="/consultation"
+                  className="inline-block border-2 border-[#E8740C] text-[#E8740C] font-bold px-6 py-2.5 rounded-full text-xs hover:bg-white transition"
+                >
+                  無料住宅相談を申し込む →
+                </Link>
+              </div>
             </div>
           ) : (
-            /* ── 診断未実施：診断を促す ── */
-            <div className="bg-[#E8740C] text-white rounded-2xl p-8 md:p-12 shadow-xl text-center">
+            /* ── 診断未実施: 主CTA = 診断開始 ── */
+            <div className="bg-[#E8740C] text-white rounded-3xl p-8 md:p-12 shadow-xl text-center">
               <p className="text-xs font-bold tracking-wider mb-2 opacity-90">FIRST STEP</p>
-              <h2 className="text-2xl md:text-3xl font-bold mb-3">
-                まずはAI家づくり診断（約2分）
+              <h2 className="text-2xl md:text-3xl font-extrabold mb-3 leading-tight">
+                まずはAI家づくり診断
+                <span className="block text-base md:text-lg font-bold opacity-90 mt-2">
+                  (約2分・10問)
+                </span>
               </h2>
-              <p className="text-sm md:text-base text-white/95 mb-6 max-w-xl mx-auto">
-                10問に答えるだけで、あなたの家づくりタイプを判定し、相性の良い工務店3社をご提案します。
+              <p className="text-sm md:text-base text-white/95 mb-6 max-w-xl mx-auto leading-relaxed">
+                10問に答えるだけで、あなたの家づくりタイプを判定し、
+                <br className="hidden md:block" />
+                相性の良い工務店3社をご提案します。結果は自動で保存されます。
               </p>
               <Link
                 href="/diagnosis"
-                className="inline-block bg-white text-[#E8740C] font-bold px-8 py-3.5 rounded-full text-sm hover:bg-gray-50 transition shadow-lg"
+                className="inline-block bg-white text-[#E8740C] font-extrabold px-10 py-4 rounded-full text-sm hover:bg-gray-50 transition shadow-lg"
               >
                 AI家づくり診断をはじめる →
               </Link>
             </div>
           )}
 
-          {/* ── 主要動線：4枚カード ── */}
+          {/* ═══════════════════════════════════════ */}
+          {/* 副ブロック: 会員で使える主機能 3 つ    */}
+          {/* ═══════════════════════════════════════ */}
           <div>
-            <SectionTitle>会員でできること</SectionTitle>
-            <div className="grid md:grid-cols-2 gap-4">
+            <SectionTitle>会員機能で家づくりを進める</SectionTitle>
+            <div className="grid md:grid-cols-3 gap-4">
               <NextStepCard
-                title="動画コンテンツを見る"
-                description="ぺいほーむが取材した平屋ルームツアー42本"
+                emoji="🎬"
+                title="動画で比較"
+                description="平屋ルームツアー42本から、気になる家を見つけてお気に入り保存"
                 href="/videos"
-                cta="動画を見る"
+                cta="動画一覧へ"
               />
               <NextStepCard
-                title="工務店を比較する"
-                description="エリア・価格帯・特徴で12社を絞り込み検索"
-                href="/builders"
-                cta="工務店一覧へ"
+                emoji="🏠"
+                title="事例を全件閲覧"
+                description="非会員は5件までの事例ライブラリが全件閲覧可能に"
+                href="/case-studies"
+                cta="事例一覧へ"
               />
               <NextStepCard
-                title="販売中の建売を見る"
-                description="提携工務店の分譲戸建を価格・間取りで検索"
-                href="/sale-homes"
-                cta="建売情報へ"
-              />
-              <NextStepCard
-                title="土地情報を見る"
-                description="工務店プランと組み合わせ可能な提携土地"
-                href="/lands"
-                cta="土地情報へ"
+                emoji="💬"
+                title="連絡条件を設定"
+                description="連絡頻度・時間帯・手段を事前に登録し、Smart Match で工務店とつながる"
+                href="/mypage/contact-preferences"
+                cta="連絡条件を設定"
               />
             </div>
           </div>
+
+          {/* ═══════════════════════════════════════ */}
+          {/* 補助特典: デジタルカタログ (折りたたみ) */}
+          {/* ═══════════════════════════════════════ */}
+          <details className="bg-white border border-[#E8740C]/20 rounded-2xl p-6 group">
+            <summary className="cursor-pointer flex items-center justify-between text-sm font-bold text-[#3D2200] list-none">
+              <span className="flex items-center gap-2">
+                <span className="text-xs bg-[#E8740C] text-white font-bold px-2 py-0.5 rounded-full">
+                  BONUS
+                </span>
+                開設記念: デジタルカタログ2冊を進呈
+              </span>
+              <span className="text-[#E8740C] group-open:rotate-180 transition">▼</span>
+            </summary>
+            <div className="mt-4 text-xs text-gray-600 leading-relaxed">
+              <p className="mb-3">
+                ぺいほーむ住宅ポータルサイト開設記念として、AI家づくり診断を完了された会員様に
+                デジタルカタログを進呈しています。
+              </p>
+              <ul className="space-y-1.5 text-[#3D2200] font-semibold mb-4">
+                <li>・施工事例集 30邸 (累計1,000万再生から厳選)</li>
+                <li>・平屋間取り図集 30プラン (17坪〜50坪)</li>
+              </ul>
+              <Link
+                href={diagnosis ? '/mypage/catalog' : '/diagnosis'}
+                className="inline-block bg-[#E8740C] text-white font-bold px-5 py-2 rounded-full text-xs hover:bg-[#D4660A] transition"
+              >
+                {diagnosis ? 'カタログを受け取る →' : 'AI診断をはじめる →'}
+              </Link>
+            </div>
+          </details>
 
           {/* ── マイページへの導線 ── */}
           <div className="text-center pt-4">
@@ -246,7 +283,7 @@ export default function WelcomePage() {
               href="/mypage"
               className="inline-flex items-center gap-2 text-sm text-[#E8740C] font-bold hover:underline"
             >
-              マイページへ →
+              マイページを開く →
             </Link>
           </div>
         </div>
@@ -265,11 +302,13 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 }
 
 function NextStepCard({
+  emoji,
   title,
   description,
   href,
   cta,
 }: {
+  emoji: string;
   title: string;
   description: string;
   href: string;
@@ -280,6 +319,9 @@ function NextStepCard({
       href={href}
       className="block bg-white border border-gray-100 rounded-2xl p-6 hover:shadow-md hover:border-[#E8740C]/30 transition"
     >
+      <div className="text-3xl mb-3" aria-hidden>
+        {emoji}
+      </div>
       <h3 className="text-base font-bold text-[#3D2200] mb-2">{title}</h3>
       <p className="text-xs text-gray-500 leading-relaxed mb-4">{description}</p>
       <span className="text-xs font-bold text-[#E8740C]">{cta} →</span>

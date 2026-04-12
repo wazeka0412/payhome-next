@@ -24,16 +24,19 @@ const HIDDEN_PATH_PREFIXES: readonly string[] = [
   '/interview',
   '/magazine',
   '/webinar',
-  '/sale-homes',
-  '/lands',
-  '/features',
+  // 2026-04-12 スコープ再拡張: /sale-homes, /lands, /features を P1 で公開
+  // '/sale-homes',
+  // '/lands',
+  // '/features',
   '/simulator',
   '/area',
-  '/welcome',
+  // 2026-04-12 修正: /welcome は会員登録完了後のリダイレクト先のため公開
+  // '/welcome',
   '/property',
   '/builders/compare',
   '/builders/contact',
-  '/mypage/catalog',
+  // 2026-04-12 修正: /mypage/catalog は会員向けデジタルカタログ受け取り画面のため公開
+  // '/mypage/catalog',
   '/mypage/questions',
   '/mypage/feedback',
   // ── B2B 側 (TOP と /biz/contact のみ残す) ──

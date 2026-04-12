@@ -75,13 +75,13 @@ export default function CaseStudyDetailPage({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
-            <p className="text-[10px] font-bold text-[#E8740C] tracking-widest mb-2">MEMBERS ONLY</p>
+            <p className="text-[10px] font-bold text-[#E8740C] tracking-widest mb-2">MEMBER REGISTRATION</p>
             <h1 className="text-2xl font-extrabold text-[#3D2200] mb-3 leading-tight">
-              この事例は会員限定です
+              会員登録で、家づくりが一気に進みます
             </h1>
             <p className="text-sm text-gray-600 leading-relaxed mb-6">
-              非会員の方は新着{FREE_VIEW_LIMIT}件までの完成事例を閲覧できます。
-              6件目以降の事例の詳細をご覧いただくには無料会員登録が必要です。
+              事例ライブラリ全件閲覧・間取り図フル解像度・お気に入り保存・AI診断結果の保存まで全て無料です。
+              (非会員は新着{FREE_VIEW_LIMIT}件まで閲覧可)
             </p>
             <div className="flex flex-col gap-2">
               <Link

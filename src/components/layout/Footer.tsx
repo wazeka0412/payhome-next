@@ -18,12 +18,20 @@ import {
  */
 const FOOTER_COLUMNS = [
   {
-    heading: 'さがす',
+    heading: 'さがす (核ループ)',
     links: [
       { href: '/videos', label: '動画コンテンツ' },
-      { href: '/builders', label: '工務店一覧' },
       { href: '/case-studies', label: '平屋事例ライブラリ' },
+      { href: '/builders', label: '工務店一覧' },
       { href: '/event', label: '見学会・イベント' },
+    ],
+  },
+  {
+    heading: 'その他のページ',
+    links: [
+      { href: '/features', label: '特集一覧' },
+      { href: '/sale-homes', label: '分譲住宅' },
+      { href: '/lands', label: '土地情報' },
     ],
   },
   {

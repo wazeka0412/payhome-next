@@ -12,9 +12,6 @@ Disallow: /news
 Disallow: /interview
 Disallow: /magazine
 Disallow: /webinar
-Disallow: /sale-homes
-Disallow: /lands
-Disallow: /features
 Disallow: /simulator
 Disallow: /area
 Disallow: /welcome
