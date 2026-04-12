@@ -1,8 +1,26 @@
 # MVP 実装仕様書（2026-05-01 リリース版）
 
 最終更新: 2026-04-12
-対応コミット: MVP スコープ縮小完了
-対象ブランチ: `main`
+対応コミット: MVP スコープ縮小 + v2 方針反映
+対象ブランチ: `release/mvp-2026-05`
+
+## リリース時の核ループ (最重要)
+
+ぺいほーむは「平屋づくりの意思決定プラットフォーム」です。
+
+```
+YouTube視聴 → AI診断 or 無料相談 → 工務店詳細 → 見学会予約
+```
+
+このループを最優先にし、他のページ・機能はこの導線を邪魔しないように整理しています。
+
+## 2026-04-12 方針変更 (v2)
+
+- **資料請求は主役から外す** (工務店ヒアリングで質が低いと判明)。補助導線のみ。
+- **会員登録の訴求を「カタログ中心」から「家づくりが進む」に変更**
+- **/welcome を会員登録直後の最重要ページとして再設計** (診断結果3社 + 次の行動に集中)
+- **特集 / 分譲住宅 / 土地情報 は MVP で主役から外す** (公開は継続、グローバルナビは「さがす」4項目に集約)
+- **成果報酬 3% の付加価値明示** (比較整理 / 事前教育 / 診断マッチング / 連絡条件整理 / ナーチャリング)
 
 ---
 
@@ -23,34 +41,50 @@ MVP 期間は既存の `middleware.ts` を維持し、Phase 2 初頭にまとめ
 
 ---
 
-## 2. 公開中の画面一覧（MVP 17画面）
+## 2. 公開中の画面一覧（MVP v2）
+
+### A. 主導線 (核ループ・リリース時に前面に出すページ)
 
 | カテゴリ | パス | 役割 |
 | --- | --- | --- |
-| トップ | `/` | ヒーロー + AI診断CTA + 動画PICKUP + 使い方3ステップ + 工務店PICKUP + 会員特典 |
-| サービス紹介 | `/about` | ぺいほーむとは |
-| 会社情報 | `/company` | 運営会社 株式会社wazeka |
-| 法務 | `/privacy`, `/terms` | プライバシーポリシー/利用規約 |
-| AI診断 | `/diagnosis` | 10問のAI家づくり診断 |
-| 無料相談 | `/consultation` | 住宅相談フォーム |
+| トップ | `/` | ヒーロー + 動画PICKUP + 事例PICKUP + 工務店PICKUP + 会員訴求 (家づくり支援) + AI診断最終CTA |
+| AI診断 | `/diagnosis` | 10問のAI家づくり診断 (主要入口) |
 | 動画 | `/videos`, `/videos/[id]` | ルームツアー動画一覧と詳細 |
 | 工務店 | `/builders`, `/builders/[id]` | 工務店一覧と詳細ページ |
-| 事例 | `/case-studies` | 平屋事例ライブラリ |
-| お客様の声 | `/voice` | レビュー一覧 |
+| 事例 | `/case-studies`, `/case-studies/[id]` | 平屋事例ライブラリ (非会員5件まで) |
 | 見学会 | `/event`, `/event/[id]`, `/event/[id]/thanks` | 見学会一覧・詳細・予約完了 |
-| カタログ | `/catalog` | デジタルカタログ |
+| 無料相談 | `/consultation` | 住宅相談フォーム (成果報酬3% の主要入口) |
+
+### B. 補助導線 (公開はするがグローバルナビ主役から外す)
+
+| カテゴリ | パス | 役割 |
+| --- | --- | --- |
+| 特集 | `/features`, `/features/[id]` | テーマ別特集。直URL・フッター・工務店詳細経由で到達 |
+| 分譲住宅 | `/sale-homes`, `/sale-homes/[id]` | 販売中の分譲戸建。フッター経由で到達 |
+| 土地情報 | `/lands`, `/lands/[id]` | 取扱中の土地。フッター経由で到達 |
+
+### C. 情報ページ
+
+| カテゴリ | パス | 役割 |
+| --- | --- | --- |
+| サービス紹介 | `/about` | ぺいほーむとは |
+| 会社情報 | `/company` | 運営会社 株式会社wazeka |
+| 法務 | `/privacy`, `/terms` | プライバシーポリシー / 利用規約 |
+| お客様の声 | `/voice` | レビュー一覧 |
+| カタログ | `/catalog` | デジタルカタログ一覧 |
 | 認証 | `/login`, `/signup` | メール・Google 認証 |
-| B2B | `/biz` | 工務店向けTOP |
-| B2B問合せ | `/biz/contact` | 資料請求/問合せフォーム |
+| 会員ようこそ | `/welcome` | **会員登録直後の最重要ページ (診断結果3社 + 次の行動)** |
+| B2B | `/biz`, `/biz/contact` | 工務店向けTOP + 問合せフォーム |
 
-### 認証後の画面
+### D. 認証後の画面 (会員限定)
 
-- `/mypage` — マイページTOP（お気に入り、診断履歴、相談履歴、連絡希望設定）
-- `/mypage/favorites` — お気に入り工務店
-- `/mypage/contact-preferences` — 連絡希望プロファイル
+- `/mypage` — マイページTOP
+- `/mypage/favorites` — お気に入り (物件/工務店/建売/土地/事例)
+- `/mypage/contact-preferences` — 連絡希望プロファイル (Smart Match)
+- `/mypage/catalog`, `/mypage/catalog/[id]` — デジタルカタログ受け取り (会員 + AI診断完了が条件)
 - `/dashboard/user/*` — ユーザーダッシュボード
-- `/dashboard/builder` — 工務店ダッシュボード（4画面のみ）
-- `/admin/dashboard`, `/admin/leads`, `/admin/builders`, `/admin/events` — 管理画面（4画面のみ）
+- `/dashboard/builder` — 工務店ダッシュボード (4画面のみ)
+- `/admin/dashboard`, `/admin/leads`, `/admin/builders`, `/admin/events` — 管理画面 (4画面のみ)
 
 ---
 
@@ -63,11 +97,13 @@ MVP 期間は既存の `middleware.ts` を維持し、Phase 2 初頭にまとめ
 
 ```
 /articles, /news, /interview, /magazine, /webinar
-/sale-homes, /lands, /features, /simulator
-/area, /welcome, /property
+/simulator, /area, /property
 /builders/compare, /builders/contact
-/mypage/catalog, /mypage/questions, /mypage/feedback
+/mypage/questions, /mypage/feedback
 ```
+
+※ 2026-04-12 更新: `/welcome` と `/mypage/catalog` は会員動線で必須のため公開に復旧。
+※ `/sale-homes`, `/lands`, `/features` は Phase 1 で公開対象だが、グローバルナビから外して補助導線化。
 
 ### B2B 側
 
