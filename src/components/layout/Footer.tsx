@@ -18,7 +18,7 @@ import {
  */
 const FOOTER_COLUMNS = [
   {
-    heading: 'さがす (核ループ)',
+    heading: 'さがす',
     links: [
       { href: '/videos', label: '動画コンテンツ' },
       { href: '/case-studies', label: '平屋事例ライブラリ' },
