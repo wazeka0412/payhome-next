@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
@@ -12,7 +12,15 @@ const SATISFACTION_OPTIONS = [
   { value: '1', label: '😞 不満' },
 ]
 
-export default function PostVisitSurveyPage() {
+export default function PostVisitSurveyPageWrapper() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-400">読み込み中...</div>}>
+      <PostVisitSurveyPage />
+    </Suspense>
+  )
+}
+
+function PostVisitSurveyPage() {
   const params = useSearchParams()
   const eventId = params.get('event_id') || ''
   const builderName = params.get('builder') || ''

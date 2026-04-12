@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
@@ -27,7 +27,15 @@ const VISIT_INTEREST_OPTIONS = [
   { value: 'equipment', label: '設備・性能' },
 ]
 
-export default function PostBookingSurveyPage() {
+export default function PostBookingSurveyPageWrapper() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-400">読み込み中...</div>}>
+      <PostBookingSurveyPage />
+    </Suspense>
+  )
+}
+
+function PostBookingSurveyPage() {
   const params = useSearchParams()
   const eventId = params.get('event_id') || ''
   const builderName = params.get('builder') || ''
