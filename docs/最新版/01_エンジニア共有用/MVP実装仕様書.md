@@ -49,6 +49,7 @@ MVP 期間は既存の `middleware.ts` を維持し、Phase 2 初頭にまとめ
 | --- | --- | --- |
 | トップ | `/` | ヒーロー + 動画PICKUP + 事例PICKUP + 工務店PICKUP + 会員訴求 (家づくり支援) + AI診断最終CTA |
 | AI診断 | `/diagnosis` | 10問のAI家づくり診断 (主要入口) |
+| クイズ | `/quiz` | 家づくり理解度チェック 10問 (教育導線 → 核ループへ合流) |
 | 動画 | `/videos`, `/videos/[id]` | ルームツアー動画一覧と詳細 |
 | 工務店 | `/builders`, `/builders/[id]` | 工務店一覧と詳細ページ |
 | 事例 | `/case-studies`, `/case-studies/[id]` | 平屋事例ライブラリ (非会員5件まで) |

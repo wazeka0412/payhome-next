@@ -221,7 +221,7 @@ export default function WelcomePage() {
           {/* ═══════════════════════════════════════ */}
           <div>
             <SectionTitle>会員機能で家づくりを進める</SectionTitle>
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-2 gap-4">
               <NextStepCard
                 emoji="🎬"
                 title="動画で比較"
@@ -235,6 +235,13 @@ export default function WelcomePage() {
                 description="非会員は5件までの事例ライブラリが全件閲覧可能に"
                 href="/case-studies"
                 cta="事例一覧へ"
+              />
+              <NextStepCard
+                emoji="📝"
+                title="家づくり理解度をチェック"
+                description="10問のクイズで知識レベルを判定。苦手カテゴリも分かります"
+                href="/quiz"
+                cta="クイズを受ける"
               />
               <NextStepCard
                 emoji="💬"

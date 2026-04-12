@@ -37,6 +37,7 @@ const NAV_CONTENT = [
     label: 'サービス',
     items: [
       { href: '/diagnosis', label: 'AI家づくり診断', desc: '10問で自分に合う家を提案' },
+      { href: '/quiz', label: 'ぺいほーむクイズ', desc: '家づくり理解度をチェック' },
       { href: '/consultation', label: '無料住宅相談', desc: '専門スタッフに相談' },
     ],
   },
