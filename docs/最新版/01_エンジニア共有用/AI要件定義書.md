@@ -40,20 +40,20 @@
 | 機能 | Phase | 現時点の実装 |
 | --- | --- | --- |
 | 診断レコメンドの精度向上 (LLM 判定) | Phase 2 | 未実装（ルールベースから差し替え） |
-| **`lead_source` tracking (成果報酬対象の識別)** | **Phase 3** | **未実装 — `leads` テーブルに `lead_source` カラム追加 + 無料相談/AI診断/会員登録フローでの自動記録** |
+| **`lead_source` tracking (成約報酬対象の識別)** | **Phase 3** | **未実装 — `leads` テーブルに `lead_source` カラム追加 + 無料相談/AI診断/会員登録フローでの自動記録** |
 | 匿名AI仲介質問（ユーザー→工務店） | Phase 4 | API のみ存在 `src/app/api/builders/questions/route.ts` |
 | 月次レポート自動集計 | Phase 4 | API ルート未作成（`/api/reports/monthly/*`） |
 | 工務店ダッシュボードの AI Q&A | Phase 4 | UI のみ `src/app/dashboard/builder/questions/page.tsx`（中身は API 未結線） |
 
-### 3.3 成果報酬の対象判定ロジック (Phase 3 導入)
+### 3.3 成約報酬の対象判定ロジック (Phase 3 導入)
 
-料金モデル v2 では成果報酬 3% が以下の条件で発生する:
+料金モデル v2 では成約報酬 一律50万円が以下の条件で発生する:
 
-| 対象 | `lead_source` | 成果報酬 |
+| 対象 | `lead_source` | 成約報酬 |
 | --- | --- | --- |
-| 無料相談経由 (`/consultation`) | `consultation` | ✅ 3% |
-| AI 診断経由 (`/diagnosis`) | `diagnosis` | ✅ 3% |
-| 会員登録済みユーザーの成約 | `member` | ✅ 3% |
+| 無料相談経由 (`/consultation`) | `consultation` | ✅ 50万円 |
+| AI 診断経由 (`/diagnosis`) | `diagnosis` | ✅ 50万円 |
+| 会員登録済みユーザーの成約 | `member` | ✅ 50万円 |
 | 非会員の直接問合せ | `direct` | ❌ なし |
 
 #### 実装要件
@@ -69,11 +69,11 @@
    - ログイン済みユーザーからの任意のリード: `lead_source = 'member'`
    - 匿名ユーザーからの直接問合せ: `lead_source = 'direct'`
 
-3. **成約報告フローと成果報酬集計**:
+3. **成約報告フローと成約報酬集計**:
    - 工務店ダッシュボードに「成約報告」フォームを実装
    - `leads` レコードに `contract_signed_at` / `contract_amount` を追記
    - 月次で `lead_source IN ('consultation','diagnosis','member')` の成約を集計
-   - 成果報酬 = `契約額 × 0.03` (上限なし)
+   - 成約報酬 = 一律 ¥500,000/件
 
 ## 4. 機能要件
 

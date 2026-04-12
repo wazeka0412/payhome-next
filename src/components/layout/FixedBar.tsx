@@ -9,7 +9,7 @@ import { LINE_URL } from '@/lib/constants';
  * 固定追従バー (MVP v2 仕様)
  *
  * 優先順位:
- *   1. 無料相談 (成果報酬 3% の主要入口。最も目立たせる)
+ *   1. 無料相談 (成約報酬の主要入口。最も目立たせる)
  *   2. AI家づくり診断 (10問。会員登録誘導)
  *   3. 見学会予約 (¥50,000/件 の課金入口)
  *   4. LINE 相談 (ライトな入口)
@@ -88,7 +88,7 @@ export default function FixedBar() {
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            {/* Primary: 無料相談 (成果報酬3%の主要入口) */}
+            {/* Primary: 無料相談 (成約報酬の主要入口) */}
             <Link
               href="/consultation"
               className="bg-[#E8740C] text-white text-sm font-bold px-5 py-2.5 rounded-full hover:bg-[#D4660A] transition-colors shadow-[0_2px_8px_rgba(232,116,12,0.3)] flex items-center gap-1.5"
