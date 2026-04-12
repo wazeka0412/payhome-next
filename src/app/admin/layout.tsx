@@ -17,6 +17,7 @@ const NAV_ITEMS: Array<{ href: string; icon: string; label: string }> = [
   { href: '/admin/leads', icon: '👥', label: 'リード管理' },
   { href: '/admin/builders', icon: '🏗', label: '工務店管理' },
   { href: '/admin/events', icon: '📅', label: '見学会管理' },
+  { href: '/admin/reports', icon: '📈', label: '月次レポート' },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
